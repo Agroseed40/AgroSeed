@@ -1,4 +1,4 @@
-# AgroSeed one-go build: delivery and remaining work
+﻿# AgroSeed one-go build: delivery and remaining work
 
 As of 9 November 2026, the task backlog records **44 complete, 8 in progress, 21 waiting on client inputs or external services, and 0 not started**. Complete means the preview-level behavior is implemented or a required decision is recorded; in-progress items are being actively worked; waiting items need production backing or client-approved content.
 
@@ -25,7 +25,7 @@ These items need client decisions, external accounts, or a production backend. T
 | AS-003 to AS-006 | Approve delivery/returns/COD rules, catalog and bilingual product content, provider/account ownership, and staging acceptance scope. | Client-approved rules, product data, contacts, provider decisions and acceptance criteria. |
 | AS-016 to AS-020 | Production database models, migrations, repeatable seeds, and persistent data validation. Local JSON files are preview-only. | Managed database choice, staging/production connections, schema direction and deployment setup. |
 | AS-021 | Durable image storage/CDN. Current uploads are stored on the local filesystem; gallery order and alt text are implemented in the preview. | Client-owned object storage, access credentials, and approved image set. |
-| AS-044 | Run the customer cart migration and verify account cart merge after a real OTP sign-in. | Configured client MySQL database and MSG91 service; staging sign-in. |
+| AS-044 | Run the customer cart migration and verify account cart merge after a real OTP sign-in. | Cognito SMS OTP configuration and staging sign-in; MySQL is needed for persisted account carts. |
 | AS-048 | Configure tax handling and connect quotes to production catalog prices; the preview explicitly excludes tax. | Approved tax rules and production catalog/price source. |
 | AS-068 | Persistent staff accounts, invitations, role assignment, and durable identity/audit records. The preview currently issues one Owner session; role access checks are in place. | Identity/database service and approved staff roster. |
 | AS-034 | ZIP media import and SKU-to-image mapping report. | Approved bulk catalog/media files and storage destination. |
@@ -53,3 +53,4 @@ Open `http://localhost:3000` for the store and `http://localhost:3000/admin` for
 ## Launch gate
 
 The site is ready for local review, not live sales. Complete the remaining database, identity, payment, support, policy, operational, staging and client-acceptance work before enabling production commerce. In `NODE_ENV=production`, the preview APIs are disabled.
+

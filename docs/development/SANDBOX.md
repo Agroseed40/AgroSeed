@@ -1,6 +1,6 @@
-# AgroSeed sandbox
+﻿# AgroSeed sandbox
 
-This Node.js app includes a bilingual storefront, local catalog API, guest cart and checkout preview, private-token order lookup, and a password-protected staff console. Preview state uses `storage/sandbox-store.json`. Customer accounts use the MySQL and MSG91 integrations when configured; the local sandbox does not send SMS.
+This Node.js app includes a bilingual storefront, local catalog API, guest cart and checkout preview, private-token order lookup, and a password-protected staff console. Preview state uses `storage/sandbox-store.json`. Customer sign-in uses Cognito SMS OTP when the user pool is configured. Saved account data uses MySQL when configured; the local sandbox does not send SMS.
 
 All demo-only areas use the `AGROSEED_DEMO_MODE` environment setting. Local development defaults to `true`; set it to `false` to hide mock UI and block sandbox catalog/order API routes. See [GoDaddy deployment requirements and audit](../godaddy-deployment.md) for deployment configuration.
 
@@ -56,3 +56,4 @@ All demo catalog, staff and order APIs are disabled when `NODE_ENV=production` o
 5. Publish only after the staging app and its environment have been reviewed. Do not add production secrets to Preview.
 
 GoDaddy hosting account access, an app, and a remote preview URL are not configured by repository files alone. The Preview deployment still needs to be created from the GoDaddy account. Do not accept paid plan upgrades or legal terms as part of sandbox setup without the account owner's action.
+

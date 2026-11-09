@@ -1,10 +1,15 @@
-import { cp, mkdir, readdir, rm, stat, writeFile } from "node:fs/promises";
+﻿import { cp, mkdir, readdir, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const output = path.join(root, ".amplify-hosting");
 const compute = path.join(output, "compute", "default");
+// These public identifiers were supplied for AgroSeed's Cognito pool. Amplify
+// environment variables can override them when the project moves to another pool.
+const cognitoUserPoolId = process.env.COGNITO_USER_POOL_ID || "ap-south-1_XbcHEhauT";
+const cognitoClientId = process.env.COGNITO_CLIENT_ID || "6tf8mnnek8c7er59vk2phv0dlh";
+const cognitoRegion = process.env.COGNITO_REGION || cognitoUserPoolId.split("_")[0];
 const manifest = {
   version: 1,
   framework: { name: "agroseed-node", version: "1.0.0" },
@@ -31,6 +36,9 @@ await writeFile(path.join(compute, "amplify-entry.mjs"), [
   'process.env.NODE_ENV = "development";',
   'process.env.AGROSEED_DEMO_MODE = "true";',
   'process.env.AGROSEED_STORAGE_DIR = "/tmp/agroseed";',
+  `process.env.COGNITO_USER_POOL_ID = ${JSON.stringify(cognitoUserPoolId)};`,
+  `process.env.COGNITO_CLIENT_ID = ${JSON.stringify(cognitoClientId)};`,
+  `process.env.COGNITO_REGION = ${JSON.stringify(cognitoRegion)};`,
   'await mkdir(process.env.AGROSEED_STORAGE_DIR, { recursive: true });',
   'await import("./server.mjs");',
   ""
@@ -44,3 +52,4 @@ if (size > limit) {
   throw new Error(`Amplify compute bundle is ${(size / 1024 / 1024).toFixed(1)} MB; the limit is 220 MB.`);
 }
 console.log(`Created .amplify-hosting (Node.js 22 compute bundle, ${(size / 1024 / 1024).toFixed(1)} MB).`);
+

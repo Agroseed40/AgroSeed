@@ -1,4 +1,4 @@
-# AgroSeed E-commerce Build Plan
+﻿# AgroSeed E-commerce Build Plan
 
 ## Product goal
 
@@ -8,7 +8,7 @@ Build AgroSeed as a bilingual (Hindi/English) online store for Indian farmers an
 
 The current responsive customer app is `public/app.html`, `public/app.js`, and `public/app.css`; the retired one-page mock and standalone catalog are kept outside the deployable source under `docs/archive/retired-prototype/`. The Node app routes `/` and customer/admin pages through the shared app. Local preview mode still uses sample catalog rows, a browser cart, demo quotes/orders, and private-token tracking. The `/admin` preview provides local product, inventory, import, order, settings, promotion and support workflows behind a password from the local environment.
 
-This is still primarily a local sandbox. Sample products are unapproved, local JSON and uploaded files are not durable hosted storage, and there is no live payment, delivery, email or order service. A real customer phone-account backend has now been added (MSG91 OTP, GoDaddy MySQL tables, customer ID/session, profile, and saved addresses), but it requires production database credentials, MSG91 credentials, and its SQL migration before it can serve customers. Demo APIs are disabled in production mode. See [the one-go delivery note](../AGROSEED_ONE_GO_DELIVERY.md) for precise scope and blockers.
+This is still primarily a local sandbox. Sample products are unapproved, local JSON and uploaded files are not durable hosted storage, and there is no live payment, delivery, email or order service. A real customer phone sign-in flow uses Cognito SMS OTP and verified ID tokens. Cognito configuration and SMS delivery must be enabled before customers can sign in. Customer profile, saved addresses, and carts still require the MySQL database and its SQL migration. Demo APIs are disabled in production mode. See [the one-go delivery note](../AGROSEED_ONE_GO_DELIVERY.md) for precise scope and blockers.
 
 ## Recommended first release
 
@@ -24,7 +24,7 @@ Use GoDaddy Node.js Hosting as the project default for the production web app an
 
 ### Current account implementation
 
-The repository's customer-account slice uses GoDaddy MySQL via `DATABASE_URL` or `DB_HOST`/`DB_NAME`/`DB_USER`/`DB_PASSWORD`. This is a deliberate fit for the selected Node.js hosting target and the current dependency-light server; it is separate from the future PostgreSQL + Prisma recommendation below. Do not point it at the future PostgreSQL schema. Before enabling it, provision MySQL in the chosen GoDaddy app, set MSG91 `MSG91_AUTH_KEY` and `MSG91_TEMPLATE_ID` as publish secrets, and run `npm run migrate:customers` against that database once. Keep provider keys in GoDaddy secrets, never in source control.
+The repository's customer-account slice uses GoDaddy MySQL via `DATABASE_URL` or `DB_HOST`/`DB_NAME`/`DB_USER`/`DB_PASSWORD`. This is a deliberate fit for the selected Node.js hosting target and the current dependency-light server; it is separate from the future PostgreSQL + Prisma recommendation below. Do not point it at the future PostgreSQL schema. Before enabling saved account data, provision MySQL with the selected database provider and run `npm run migrate:customers` against that database once. Phone sign-in is handled separately by Cognito; configure the pool and SMS delivery in AWS Amplify/Cognito. Never put database passwords or service credentials in source control.
 
 ## Suggested technology
 
@@ -173,6 +173,7 @@ GET            /admin/reports/sales
 - Confirm launch region/PIN codes, delivery partners, COD availability, and who will fulfill orders.
 - Provide the actual product catalog (SKUs, pack sizes, prices, stock, images, and label/usage information).
 - Choose whether to preserve the current standalone HTML prototype as a visual reference or migrate its design into Next.js components.
+
 
 
 

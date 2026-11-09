@@ -1,15 +1,26 @@
-import { createHash, randomBytes, randomUUID } from "node:crypto";
+﻿import { randomBytes, randomUUID } from "node:crypto";
+import {
+  CognitoIdentityProviderClient,
+  InitiateAuthCommand,
+  RespondToAuthChallengeCommand,
+  SignUpCommand,
+  ConfirmSignUpCommand,
+  ResendConfirmationCodeCommand,
+  GlobalSignOutCommand
+} from "@aws-sdk/client-cognito-identity-provider";
+import { CognitoJwtVerifier } from "aws-jwt-verify";
 import mysql from "mysql2/promise";
 
 const COOKIE = "agroseed_customer";
-const SESSION_DAYS = 30;
+const REFRESH_COOKIE = `${COOKIE}_refresh`;
+const CSRF_COOKIE = `${COOKIE}_csrf`;
+const REFRESH_DAYS = 30;
 const pool = process.env.DATABASE_URL
   ? mysql.createPool(process.env.DATABASE_URL)
   : process.env.DB_HOST && process.env.DB_NAME && process.env.DB_USER
     ? mysql.createPool({ host: process.env.DB_HOST, port: Number(process.env.DB_PORT || 3306), database: process.env.DB_NAME, user: process.env.DB_USER, password: process.env.DB_PASSWORD || "", waitForConnections: true, connectionLimit: 8, timezone: "Z", ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: true } : undefined })
     : null;
 
-const hash = (value) => createHash("sha256").update(value).digest("hex");
 const send = (res, status, body, extra = {}) => {
   res.writeHead(status, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff", ...extra });
   res.end(JSON.stringify(body));
@@ -25,15 +36,80 @@ function phoneNumber(input) {
   if (/^\+?[1-9]\d{7,14}$/.test(value)) return value.replace(/^\+/, "");
   return null;
 }
-function cookie(req) {
-  const value = (req.headers.cookie || "").split(";").map((part) => part.trim()).find((part) => part.startsWith(`${COOKIE}=`));
-  try { return decodeURIComponent(value?.slice(COOKIE.length + 1) || ""); } catch { return ""; }
+function readCookie(req, name) {
+  const value = (req.headers.cookie || "").split(";").map((part) => part.trim()).find((part) => part.startsWith(`${name}=`));
+  try { return decodeURIComponent(value?.slice(name.length + 1) || ""); } catch { return ""; }
 }
-function cookieHeader(token, secure, clear = false) {
-  return `${COOKIE}=${clear ? "" : encodeURIComponent(token)}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${clear ? 0 : SESSION_DAYS * 86400}${secure ? "; Secure" : ""}`;
+function secureRequest(req) {
+  const forwarded = String(req.headers["x-forwarded-proto"] || "").split(",")[0].trim().toLowerCase();
+  const host = String(req.headers.host || "").toLowerCase();
+  const localHost = /^(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/.test(host);
+  return forwarded === "https" || Boolean(req.socket.encrypted) || process.env.NODE_ENV === "production" || (Boolean(host) && !localHost);
+}
+function cookieHeader(name, value, secure, maxAge, httpOnly = true) {
+  return `${name}=${value ? encodeURIComponent(value) : ""}; ${httpOnly ? "HttpOnly; " : ""}SameSite=Lax; Path=/; Max-Age=${value ? maxAge : 0}${secure ? "; Secure" : ""}`;
+}
+function cookieHeaders(req, tokens, csrf) {
+  const secure = secureRequest(req), expires = Math.max(60, Number(tokens.ExpiresIn) || 3600);
+  const refreshSeconds = Number(process.env.COGNITO_REFRESH_TOKEN_MAX_AGE_SECONDS || REFRESH_DAYS * 86400);
+  return [
+    cookieHeader(COOKIE, tokens.IdToken, secure, expires),
+    cookieHeader(`${COOKIE}_access`, tokens.AccessToken, secure, expires),
+    cookieHeader(REFRESH_COOKIE, tokens.RefreshToken || readCookie(req, REFRESH_COOKIE), secure, refreshSeconds),
+    cookieHeader(CSRF_COOKIE, csrf, secure, refreshSeconds)
+  ];
+}
+function clearAuthCookies(req) {
+  const secure = secureRequest(req);
+  return [COOKIE, `${COOKIE}_access`, REFRESH_COOKIE, CSRF_COOKIE, `${COOKIE}_challenge`].map((name) => cookieHeader(name, "", secure, 0, name !== CSRF_COOKIE));
+}
+function cognitoConfig() {
+  const userPoolId = String(process.env.COGNITO_USER_POOL_ID || "").trim();
+  const clientId = String(process.env.COGNITO_CLIENT_ID || "").trim();
+  const region = String(process.env.COGNITO_REGION || userPoolId.split("_")[0] || "").trim();
+  if (!userPoolId || !clientId || !region) throw Object.assign(new Error("Phone sign-in is not configured yet. Add the Cognito user pool ID and app client ID to the Amplify app settings."), { statusCode: 503 });
+  return { userPoolId, clientId, region };
+}
+let cognitoClient, cognitoVerifier, cognitoKey = "";
+function cognito() {
+  const config = cognitoConfig(), key = `${config.region}:${config.userPoolId}:${config.clientId}`;
+  if (key !== cognitoKey) {
+    cognitoClient = new CognitoIdentityProviderClient({ region: config.region });
+    cognitoVerifier = CognitoJwtVerifier.create({ userPoolId: config.userPoolId, clientId: config.clientId, tokenUse: "id" });
+    cognitoKey = key;
+  }
+  return { ...config, client: cognitoClient, verifier: cognitoVerifier };
 }
 async function dbReady() {
-  if (!pool) throw Object.assign(new Error("Customer accounts are not enabled yet: configure the production MySQL database in GoDaddy."), { statusCode: 503 });
+  if (!pool) throw Object.assign(new Error("Customer data storage is not configured. Sign-in can work, but saved addresses and carts need a MySQL database."), { statusCode: 503 });
+}
+async function ensureCustomerRecord(current) {
+  await dbReady();
+  const phone = String(current.phone || "").replace(/^\+/, "");
+  if (!current.id || !/^[0-9a-f-]{36}$/i.test(current.id) || !phone) throw Object.assign(new Error("Your verified phone details could not be loaded. Sign out and sign in again."), { statusCode: 401 });
+  await pool.execute("INSERT INTO customers (id, phone, name, email, created_at, updated_at) VALUES (?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP()) ON DUPLICATE KEY UPDATE phone=VALUES(phone), name=COALESCE(customers.name, VALUES(name)), email=COALESCE(customers.email, VALUES(email)), updated_at=UTC_TIMESTAMP()", [current.id, phone, current.name || null, current.email || null]);
+}
+async function session(req, res) {
+  const idToken = readCookie(req, COOKIE), refreshToken = readCookie(req, REFRESH_COOKIE);
+  if (!idToken && !refreshToken) return null;
+  const { clientId, verifier, client } = cognito();
+  let claims = null;
+  if (idToken) { try { claims = await verifier.verify(idToken); } catch {} }
+  if (!claims && refreshToken) {
+    try {
+      const refreshed = await client.send(new InitiateAuthCommand({ AuthFlow: "REFRESH_TOKEN_AUTH", ClientId: clientId, AuthParameters: { REFRESH_TOKEN: refreshToken } }));
+      const tokens = refreshed.AuthenticationResult;
+      if (tokens?.IdToken && tokens?.AccessToken) {
+        claims = await verifier.verify(tokens.IdToken);
+        const csrf = readCookie(req, CSRF_COOKIE) || randomBytes(24).toString("base64url");
+        res.setHeader("Set-Cookie", cookieHeaders(req, { ...tokens, RefreshToken: tokens.RefreshToken || refreshToken }, csrf));
+      }
+    } catch { return null; }
+  }
+  if (!claims?.sub) return null;
+  let csrf = readCookie(req, CSRF_COOKIE);
+  if (!csrf) { csrf = randomBytes(24).toString("base64url"); res.setHeader("Set-Cookie", cookieHeader(CSRF_COOKIE, csrf, secureRequest(req), REFRESH_DAYS * 86400)); }
+  return { id: claims.sub, phone: claims.phone_number ? String(claims.phone_number).replace(/^\+/, "") : null, name: claims.name || claims.given_name || null, email: claims.email || null, csrf_token: csrf, access_token: readCookie(req, `${COOKIE}_access`) };
 }
 function normalizeCartItems(items) {
   if (!Array.isArray(items) || items.length > 50) throw Object.assign(new Error("A cart can contain at most 50 items."), { statusCode: 400 });
@@ -60,76 +136,116 @@ function mergeCartItems(accountItems, guestItems, priorGuestItems) {
   }
   return [...account].map(([sku, quantity]) => ({ sku, quantity }));
 }
-function otpReady() {
-  if (!process.env.MSG91_AUTH_KEY || !process.env.MSG91_TEMPLATE_ID) throw Object.assign(new Error("Phone verification is not enabled yet: configure the MSG91 auth key and approved OTP template in GoDaddy."), { statusCode: 503 });
-}
-async function session(req) {
-  const raw = cookie(req); if (!raw) return null;
-  const [rows] = await pool.execute("SELECT s.id AS session_id, s.csrf_token, c.id, c.phone, c.name, c.email FROM customer_sessions s JOIN customers c ON c.id=s.customer_id WHERE s.token_hash=? AND s.expires_at > UTC_TIMESTAMP()", [hash(raw)]);
-  return rows[0] || null;
-}
 function sameOrigin(req) {
   const origin = req.headers.origin;
   if (!origin) return true;
   try { return new URL(origin).host === req.headers.host; } catch { return false; }
 }
-async function msg91(path, query, method = "GET") {
-  const url = new URL(`https://control.msg91.com/api/v5/otp${path}`);
-  for (const [key, value] of Object.entries(query)) url.searchParams.set(key, value);
-  const response = await fetch(url, { method, headers: { authkey: process.env.MSG91_AUTH_KEY, "content-type": "application/json", accept: "application/json" }, ...(method === "POST" ? { body: "{}" } : {}), signal: AbortSignal.timeout(12000) });
-  const result = await response.json().catch(() => ({}));
-  if (!response.ok || result.type === "error") throw Object.assign(new Error("The SMS provider could not complete phone verification. Please try again."), { statusCode: response.status === 429 ? 429 : 502 });
-  return result;
+function cognitoError(error) {
+  const name = error?.name || "";
+  if (["CodeMismatchException", "ExpiredCodeException"].includes(name)) return Object.assign(new Error("That code is incorrect or expired. Request a new code."), { statusCode: 400 });
+  if (["TooManyRequestsException", "TooManyFailedAttemptsException", "LimitExceededException"].includes(name)) return Object.assign(new Error("Too many attempts. Wait a little before requesting another code."), { statusCode: 429 });
+  if (["UserNotFoundException", "NotAuthorizedException"].includes(name)) return Object.assign(new Error("We could not verify that number. Check it and try again."), { statusCode: 400 });
+  if (["InvalidParameterException", "InvalidPasswordException", "UsernameExistsException"].includes(name)) return Object.assign(new Error("Cognito is not configured for phone OTP sign-in yet. Check the user pool and app client settings."), { statusCode: 503 });
+  return Object.assign(new Error("Phone sign-in could not be completed. Please try again."), { statusCode: 502 });
 }
-
+function challengeReply(phone, result, flow = "sms") {
+  if (result.ChallengeName === "SELECT_CHALLENGE") {
+    return { ok: true, flow: "select_sms", phone: `+${phone}`, challengeSession: result.Session };
+  }
+  if (result.ChallengeName !== "SMS_OTP" || !result.Session) throw Object.assign(new Error("Cognito did not return an SMS verification challenge. Check the user pool's SMS OTP settings."), { statusCode: 503 });
+  return { ok: true, flow, phone: `+${phone}`, challengeSession: result.Session, message: "Verification code sent by SMS." };
+}
+async function initiatePhoneAuth(phone, sessionToken = undefined) {
+  const { client, clientId } = cognito();
+  return client.send(new InitiateAuthCommand({
+    AuthFlow: "USER_AUTH", ClientId: clientId,
+    ...(sessionToken ? { Session: sessionToken } : {}),
+    AuthParameters: { USERNAME: `+${phone}`, ...(sessionToken ? {} : { PREFERRED_CHALLENGE: "SMS_OTP" }) }
+  }));
+}
+async function startExistingPhoneSignIn(phone) {
+  const { client, clientId } = cognito();
+  try {
+    const result = await initiatePhoneAuth(phone);
+    if (result.ChallengeName === "SELECT_CHALLENGE") {
+      const selected = await client.send(new RespondToAuthChallengeCommand({ ClientId: clientId, ChallengeName: "SELECT_CHALLENGE", Session: result.Session, ChallengeResponses: { USERNAME: `+${phone}`, ANSWER: "SMS_OTP" } }));
+      return challengeReply(phone, selected);
+    }
+    return challengeReply(phone, result);
+  } catch (error) {
+    if (error.name === "UserNotConfirmedException") {
+      await client.send(new ResendConfirmationCodeCommand({ ClientId: clientId, Username: `+${phone}` }));
+      return { ok: true, flow: "signup", phone: `+${phone}`, challengeSession: "", message: "Verification code sent by SMS." };
+    }
+    throw error;
+  }
+}
+async function startPhoneSignIn(phone) {
+  const { client, clientId } = cognito();
+  try {
+    const signup = await client.send(new SignUpCommand({ ClientId: clientId, Username: `+${phone}`, UserAttributes: [{ Name: "phone_number", Value: `+${phone}` }] }));
+    if (signup.UserConfirmed) return startExistingPhoneSignIn(phone);
+    return { ok: true, flow: "signup", phone: `+${phone}`, challengeSession: signup.Session || "", message: "Verification code sent by SMS." };
+  } catch (error) {
+    if (error.name === "UsernameExistsException") return startExistingPhoneSignIn(phone);
+    throw error;
+  }
+}async function issueCustomerSession(req, res, tokens, phone) {
+  if (!tokens?.IdToken || !tokens?.AccessToken) throw Object.assign(new Error("Cognito sign-in did not return a complete session."), { statusCode: 502 });
+  const { verifier } = cognito(), claims = await verifier.verify(tokens.IdToken);
+  if (claims.phone_number_verified !== true || String(claims.phone_number || "").replace(/^\+/, "") !== phone) throw Object.assign(new Error("Cognito did not confirm ownership of this mobile number."), { statusCode: 401 });
+  const csrf = randomBytes(24).toString("base64url");
+  const current = { id: claims.sub, phone: `+${phone}`, name: claims.name || claims.given_name || null, email: claims.email || null };
+  return send(res, 200, { ok: true, customer: current, csrf }, { "Set-Cookie": cookieHeaders(req, tokens, csrf) });
+}
 export async function handleCustomerAuth(req, res, pathname) {
   const method = req.method;
   if (!pathname.startsWith("/api/v1/customer/")) return false;
   try {
-    await dbReady();
+    if (method === "POST" && ["/api/v1/customer/otp/request", "/api/v1/customer/otp/verify"].includes(pathname) && !sameOrigin(req)) return send(res, 403, { error: "Request origin could not be verified." });
     if (method === "POST" && pathname === "/api/v1/customer/otp/request") {
-      otpReady();
       const data = await body(req), phone = phoneNumber(data.phone);
       if (!phone) return send(res, 400, { error: "Enter a valid mobile number with country code, or a 10-digit Indian mobile number." });
-      const ip = String(req.socket.remoteAddress || "unknown");
-      const [limits] = await pool.execute("SELECT SUM(phone_hash=?) AS phone_count, SUM(ip_hash=?) AS ip_count FROM customer_otp_requests WHERE created_at > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 15 MINUTE)", [hash(phone), hash(ip)]);
-      if (Number(limits[0]?.phone_count || 0) >= 3 || Number(limits[0]?.ip_count || 0) >= 10) return send(res, 429, { error: "Too many code requests. Wait 15 minutes before trying again." });
-      const result = await msg91("", { template_id: process.env.MSG91_TEMPLATE_ID, mobile: phone, otp_length: "6", otp_expiry: "10", realTimeResponse: "1" }, "POST");
-      if (!result.request_id && result.type !== "success") return send(res, 502, { error: "SMS provider did not confirm the code request." });
-      await pool.execute("INSERT INTO customer_otp_requests (id, phone_hash, ip_hash, provider_request_id, created_at) VALUES (?, ?, ?, ?, UTC_TIMESTAMP())", [randomUUID(), hash(phone), hash(ip), result.request_id || ""]);
-      return send(res, 200, { ok: true, phone: `+${phone}`, message: "Verification code sent." });
+      const result = await startPhoneSignIn(phone);
+      return send(res, 200, result);
     }
     if (method === "POST" && pathname === "/api/v1/customer/otp/verify") {
-      otpReady();
-      const data = await body(req), phone = phoneNumber(data.phone), otp = String(data.otp || "").trim();
+      const data = await body(req), phone = phoneNumber(data.phone), otp = String(data.otp || "").trim(), flow = String(data.flow || "sms"), challengeSession = String(data.challengeSession || "");
       if (!phone || !/^\d{4,9}$/.test(otp)) return send(res, 400, { error: "Enter your mobile number and the verification code." });
-      const [attempts] = await pool.execute("UPDATE customer_otp_requests SET attempt_count=attempt_count+1 WHERE phone_hash=? AND created_at > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 15 MINUTE) AND attempt_count < 5", [hash(phone)]);
-      if (!attempts.affectedRows) return send(res, 429, { error: "Request a new verification code. Too many attempts were made." });
-      const verified = await msg91("/verify", { mobile: phone, otp });
-      if (verified.type !== "success") return send(res, 400, { error: "That code is incorrect or expired. Request a new code." });
-      const customerId = randomUUID();
-      await pool.execute("INSERT INTO customers (id, phone, created_at, updated_at) VALUES (?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP()) ON DUPLICATE KEY UPDATE updated_at=UTC_TIMESTAMP()", [customerId, phone]);
-      const [customers] = await pool.execute("SELECT id, phone, name, email FROM customers WHERE phone=? LIMIT 1", [phone]);
-      const customer = customers[0], rawToken = randomBytes(32).toString("base64url"), csrf = randomBytes(24).toString("base64url");
-      await pool.execute("INSERT INTO customer_sessions (id, customer_id, token_hash, csrf_token, expires_at, created_at) VALUES (?, ?, ?, ?, DATE_ADD(UTC_TIMESTAMP(), INTERVAL ? DAY), UTC_TIMESTAMP())", [randomUUID(), customer.id, hash(rawToken), csrf, SESSION_DAYS]);
-      await pool.execute("DELETE FROM customer_otp_requests WHERE phone_hash=?", [hash(phone)]);
-      const secure = process.env.NODE_ENV === "production";
-      return send(res, 200, { ok: true, customer, csrf }, { "Set-Cookie": cookieHeader(rawToken, secure) });
+      if (flow === "signup") {
+        const { client, clientId } = cognito();
+        const confirmed = await client.send(new ConfirmSignUpCommand({ ClientId: clientId, Username: `+${phone}`, ConfirmationCode: otp, ...(challengeSession ? { Session: challengeSession } : {}) }));
+        let auth = await initiatePhoneAuth(phone, confirmed.Session);
+        if (auth.AuthenticationResult) return issueCustomerSession(req, res, auth.AuthenticationResult, phone);
+        if (auth.ChallengeName === "SELECT_CHALLENGE") {
+          auth = await client.send(new RespondToAuthChallengeCommand({ ClientId: clientId, ChallengeName: "SELECT_CHALLENGE", Session: auth.Session, ChallengeResponses: { USERNAME: `+${phone}`, ANSWER: "SMS_OTP" } }));
+        }
+        return send(res, 200, { ...challengeReply(phone, auth), pendingOtp: true });
+      }
+      const { client, clientId } = cognito();
+      const result = flow === "select_sms"
+        ? await client.send(new RespondToAuthChallengeCommand({ ClientId: clientId, ChallengeName: "SELECT_CHALLENGE", Session: challengeSession, ChallengeResponses: { USERNAME: `+${phone}`, ANSWER: "SMS_OTP" } }))
+        : await client.send(new RespondToAuthChallengeCommand({ ClientId: clientId, ChallengeName: "SMS_OTP", Session: challengeSession, ChallengeResponses: { USERNAME: `+${phone}`, SMS_OTP_CODE: otp } }));
+      if (result.AuthenticationResult) return issueCustomerSession(req, res, result.AuthenticationResult, phone);
+      return send(res, 200, { ...challengeReply(phone, result), pendingOtp: true });
     }
     if (method === "GET" && pathname === "/api/v1/customer/session") {
-      const current = await session(req);
+      const current = await session(req, res);
       if (!current) return send(res, 200, { customer: null });
-      return send(res, 200, { customer: { id: current.id, phone: `+${current.phone}`, name: current.name, email: current.email }, csrf: current.csrf_token });
+      return send(res, 200, { customer: { id: current.id, phone: current.phone ? `+${current.phone}` : null, name: current.name, email: current.email, authProvider: "cognito" }, csrf: current.csrf_token });
     }
     if (method === "DELETE" && pathname === "/api/v1/customer/session") {
-      const current = await session(req);
-      if (current && sameOrigin(req)) await pool.execute("DELETE FROM customer_sessions WHERE id=?", [current.session_id]);
-      return send(res, 200, { ok: true }, { "Set-Cookie": cookieHeader("", process.env.NODE_ENV === "production", true) });
+      if (!sameOrigin(req)) return send(res, 403, { error: "Request origin could not be verified." });
+      const accessToken = readCookie(req, `${COOKIE}_access`);
+      if (accessToken) { try { const { client } = cognito(); await client.send(new GlobalSignOutCommand({ AccessToken: accessToken })); } catch {} }
+      return send(res, 200, { ok: true }, { "Set-Cookie": clearAuthCookies(req) });
     }
-    const current = await session(req);
+    const current = await session(req, res);
     if (!current) return send(res, 401, { error: "Sign in with your verified mobile number to continue." });
     if (!sameOrigin(req)) return send(res, 403, { error: "Request origin could not be verified." });
-    if (method !== "GET" && req.headers["x-agroseed-csrf"] !== current.csrf_token) return send(res, 403, { error: "Refresh your account page and try again." });
+    if (method !== "GET" && (!current.csrf_token || req.headers["x-agroseed-csrf"] !== current.csrf_token)) return send(res, 403, { error: "Refresh your account page and try again." });
+    if (pathname === "/api/v1/customer/cart" || pathname === "/api/v1/customer/cart/merge" || pathname.startsWith("/api/v1/customer/addresses") || pathname === "/api/v1/customer/profile") await ensureCustomerRecord(current);
     if (method === "GET" && pathname === "/api/v1/customer/cart") {
       const [rows] = await pool.execute("SELECT items_json FROM customer_carts WHERE customer_id=?", [current.id]);
       return send(res, 200, { items: storedCartItems(rows[0]?.items_json) });
@@ -177,6 +293,23 @@ export async function handleCustomerAuth(req, res, pathname) {
     return send(res, 404, { error: "Customer route not found." });
   } catch (error) {
     if (res.headersSent || res.destroyed) return true;
-    return send(res, error.statusCode || 500, { error: error.statusCode ? error.message : "Customer account service is temporarily unavailable." });
+    const isCognitoError = Boolean(error?.name && error.name.endsWith("Exception"));
+    const safeError = error.statusCode ? error : isCognitoError ? cognitoError(error) : Object.assign(new Error("Customer account service is temporarily unavailable."), { statusCode: 500 });
+    return send(res, safeError.statusCode || 500, { error: safeError.message });
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,4 +1,4 @@
-# AgroSeed Client Delivery Task Backlog
+﻿# AgroSeed Client Delivery Task Backlog
 
 This is the task-by-task execution list derived from `AGROSEED_BUILD_PLAN.md` and `AGROSEED_DEVELOPMENT_ROADMAP.md`. Work in order, one task at a time. Each task should result in a reviewable change and satisfy its completion condition before the next dependent task starts.
 
@@ -97,7 +97,7 @@ This is the first-release scope baseline based on the existing build plan, the r
 
 ## Phase 5 — Build cart, delivery quote, and checkout
 
-- [!] **AS-044 — Create cart API and persistence.** Guest carts use a random browser ID and local preview persistence; signed-in customer carts are stored in MySQL and merge guest quantities idempotently at sign-in. The code and migration are ready; defer database migration and real OTP/cart verification until the GoDaddy MySQL database and MSG91 service are configured.
+- [!] **AS-044 — Create cart API and persistence.** Guest carts use a random browser ID and local preview persistence; signed-in customer carts are stored in MySQL and merge guest quantities idempotently at sign-in. The code and migration are ready; defer database migration and real OTP/cart verification until MySQL storage is configured and Cognito SMS OTP is enabled.
 - [x] **AS-045 — Build cart page.** Guest and signed-in carts display pack details, quantity edits/removal, preview coupons, and server-repriced checkout; cart changes sync to the account when signed in.
 - [x] **AS-046 — Add serviceability lookup.** Staff can configure preview PIN codes, fees and estimates; quotes block unsupported PINs once areas are configured. No approved launch areas are assumed.
 - [x] **AS-047 — Add address entry and validation.** Checkout validates recipient, Indian mobile and PIN fields server-side. A browser-local address book supports create/edit/delete/default and checkout reuse; verified account ownership is tracked under AS-058 to AS-059.
@@ -117,7 +117,7 @@ This is the first-release scope baseline based on the existing build plan, the r
 
 ## Phase 7 — Customer accounts, support, and store content
 
-- [~] **AS-058 — Implement phone OTP.** Server-side MSG91 request/verify, expiry, send/attempt limits, random customer IDs, hashed 30-day sessions, HttpOnly cookies, same-origin/CSRF checks are implemented. **Remaining:** owner must configure MSG91 auth key/template and GoDaddy IP allowlisting if enabled; run the account SQL migration and verify real SMS on the deployed app.
+- [~] **AS-058 — Implement phone OTP.** Cognito `USER_AUTH` SMS OTP, new-user confirmation, ID-token verification, refreshable HttpOnly cookies, same-origin/CSRF checks are implemented. **Remaining:** configure Cognito phone sign-in, SMS delivery, user-pool/app-client IDs and verify real SMS on the deployed Amplify app. MySQL migration is required only for saved account data.
 - [~] **AS-059 — Build account profile and addresses.** Verified customers can edit profile and save/edit/delete/default addresses in MySQL with per-customer ownership checks. **Remaining:** configure production database and run the migration; connect addresses to the live checkout flow.
 - [~] **AS-060 — Build account order history.** Local account order history lists this device's private-token orders. Cross-device history and verified customer ownership remain.
 - [~] **AS-061 — Build help and contact pages.** Help/contact pages and editable admin fields for approved support details are implemented; contact requests enter the local preview inbox. **Complete when:** messages reach the client's monitored support destination.
@@ -140,3 +140,4 @@ This is the first-release scope baseline based on the existing build plan, the r
 ## Remaining client inputs
 
 The next items requiring AgroSeed's input are **AS-003–006**: launch delivery/returns/COD rules, approved catalog and product content, integration/account ownership, and staging acceptance scope. Production architecture, database, hosting, and provider setup also need the relevant owner decisions before live deployment.
+

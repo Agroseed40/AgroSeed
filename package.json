@@ -1,0 +1,19 @@
+{
+  "name": "agroseed-storefront",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AgroSeed storefront sandbox and GoDaddy Node.js preview app",
+  "main": "server.mjs",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "build": "node scripts/build-check.mjs && node scripts/godaddy-preflight.mjs && node scripts/package-preview.mjs",
+    "start": "node server.mjs",
+    "dev": "node --watch server.mjs",
+    "migrate:customers": "node scripts/migrate-customer-accounts.mjs"
+  },
+  "dependencies": {
+    "mysql2": "^3.24.6"
+  }
+}

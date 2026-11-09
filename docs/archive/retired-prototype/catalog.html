@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f4ea">
+  <title>Shop farm and garden products | Agro Seed</title>
+  <link rel="stylesheet" href="/catalog-page.css">
+  <script src="/runtime-config.js"></script>
+</head>
+<body>
+  <div class="catalog-announcement">AGRO SEED <span>·</span> खेती और बागवानी के लिए</div>
+  <header class="catalog-header">
+    <a class="catalog-logo" href="/" aria-label="Agro Seed home"><span class="logo-mark">✳</span><span>AGRO <b>SEED</b></span></a>
+    <form class="catalog-search" action="/search" method="get">
+      <label class="visually-hidden" for="catalog-search-input">Search products</label>
+      <input id="catalog-search-input" type="search" name="q" placeholder="Search seeds, tools, and farm supplies">
+      <button type="submit">Search</button>
+    </form>
+    <a class="home-link" href="/">Home</a>
+  </header>
+  <nav class="catalog-nav" aria-label="Product categories">
+    <a href="/shop">All products</a>
+    <a href="/category/seeds">Seeds</a>
+    <a href="/category/plant-nutrition">Plant nutrition</a>
+    <a href="/category/crop-protection">Crop protection</a>
+    <a href="/category/farm-tools">Farm tools</a>
+    <a href="/category/irrigation">Irrigation</a>
+    <a href="/category/organic-growing">Organic growing</a>
+  </nav>
+
+  <main class="catalog-main">
+    <div class="breadcrumbs" id="catalog-breadcrumb"><a href="/">Home</a><span>›</span><span id="breadcrumb-current">Shop</span></div>
+    <div class="demo-notice" id="catalog-demo-notice" hidden>
+      <strong>Sample catalog</strong>
+      <span>These are placeholder products and prices for development. AgroSeed must approve the real catalog before launch.</span>
+    </div>
+    <div class="catalog-heading">
+      <div><p class="eyebrow">AGRO SEED · FARM ESSENTIALS</p><h1 id="catalog-title">Shop all products</h1><p id="catalog-description">Browse the sample AgroSeed catalog.</p></div>
+      <label class="sort-control" id="sort-control">Sort by
+        <select id="catalog-sort"><option value="featured">Featured</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option><option value="name">Name</option></select>
+      </label>
+    </div>
+    <div class="catalog-layout" id="catalog-listing">
+      <aside class="catalog-sidebar">
+        <h2>Categories</h2><nav id="category-links" class="category-links"></nav>
+        <h2>Brands</h2><nav id="brand-links" class="category-links"></nav>
+      </aside>
+      <section class="catalog-results" aria-live="polite">
+        <div class="results-meta"><span id="result-count">Loading products…</span></div>
+        <div class="product-grid" id="product-grid"></div>
+        <p class="empty-state" id="empty-state" hidden>No products matched. Try another search or category.</p>
+      </section>
+    </div>
+    <section class="product-detail" id="product-detail" hidden></section>
+    <section class="catalog-unavailable" id="catalog-unavailable" hidden>
+      <h2>Live catalog is not connected yet</h2>
+      <p>Products will appear here after AgroSeed connects and approves its live catalog.</p>
+    </section>
+  </main>
+
+  <footer class="catalog-footer"><a href="/">AGRO SEED</a><span>Growing things together.</span><a href="/shop">Browse products</a></footer>
+  <script src="/catalog-page.js" defer></script>
+</body>
+</html>

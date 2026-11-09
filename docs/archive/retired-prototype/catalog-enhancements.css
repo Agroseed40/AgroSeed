@@ -1,0 +1,108 @@
+
+body{padding-bottom:104px}
+#categories,#brands,#shop{scroll-margin-top:18px}
+.catalog-eyebrow{display:block;margin-bottom:7px;color:#a83227;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.catalog-category-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.catalog-category-card{display:flex;align-items:center;flex-direction:column;gap:8px;min-width:0;padding:14px 12px;border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);text-align:center;transition:transform .18s,border-color .18s,background .18s}
+.catalog-category-card:hover,.catalog-category-card.active{transform:translateY(-2px);border-color:#78966e;background:#f0f3e9}
+.catalog-category-card strong{font-size:12px}
+.catalog-category-card small{display:flex;align-items:center;gap:4px;color:var(--muted);font-size:9px}
+.catalog-category-card small b{color:var(--green);font-size:10px}
+.catalog-category-card small i{font-style:normal;color:#a83227}
+.catalog-category-art{width:100px;height:100px;flex:none;border:1px solid #ebe6da;border-radius:14px;background-color:#f4f0e7;background-image:url("assets/agri-product-sprite.png");background-size:400% 400%;background-position:var(--sprite-x) var(--sprite-y);background-repeat:no-repeat}
+.subcategory-shelf{margin-top:16px;padding:14px 16px;border:1px solid #dfe3d7;border-radius:14px;background:#f0f2e8}
+.subcategory-intro{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.subcategory-intro strong{display:block;font-size:13px}
+.subcategory-intro small,.subcategory-intro>span{color:var(--muted);font-size:10px}
+.subcategory-chips{display:flex;gap:8px;overflow-x:auto;padding:2px 1px 4px;scrollbar-width:thin}
+.subcategory-chip{flex:none;border:1px solid #d9dfd4;border-radius:999px;background:#fff;padding:8px 12px;color:#465348;font-size:10px;font-weight:700}
+.subcategory-chip.active,.subcategory-chip:hover{background:var(--green);border-color:var(--green);color:#fff}
+.brand-section{padding:20px 0 4px;border-top:1px solid var(--line)}
+.brand-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.brand-card{display:flex;align-items:center;gap:10px;min-width:0;padding:11px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);text-align:left;transition:.18s}
+.brand-card:hover,.brand-card.active{border-color:#819775;background:#f0f3e9;transform:translateY(-1px)}
+.brand-mark{display:block;width:42px;height:42px;flex:none;object-fit:cover;border-radius:12px;background:#e7eedc}
+.brand-tone-1{background:#f0e7d4;color:#8f3a25}.brand-tone-2{background:#e2eddf;color:#315b38}.brand-tone-3{background:#e9e5d9;color:#303a2f}.brand-tone-4{background:#f2e7e3;color:#9e3829}.brand-tone-5{background:#e4ebef;color:#31525e}
+.brand-card-copy{display:block;min-width:0;flex:1}
+.brand-card-copy strong{display:block;overflow:hidden;font-size:11px;text-overflow:ellipsis;white-space:nowrap}
+.brand-card-copy small{display:flex;gap:4px;align-items:center;margin-top:3px;color:var(--muted);font-size:9px}
+.brand-card-copy small b{color:var(--green)}
+.brand-arrow{color:#a83227;font-size:15px}
+.catalog-meta{display:flex;justify-content:space-between;align-items:center;margin:0 0 12px;color:#4f5d50;font-size:11px}
+.catalog-meta b{color:var(--green);font-size:14px}
+.catalog-meta small{color:var(--muted);font-size:10px}
+.product-photo{height:auto;aspect-ratio:1/1;background:#f2eee5}
+.catalog-sprite{display:block;width:100%;height:100%;background-color:#f4f0e7;background-image:url("assets/agri-product-sprite.png");background-size:400% 400%;background-position:var(--sprite-x) var(--sprite-y);background-repeat:no-repeat}
+.product-subcategory{margin-top:-3px;color:#7a8579;font-size:9px}
+.product{position:relative;overflow:visible}
+.product:focus-within{z-index:20;transform:none}
+.product-photo{overflow:hidden;border-radius:13px 13px 0 0}
+.product-variant-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px}
+.pack-picker{position:relative;min-width:0;flex:1}
+.pack-picker summary{display:flex;align-items:center;justify-content:space-between;gap:7px;list-style:none;cursor:pointer;min-height:34px;padding:6px 9px;border:1px solid #dce2d8;border-radius:8px;background:#fbfbf7;color:#33463a;font-size:10px}
+.pack-picker summary::-webkit-details-marker{display:none}
+.pack-picker summary:after{content:'▾';color:#758078;font-size:11px}
+.pack-current{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--green)}
+.pack-popover{position:absolute;z-index:30;left:0;bottom:calc(100% + 8px);width:min(240px,calc(100vw - 42px));padding:12px;border:1px solid #dce2d8;border-radius:12px;background:#fff;box-shadow:0 12px 32px #1b2b1b26}
+.pack-popover>strong{display:block;margin-bottom:8px;font-size:11px}
+.pack-options{display:flex;flex-wrap:wrap;gap:6px}
+.pack-option{border:1px solid #dce2d8;border-radius:7px;background:#f8f8f3;padding:7px 8px;color:#465348;font-size:9px;font-weight:700}
+.pack-option.active,.pack-option:hover{border-color:var(--green);background:var(--green);color:#fff}
+.pack-popover>small{display:block;margin-top:8px;color:var(--muted);font-size:8px;line-height:1.4}
+.product-quantity{display:flex;align-items:center;gap:6px;flex:none}
+.product-quantity>span{color:var(--muted);font-size:9px}
+.quantity-control{display:flex;align-items:center;overflow:hidden;border:1px solid #dce2d8;border-radius:8px;background:#fff}
+.quantity-control button{width:25px;height:32px;border:0;background:#f6f7f1;color:var(--green);font-size:15px;font-weight:700}
+.quantity-control button:disabled{color:#b5bcb3;cursor:not-allowed}
+.quantity-control output{min-width:23px;text-align:center;color:var(--ink);font-size:10px;font-weight:700}
+.product-foot{gap:8px;margin-top:10px;padding-top:10px}
+.product-foot .price{font-size:16px;white-space:nowrap}
+.add-to-cart{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;flex:1;border:0;border-radius:8px;background:var(--green);padding:8px 10px;color:#fff;font-size:10px;font-weight:800;white-space:nowrap;transition:background .18s,transform .18s}
+.add-to-cart:hover{background:#173c29;transform:translateY(-1px)}
+.add-to-cart svg{width:15px;height:15px;flex:none}
+.product-title{min-height:37px}
+.load-more-button{display:block;margin:22px auto 18px;padding:12px 19px;border:1px solid #b8c7af;border-radius:9px;background:#fff;color:var(--green);font-size:11px;font-weight:800}
+.load-more-button:hover{background:#edf1e8}
+.load-more-button[hidden]{display:none}
+#productLoadSentinel{height:1px}
+.fixed-farm-nav{position:fixed;z-index:50;left:0;right:0;bottom:0;transform:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));width:100%;padding:7px 14px calc(7px + env(safe-area-inset-bottom));border:0;border-top:1px solid #d7dfd2;border-radius:0;background:#fbfcf7;box-shadow:0 -5px 22px #15231a18;backdrop-filter:blur(12px)}
+.farm-nav-item{display:flex;align-items:center;flex-direction:column;justify-content:center;gap:2px;min-height:49px;border:0;border-radius:6px;background:transparent;color:#657165}
+.farm-nav-item>span{font-size:19px;line-height:1}
+.farm-nav-item small{font-size:9px;font-weight:700}
+.farm-nav-item.active{background:#e6eddf;color:#244f37}
+.farm-nav-item.rohan-nav>span{color:#b83224}
+.order-lookup{display:grid;gap:8px;margin-top:18px}
+.order-lookup label{font-size:11px;font-weight:700}
+.order-lookup input{width:100%;border:1px solid #d5ddce;border-radius:7px;padding:11px;background:#fff;font:12px 'DM Sans',sans-serif}
+.order-lookup button{min-height:40px;border:0;border-radius:7px;background:#244f37;color:#fff;font-size:11px;font-weight:800}
+.order-result{margin-top:15px;padding:13px;border-radius:9px;background:#edf1e7;color:#526151;font-size:11px;line-height:1.6}
+.support-options{display:grid;gap:8px;margin-top:14px}
+.support-options button{padding:12px;border:1px solid #dfe2d7;border-radius:9px;background:#fff;color:#26372a;text-align:left;font-size:11px;font-weight:700}
+.support-options button:hover{border-color:#89a27b;background:#f0f3e9}
+.ai-panel{max-height:calc(100dvh - 34px);overflow:auto}
+.ai-messages{display:grid;gap:9px;max-height:260px;overflow:auto;padding:12px 0}
+.ai-bubble,.ai-user-bubble{max-width:90%;padding:10px 12px;border-radius:12px;font-size:11px;line-height:1.6}
+.ai-bubble{background:#e8eee1;color:#314333;border-bottom-left-radius:3px}
+.ai-user-bubble{justify-self:end;background:#244f37;color:#fff;border-bottom-right-radius:3px}
+.ai-quick{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 11px}
+.ai-quick button{border:1px solid #ccd8c7;border-radius:999px;background:#fff;padding:7px 9px;color:#31543b;font-size:9px}
+.ai-form{display:flex;gap:7px}
+.ai-form input{flex:1;min-width:0;border:1px solid #d5ddce;border-radius:7px;padding:10px;background:#fff;font:12px 'DM Sans',sans-serif}
+.ai-form button{border:0;border-radius:7px;background:#244f37;color:#fff;padding:0 13px;font-size:11px;font-weight:800}
+@media(max-width:900px){.catalog-category-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.brand-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.products{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:620px){body{padding-bottom:94px}.catalog-category-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.catalog-category-card{padding:11px 8px}.catalog-category-art{width:84px;height:84px}.brand-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.brand-card{padding:8px;gap:7px}.brand-mark{width:34px;height:34px;border-radius:10px}.brand-card-copy strong{font-size:10px}.products{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.product-photo{aspect-ratio:1/1}.product-body{padding:10px}.product-title{font-size:11px;min-height:44px}.product-subcategory{font-size:8px}.product-variant-row{gap:5px}.pack-picker summary{gap:4px;padding:5px 6px;font-size:9px}.product-quantity{gap:4px}.quantity-control button{width:23px;height:30px}.product-quantity>span{font-size:8px}.product-foot{align-items:center;gap:5px}.product-foot .price{font-size:14px}.price small{font-size:8px;margin-left:2px}.add-to-cart{gap:4px;padding:7px 6px;font-size:9px}.add-to-cart svg{width:13px;height:13px}.product:nth-child(even) .pack-popover{left:auto;right:0}.fixed-farm-nav{padding:5px 6px calc(5px + env(safe-area-inset-bottom))}.farm-nav-item{min-height:48px;gap:1px}.farm-nav-item>span{font-size:18px}.farm-nav-item small{font-size:8px}.subcategory-shelf{padding:12px}.subcategory-intro{align-items:flex-start}.subcategory-intro>span{white-space:nowrap}.catalog-meta{align-items:flex-start;gap:8px}.ai-panel{padding:22px}}
+
+/* A seed rises into a sprout inside the configurable Agro Seed mark. */
+.brandmark-animated{overflow:visible}
+.brandmark-animated svg{width:25px;height:25px;overflow:visible}
+.sprout-ground{fill:none;stroke:#b8c99c;stroke-width:1.8;stroke-linecap:round;opacity:.9}
+.sprout-stem{fill:none;stroke:#b8c99c;stroke-width:2.2;stroke-linecap:round;stroke-dasharray:14;stroke-dashoffset:14;animation:agro-stem-grow 7s ease-in-out infinite}
+.sprout-leaf{fill:#b8c99c;opacity:0;transform-box:fill-box;animation:agro-leaf-grow 7s cubic-bezier(.2,.8,.2,1) infinite}
+.sprout-leaf-left{transform-origin:right bottom}
+.sprout-leaf-right{fill:#f1f3e8;transform-origin:left bottom;animation-delay:.12s}
+.brand-name{animation:agro-wordmark-glow 7s ease-in-out infinite}
+@keyframes agro-stem-grow{0%,9%,91%,100%{stroke-dashoffset:14}24%,82%{stroke-dashoffset:0}}
+@keyframes agro-leaf-grow{0%,17%,89%,100%{opacity:0;transform:scale(.15) rotate(-24deg)}29%,61%{opacity:1;transform:scale(1) rotate(0)}70%{opacity:1;transform:scale(1) rotate(-4deg)}77%,82%{opacity:1;transform:scale(1) rotate(3deg)}}
+@keyframes agro-wordmark-glow{0%,30%,100%{color:var(--ink);text-shadow:none}36%,46%{color:var(--green);text-shadow:0 0 9px #b8c99c88}}
+@media(prefers-reduced-motion:reduce){.brandmark-animated,.brand-name,.sprout-stem,.sprout-leaf{animation:none!important}.sprout-stem{stroke-dashoffset:0}.sprout-leaf{opacity:1;transform:none}.brand-name{color:var(--ink);text-shadow:none}}
+

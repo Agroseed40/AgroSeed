@@ -1,0 +1,52 @@
+#agro-debug-root {
+  position: fixed;
+  z-index: 1000;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  color: #18251c;
+  font: 13px/1.45 'DM Sans', system-ui, sans-serif;
+}
+
+#agro-debug-toggle {
+  display: block;
+  border: 1px solid #254e37;
+  border-right: 0;
+  border-radius: 9px 0 0 9px;
+  padding: 11px 10px;
+  background: #244f37;
+  color: #f6f4ea;
+  font: 800 11px/1 'DM Sans', system-ui, sans-serif;
+  letter-spacing: .08em;
+  cursor: pointer;
+  box-shadow: 0 4px 18px #13241733;
+}
+
+#agro-debug-panel {
+  position: absolute;
+  top: 50%;
+  right: 44px;
+  width: min(350px, calc(100vw - 58px));
+  max-height: min(78vh, 650px);
+  overflow: auto;
+  transform: translateY(-50%);
+  border: 1px solid #d7dece;
+  border-radius: 14px;
+  padding: 17px;
+  background: #fbfbf6;
+  box-shadow: 0 14px 42px #1324172e;
+}
+
+#agro-debug-panel[hidden] { display: none !important; }
+#agro-debug-panel h2 { margin: 0; font: 800 16px/1.2 'Manrope', system-ui, sans-serif; }
+#agro-debug-panel p { margin: 6px 0 14px; color: #68736a; font-size: 11px; }
+#agro-debug-panel .agro-debug-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid #e6e9e0; padding: 10px 0; }
+#agro-debug-panel .agro-debug-row strong { font-size: 12px; }
+#agro-debug-panel .agro-debug-state { flex: none; border-radius: 999px; padding: 4px 8px; background: #edf0e8; color: #59655b; font-size: 10px; font-weight: 800; }
+#agro-debug-panel .agro-debug-state[data-state="ok"] { background: #e3f1e5; color: #21613b; }
+#agro-debug-panel .agro-debug-state[data-state="error"] { background: #fae5e1; color: #963729; }
+#agro-debug-panel button.agro-debug-action { width: 100%; margin-top: 9px; border: 0; border-radius: 8px; padding: 10px 12px; background: #244f37; color: #fff; font: 700 12px 'DM Sans', system-ui, sans-serif; cursor: pointer; }
+#agro-debug-panel button.agro-debug-action.secondary { border: 1px solid #cdd6c8; background: #fff; color: #244f37; }
+#agro-debug-panel button.agro-debug-action:disabled { opacity: .6; cursor: wait; }
+#agro-debug-output { min-height: 50px; max-height: 150px; overflow: auto; margin: 10px 0 0; border-radius: 8px; padding: 9px; background: #f0f2ec; color: #465248; white-space: pre-wrap; overflow-wrap: anywhere; font: 10px/1.45 ui-monospace, Consolas, monospace; }
+#agro-debug-panel .agro-debug-warning { margin-top: 10px; border-left: 3px solid #b57825; padding: 7px 9px; background: #fbf2e2; color: #6b4a1d; font-size: 10px; }

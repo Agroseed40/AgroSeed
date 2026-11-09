@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "sku": "SB-SEED-0001",
+    "name": "अर्का रक्षक टमाटर के बीज",
+    "nameEn": "Arka Rakshak Tomato Seeds",
+    "brand": "सहज बीज",
+    "brandEn": "Sahaj Seeds",
+    "category": "बीज",
+    "categoryEn": "Seeds",
+    "pricePaise": 24500,
+    "mrpPaise": 29500,
+    "stock": 25,
+    "active": true
+  },
+  {
+    "id": 2,
+    "sku": "SB-NUTR-0002",
+    "name": "नीम और समुद्री शैवाल मिट्टी टॉनिक",
+    "nameEn": "Neem and Seaweed Soil Tonic",
+    "brand": "अर्थकाइंड",
+    "brandEn": "Earthkind",
+    "category": "पौधों का पोषण",
+    "categoryEn": "Plant nutrition",
+    "pricePaise": 39000,
+    "mrpPaise": 45000,
+    "stock": 18,
+    "active": true
+  },
+  {
+    "id": 3,
+    "sku": "SB-PEST-0003",
+    "name": "पीले चिपचिपे कीट कार्ड · 10 का पैक",
+    "nameEn": "Yellow Sticky Pest Cards · Pack of 10",
+    "brand": "हमारा चयन",
+    "brandEn": "Our Selection",
+    "category": "फसल सुरक्षा",
+    "categoryEn": "Crop protection",
+    "pricePaise": 18000,
+    "mrpPaise": 22000,
+    "stock": 40,
+    "active": true
+  },
+  {
+    "id": 4,
+    "sku": "SB-TOOL-0004",
+    "name": "मजबूत बागवानी छँटाई कैंची",
+    "nameEn": "Garden Pruning Shears",
+    "brand": "किसान वर्क्स",
+    "brandEn": "Kisan Works",
+    "category": "औज़ार",
+    "categoryEn": "Farm tools",
+    "pricePaise": 68000,
+    "mrpPaise": 79000,
+    "stock": 12,
+    "active": true
+  },
+  {
+    "id": 5,
+    "sku": "SB-SEED-0005",
+    "name": "मानसून के लिए भिंडी के बीज",
+    "nameEn": "Monsoon Okra Seeds",
+    "brand": "सहज बीज",
+    "brandEn": "Sahaj Seeds",
+    "category": "बीज",
+    "categoryEn": "Seeds",
+    "pricePaise": 12000,
+    "mrpPaise": 15000,
+    "stock": 35,
+    "active": true
+  }
+]

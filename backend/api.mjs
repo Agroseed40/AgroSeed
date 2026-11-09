@@ -7,7 +7,7 @@ import { handleCustomerAuth } from "./customer-auth.mjs";
 
 const backendDir = path.dirname(fileURLToPath(import.meta.url));
 const appRoot = path.resolve(backendDir, "..");
-const dataDir = path.join(appRoot, "storage");
+const dataDir = path.resolve(process.env.AGROSEED_STORAGE_DIR || path.join(appRoot, "storage"));
 const dataFile = path.join(dataDir, "sandbox-store.json");
 const seedFile = path.join(backendDir, "seed", "products.json");
 const orderNumberPattern = /^AS-SBX-[A-Z0-9-]{8,40}$/;

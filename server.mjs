@@ -8,7 +8,8 @@ import { runtimeConfig } from "./config/features.mjs";
 
 const appRoot = path.dirname(fileURLToPath(import.meta.url));
 const publicRoot = path.join(appRoot, "public");
-const uploadRoot = path.resolve(appRoot, "storage", "uploads");
+const storageRoot = path.resolve(process.env.AGROSEED_STORAGE_DIR || path.join(appRoot, "storage"));
+const uploadRoot = path.join(storageRoot, "uploads");
 const portValue = process.env.PORT || "3000";
 const port = Number(portValue);
 if (!Number.isInteger(port) || port < 1 || port > 65535) {

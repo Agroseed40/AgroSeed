@@ -6,20 +6,15 @@ The storefront and API run in one Node.js server. Amplify must publish the serve
 
 The root `amplify.yml` installs dependencies, runs `npm run build`, and publishes `.amplify-hosting/`. The build keeps the GoDaddy ZIP and also creates the Amplify deployment manifest and self-contained Node.js 22 compute bundle.
 
-The Amplify compute server listens on the `PORT` supplied by the platform (Amplify compute uses port 3000). The bundle routes requests through the server, which serves both the storefront files and API.
+The Amplify compute server listens on the `PORT` supplied by the platform (Amplify compute uses port 3000). The bundle routes requests through the server, which serves both the storefront files and API. Its entrypoint explicitly selects the sandbox preview mode and places preview data in `/tmp/agroseed`, because Amplify compute does not allow writes beside the deployed application files.
 
 ## Amplify app environment
 
-Set these values in the Amplify app's environment settings:
+This Amplify bundle is a public staging preview, not a production store. The entrypoint sets `NODE_ENV=development`, `AGROSEED_DEMO_MODE=true`, and `AGROSEED_STORAGE_DIR=/tmp/agroseed` in the compute process. Do not set `PORT`; Amplify supplies it. The preview filesystem is temporary, so products, settings, and preview orders can disappear or differ between compute instances.
 
-```text
-NODE_ENV=production
-AGROSEED_DEMO_MODE=false
-```
+Do not connect real customers, payments, or orders to this preview. Production requires a durable catalog/order database and durable product image storage. Add database and provider credentials only through AWS secret/environment settings, never in Git.
 
-Do not set `PORT`; Amplify supplies it. Add database and provider credentials only in the AWS app's secret/environment settings, never in Git.
-
-The `Failed to set up process.env.secrets` warning means Amplify could not read its configured SSM parameter path. It did not cause the missing `index.html` warning. Configure the referenced parameters in AWS Systems Manager Parameter Store or remove the unused secret path configuration.
+The `Failed to set up process.env.secrets` warning means Amplify could not read its configured SSM parameter path. It does not cause the sandbox file-write error. Configure the referenced parameters in AWS Systems Manager Parameter Store when the production services are ready, or remove the unused secret path configuration.
 
 ## Data persistence and launch readiness
 

@@ -9,7 +9,7 @@ const manifest = {
   version: 1,
   framework: { name: "agroseed-node", version: "1.0.0" },
   routes: [{ path: "/*", target: { kind: "Compute", src: "default" } }],
-  computeResources: [{ name: "default", runtime: "nodejs22.x", entrypoint: "server.mjs" }]
+  computeResources: [{ name: "default", runtime: "nodejs22.x", entrypoint: "amplify-entry.mjs" }]
 };
 
 async function directorySize(directory) {
@@ -26,6 +26,15 @@ await mkdir(compute, { recursive: true });
 for (const entry of ["server.mjs", "package.json", "package-lock.json", "backend", "config", "public", "scripts", "node_modules"]) {
   await cp(path.join(root, entry), path.join(compute, entry), { recursive: true });
 }
+await writeFile(path.join(compute, "amplify-entry.mjs"), [
+  'import { mkdir } from "node:fs/promises";',
+  'process.env.NODE_ENV = "development";',
+  'process.env.AGROSEED_DEMO_MODE = "true";',
+  'process.env.AGROSEED_STORAGE_DIR = "/tmp/agroseed";',
+  'await mkdir(process.env.AGROSEED_STORAGE_DIR, { recursive: true });',
+  'await import("./server.mjs");',
+  ""
+].join("\n"));
 await writeFile(path.join(output, "deploy-manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
 
 const size = await directorySize(compute);

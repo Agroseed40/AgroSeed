@@ -5,7 +5,8 @@ import { fileURLToPath } from "node:url";
 import { allowSandboxOrders, demoMode } from "../config/features.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const storeFile = path.join(root, "storage", "sandbox-store.json");
+const storageRoot = path.resolve(process.env.AGROSEED_STORAGE_DIR || path.join(root, "storage"));
+const storeFile = path.join(storageRoot, "sandbox-store.json");
 const seedFile = path.join(root, "backend", "seed", "products.json");
 const demoEnabled = demoMode && process.env.NODE_ENV !== "production";
 const sessions = new Map();
@@ -454,7 +455,7 @@ export async function handleSandboxRequest(request, response, pathname) {
         if (!(isPng || isJpeg || isWebp)) { send(response, 400, { error: "The image contents do not match PNG, JPG, or WebP format." }); return true; }
         const extension = isPng ? "png" : isJpeg ? "jpg" : "webp";
         const name = `${randomBytes(18).toString("hex")}.${extension}`;
-        const directory = path.join(root, "storage", "uploads");
+        const directory = path.join(storageRoot, "uploads");
         await mkdir(directory, { recursive: true });
         await writeFile(path.join(directory, name), buffer, { flag: "wx" });
         await change((data) => audit(data, "image_uploaded", "image", name, "Product image uploaded to the local sandbox"));

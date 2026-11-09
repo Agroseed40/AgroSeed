@@ -1,4 +1,4 @@
-﻿import { randomBytes, randomUUID } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import {
   CognitoIdentityProviderClient,
   InitiateAuthCommand,
@@ -145,7 +145,7 @@ function cognitoError(error) {
   const name = error?.name || "";
   if (["CodeMismatchException", "ExpiredCodeException"].includes(name)) return Object.assign(new Error("That code is incorrect or expired. Request a new code."), { statusCode: 400 });
   if (["TooManyRequestsException", "TooManyFailedAttemptsException", "LimitExceededException"].includes(name)) return Object.assign(new Error("Too many attempts. Wait a little before requesting another code."), { statusCode: 429 });
-  if (["UserNotFoundException", "NotAuthorizedException"].includes(name)) return Object.assign(new Error("We could not verify that number. Check it and try again."), { statusCode: 400 });
+  if (["UserNotFoundException", "NotAuthorizedException"].includes(name)) return Object.assign(new Error("We couldn't start sign-in for this number. Check the number and try again. If it continues, ask AgroSeed support to check the phone sign-in setup."), { statusCode: 400 });
   if (["InvalidParameterException", "InvalidPasswordException", "UsernameExistsException"].includes(name)) return Object.assign(new Error("Cognito is not configured for phone OTP sign-in yet. Check the user pool and app client settings."), { statusCode: 503 });
   return Object.assign(new Error("Phone sign-in could not be completed. Please try again."), { statusCode: 502 });
 }
@@ -298,6 +298,7 @@ export async function handleCustomerAuth(req, res, pathname) {
     return send(res, safeError.statusCode || 500, { error: safeError.message });
   }
 }
+
 
 
 

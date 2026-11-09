@@ -1,4 +1,4 @@
-import { randomBytes, randomUUID } from "node:crypto";
+﻿import { randomBytes, randomUUID } from "node:crypto";
 import {
   CognitoIdentityProviderClient,
   InitiateAuthCommand,
@@ -10,6 +10,7 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import { CognitoJwtVerifier } from "aws-jwt-verify";
 import mysql from "mysql2/promise";
+import { handleSupabaseCustomerAuth } from "./customer-auth-supabase.mjs";
 
 const COOKIE = "agroseed_customer";
 const REFRESH_COOKIE = `${COOKIE}_refresh`;
@@ -200,6 +201,9 @@ async function startPhoneSignIn(phone) {
   return send(res, 200, { ok: true, customer: current, csrf }, { "Set-Cookie": cookieHeaders(req, tokens, csrf) });
 }
 export async function handleCustomerAuth(req, res, pathname) {
+  if (String(process.env.CUSTOMER_AUTH_PROVIDER || "cognito").trim().toLowerCase() === "supabase") {
+    return handleSupabaseCustomerAuth(req, res, pathname);
+  }
   const method = req.method;
   if (!pathname.startsWith("/api/v1/customer/")) return false;
   try {
@@ -298,7 +302,6 @@ export async function handleCustomerAuth(req, res, pathname) {
     return send(res, safeError.statusCode || 500, { error: safeError.message });
   }
 }
-
 
 
 

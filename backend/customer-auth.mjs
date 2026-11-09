@@ -1,4 +1,4 @@
-﻿import { randomBytes, randomUUID } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import {
   CognitoIdentityProviderClient,
   InitiateAuthCommand,
@@ -201,7 +201,7 @@ async function startPhoneSignIn(phone) {
   return send(res, 200, { ok: true, customer: current, csrf }, { "Set-Cookie": cookieHeaders(req, tokens, csrf) });
 }
 export async function handleCustomerAuth(req, res, pathname) {
-  if (String(process.env.CUSTOMER_AUTH_PROVIDER || "cognito").trim().toLowerCase() === "supabase") {
+  if (String(process.env.CUSTOMER_AUTH_PROVIDER || "supabase").trim().toLowerCase() === "supabase") {
     return handleSupabaseCustomerAuth(req, res, pathname);
   }
   const method = req.method;

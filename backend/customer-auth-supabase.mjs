@@ -17,18 +17,16 @@ async function body(req) {
 function config() {
   const url = String(process.env.SUPABASE_URL || "").trim().replace(/\/$/, "");
   const key = String(process.env.SUPABASE_PUBLISHABLE_KEY || "").trim();
-  if (!url || !key) throw Object.assign(new Error("Phone sign-in is not configured. Add the Supabase project URL and publishable key to the server environment."), { statusCode: 503 });
+  if (!url || !key) throw Object.assign(new Error("Email sign-in is not configured. Add the Supabase project URL and publishable key to the server environment."), { statusCode: 503 });
   return { url, issuer: `${url}/auth/v1` };
 }
 function supabase(token) {
   config();
   return token ? createContextClient({ auth: { token } }) : createContextClient();
 }
-function phoneNumber(input) {
-  const value = String(input || "").replace(/[\s()-]/g, "");
-  if (/^[6-9]\d{9}$/.test(value)) return `91${value}`;
-  if (/^\+?[1-9]\d{7,14}$/.test(value)) return value.replace(/^\+/, "");
-  return null;
+function emailAddress(input) {
+  const value = String(input || "").trim().toLowerCase();
+  return value.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? value : null;
 }
 function readCookie(req, name) {
   const value = (req.headers.cookie || "").split(";").map((part) => part.trim()).find((part) => part.startsWith(`${name}=`));
@@ -126,16 +124,16 @@ function authError(error, phase) {
   const status = Number(error?.status || 0), message = String(error?.message || "").toLowerCase();
   if (status === 429 || /rate.?limit|too many|wait .*second/.test(message)) return Object.assign(new Error("Too many code requests. Wait a little and try again."), { statusCode: 429 });
   if (phase === "verify" && (status === 400 || /otp|token|expired|invalid/.test(message))) return Object.assign(new Error("That code is incorrect or expired. Request a new code."), { statusCode: 400 });
-  if (phase === "request") return Object.assign(new Error("Supabase could not send a sign-in code. Check that Phone sign-in and an SMS provider are enabled in Supabase Auth."), { statusCode: status >= 400 && status < 500 ? status : 502 });
-  return Object.assign(new Error("Phone sign-in could not be completed. Please try again."), { statusCode: 502 });
+  if (phase === "request") return Object.assign(new Error("Supabase could not send a sign-in code. Check that Email sign-in is enabled and email delivery is configured in Supabase Auth."), { statusCode: status >= 400 && status < 500 ? status : 502 });
+  return Object.assign(new Error("Email sign-in could not be completed. Please try again."), { statusCode: 502 });
 }
-async function issueCustomerSession(req, res, data, phone) {
+async function issueCustomerSession(req, res, data, email) {
   const session = data?.session, user = data?.user || session?.user;
   if (!session?.access_token || !session?.refresh_token || !user?.id) throw Object.assign(new Error("Supabase did not return a complete customer session."), { statusCode: 502 });
-  const verifiedPhone = String(user.phone || "").replace(/\D/g, "");
-  if (!user.phone_confirmed_at || verifiedPhone !== phone) throw Object.assign(new Error("Supabase did not confirm ownership of this mobile number."), { statusCode: 401 });
+  const verifiedEmail = String(user.email || "").trim().toLowerCase();
+  if (!user.email_confirmed_at || verifiedEmail !== email) throw Object.assign(new Error("Supabase did not confirm ownership of this email address."), { statusCode: 401 });
   const csrf = randomBytes(24).toString("base64url");
-  const current = { id: user.id, phone: `+${phone}`, name: user.user_metadata?.full_name || user.user_metadata?.name || null, email: user.email || null };
+  const current = { id: user.id, phone: user.phone || null, name: user.user_metadata?.full_name || user.user_metadata?.name || null, email: verifiedEmail };
   return send(res, 200, { ok: true, customer: current, csrf }, { "Set-Cookie": cookieHeaders(req, session, csrf) });
 }
 export async function handleSupabaseCustomerAuth(req, res, pathname) {
@@ -146,19 +144,19 @@ export async function handleSupabaseCustomerAuth(req, res, pathname) {
     if (method === "POST" && ["/api/v1/customer/otp/request", "/api/v1/customer/otp/verify"].includes(pathname) && !sameOrigin(req)) return send(res, 403, { error: "Request origin could not be verified." });
     if (method === "POST" && pathname === "/api/v1/customer/otp/request") {
       phase = "request";
-      const data = await body(req), phone = phoneNumber(data.phone);
-      if (!phone) return send(res, 400, { error: "Enter a valid mobile number with country code, or a 10-digit Indian mobile number." });
-      const { error } = await supabase().auth.signInWithOtp({ phone: `+${phone}`, options: { shouldCreateUser: true } });
+      const data = await body(req), email = emailAddress(data.email);
+      if (!email) return send(res, 400, { error: "Enter a valid email address." });
+      const { error } = await supabase().auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
       if (error) throw authError(error, phase);
-      return send(res, 200, { ok: true, flow: "supabase", phone: `+${phone}`, challengeSession: "", message: "Verification code sent by SMS." });
+      return send(res, 200, { ok: true, flow: "supabase", email, challengeSession: "", message: "Verification code sent by email." });
     }
     if (method === "POST" && pathname === "/api/v1/customer/otp/verify") {
       phase = "verify";
-      const data = await body(req), phone = phoneNumber(data.phone), otp = String(data.otp || "").trim();
-      if (!phone || !/^\d{4,9}$/.test(otp)) return send(res, 400, { error: "Enter your mobile number and the verification code." });
-      const result = await supabase().auth.verifyOtp({ phone: `+${phone}`, token: otp, type: "sms" });
+      const data = await body(req), email = emailAddress(data.email), otp = String(data.otp || "").trim();
+      if (!email || !/^\d{4,9}$/.test(otp)) return send(res, 400, { error: "Enter your email address and the verification code." });
+      const result = await supabase().auth.verifyOtp({ email, token: otp, type: "email" });
       if (result.error) throw authError(result.error, phase);
-      return issueCustomerSession(req, res, result.data, phone);
+      return issueCustomerSession(req, res, result.data, email);
     }
     if (method === "GET" && pathname === "/api/v1/customer/session") {
       const current = await supabaseSession(req, res);
@@ -178,7 +176,7 @@ export async function handleSupabaseCustomerAuth(req, res, pathname) {
       return send(res, 200, { ok: true }, { "Set-Cookie": clearAuthCookies(req) });
     }
     const current = await supabaseSession(req, res);
-    if (!current) return send(res, 401, { error: "Sign in with your verified mobile number to continue." });
+    if (!current) return send(res, 401, { error: "Sign in with your verified email address to continue." });
     if (!sameOrigin(req)) return send(res, 403, { error: "Request origin could not be verified." });
     if (method !== "GET" && (!current.csrf_token || req.headers["x-agroseed-csrf"] !== current.csrf_token)) return send(res, 403, { error: "Refresh your account page and try again." });
     const db = supabase(current.access_token);

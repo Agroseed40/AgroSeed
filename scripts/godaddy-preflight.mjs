@@ -68,7 +68,7 @@ const sourceFiles = [];
 
 async function collectSources(directory) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
-    if (entry.name === "node_modules" || entry.name === ".git" || entry.name === "dist" || entry.name === "storage") continue;
+    if (entry.name === "node_modules" || entry.name === ".git" || entry.name === "dist" || entry.name === ".amplify-hosting" || entry.name === "storage") continue;
     const entryPath = path.join(directory, entry.name);
     if (entry.isDirectory()) await collectSources(entryPath);
     else if (/\.(?:mjs|js)$/.test(entry.name)) sourceFiles.push(entryPath);

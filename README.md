@@ -1,6 +1,6 @@
 # AgroSeed
 
-AgroSeed is a Node.js storefront and API for an Indian farm-supplies store. The storefront and backend run in one process; GoDaddy deploys the same package with `npm start`.
+AgroSeed is a Node.js storefront and API for an Indian farm-supplies store. The storefront and backend run in one process. The build creates a GoDaddy preview ZIP and an AWS Amplify server deployment bundle.
 
 ## Run the preview
 
@@ -34,9 +34,11 @@ package.json        Runtime commands and dependencies
 ## Useful commands
 
 ```powershell
-npm run build                 # Check files and create dist/agroseed-preview.zip
+npm run build                 # Check files and create GoDaddy and Amplify deployment packages
 npm run migrate:customers     # Apply customer-account tables to configured MySQL
 ```
+
+AWS Amplify uses the `amplify.yml` build settings and deploys `.amplify-hosting/`. Configure `NODE_ENV=production` and `AGROSEED_DEMO_MODE=false` in the Amplify app environment before publishing. The app needs a production database and approved service credentials before live customer workflows can be enabled. See [AWS Amplify deployment notes](docs/aws-amplify-deployment.md).
 
 The customer-account migration requires `DATABASE_URL` or the `DB_*` settings. Real phone verification also requires MSG91 credentials. Do not put production secrets in source files.
 

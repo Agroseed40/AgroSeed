@@ -10,6 +10,11 @@ const compute = path.join(output, "compute", "default");
 const cognitoUserPoolId = process.env.COGNITO_USER_POOL_ID || "ap-south-1_XbcHEhauT";
 const cognitoClientId = process.env.COGNITO_CLIENT_ID || "6tf8mnnek8c7er59vk2phv0dlh";
 const cognitoRegion = process.env.COGNITO_REGION || cognitoUserPoolId.split("_")[0];
+// Carry Amplify build-time auth configuration into the generated compute runtime.
+// Only the Supabase URL and publishable key belong in this bundle; never include a secret key.
+const customerAuthProvider = String(process.env.CUSTOMER_AUTH_PROVIDER || "").trim();
+const supabaseUrl = String(process.env.SUPABASE_URL || "").trim();
+const supabasePublishableKey = String(process.env.SUPABASE_PUBLISHABLE_KEY || "").trim();
 const manifest = {
   version: 1,
   framework: { name: "agroseed-node", version: "1.0.0" },
@@ -39,6 +44,9 @@ await writeFile(path.join(compute, "amplify-entry.mjs"), [
   `process.env.COGNITO_USER_POOL_ID = ${JSON.stringify(cognitoUserPoolId)};`,
   `process.env.COGNITO_CLIENT_ID = ${JSON.stringify(cognitoClientId)};`,
   `process.env.COGNITO_REGION = ${JSON.stringify(cognitoRegion)};`,
+  `process.env.CUSTOMER_AUTH_PROVIDER = ${JSON.stringify(customerAuthProvider)} || process.env.CUSTOMER_AUTH_PROVIDER || "supabase";`,
+  `process.env.SUPABASE_URL = ${JSON.stringify(supabaseUrl)} || process.env.SUPABASE_URL || "";`,
+  `process.env.SUPABASE_PUBLISHABLE_KEY = ${JSON.stringify(supabasePublishableKey)} || process.env.SUPABASE_PUBLISHABLE_KEY || "";`,
   'await mkdir(process.env.AGROSEED_STORAGE_DIR, { recursive: true });',
   'await import("./server.mjs");',
   ""

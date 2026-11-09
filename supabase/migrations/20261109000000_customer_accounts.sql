@@ -41,6 +41,10 @@ alter table public.customers enable row level security;
 alter table public.customer_carts enable row level security;
 alter table public.customer_addresses enable row level security;
 
+grant select, insert, update on public.customers to authenticated;
+grant select, insert, update on public.customer_carts to authenticated;
+grant select, insert, update, delete on public.customer_addresses to authenticated;
+
 drop policy if exists customers_select_own on public.customers;
 create policy customers_select_own on public.customers
   for select to authenticated using (auth.uid() = id);

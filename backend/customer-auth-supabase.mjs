@@ -167,6 +167,14 @@ export async function handleSupabaseCustomerAuth(req, res, pathname) {
     }
     if (method === "DELETE" && pathname === "/api/v1/customer/session") {
       if (!sameOrigin(req)) return send(res, 403, { error: "Request origin could not be verified." });
+      const accessToken = readCookie(req, `${COOKIE}_access`) || readCookie(req, COOKIE), refreshToken = readCookie(req, REFRESH_COOKIE);
+      if (accessToken && refreshToken) {
+        try {
+          const client = supabase();
+          const established = await client.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+          if (!established.error) await client.auth.signOut({ scope: "local" });
+        } catch {}
+      }
       return send(res, 200, { ok: true }, { "Set-Cookie": clearAuthCookies(req) });
     }
     const current = await supabaseSession(req, res);

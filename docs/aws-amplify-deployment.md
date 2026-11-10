@@ -18,9 +18,10 @@ The storefront sends `/account/login` directly to Cognito Managed Login; there i
 
 Set these environment variables in Amplify build settings (the package script carries build-time values into the compute bundle):
 
-- `COGNITO_USER_POOL_ID` and `COGNITO_CLIENT_ID` (the client must be a public app client without a client secret).
+- `COGNITO_USER_POOL_ID` and `COGNITO_CLIENT_ID`. A public client without a secret is preferred; if your app client has a secret, also configure `COGNITO_CLIENT_SECRET` server-side.
 - `COGNITO_DOMAIN=https://ap-south-1xbchehaut.auth.ap-south-1.amazoncognito.com`.
 - `COGNITO_REDIRECT_URI=https://main.d1r4w0u6vll4kh.amplifyapp.com/api/v1/customer/callback`.
+- `COGNITO_CLIENT_SECRET`, only if the configured app client has a secret. Store it as an Amplify environment variable; never add its value to Git.
 
 In the Cognito console, choose **Managed login** branding for the user-pool domain and configure the app client for the authorization code grant with PKCE. The app requests only the required `openid` scope, so it does not depend on optional `email` or `profile` scopes being enabled. Cognito includes all user attributes readable by the app client in the ID token for an `openid`-only request. Add the exact callback URI above to the app client's callback URLs and `https://main.d1r4w0u6vll4kh.amplifyapp.com/` to its sign-out URLs. Cognito handles the customer identity and credentials; MySQL is still required for the app's saved carts and addresses. Apply `npm run migrate:customers` after MySQL is configured to enable those saved customer features.
 ## Data persistence and launch readiness

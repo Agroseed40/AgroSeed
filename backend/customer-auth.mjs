@@ -103,7 +103,7 @@ async function session(req, res) {
   if (idToken) { try { claims = await verifier.verify(idToken); } catch {} }
   if (!claims && refreshToken) {
     try {
-      const response = await fetch(`${domain}/oauth2/token`, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: new URLSearchParams({ grant_type: "refresh_token", client_id: clientId, refresh_token: refreshToken }) });
+      const response = await cognitoTokenRequest(domain, clientId, { grant_type: "refresh_token", refresh_token: refreshToken });
       if (!response.ok) return null;
       const refreshed = await response.json();
       const tokens = { IdToken: refreshed.id_token, AccessToken: refreshed.access_token, RefreshToken: refreshed.refresh_token || refreshToken, ExpiresIn: refreshed.expires_in };
@@ -160,6 +160,24 @@ function requestOrigin(req) {
 function callbackUri(req) {
   return String(process.env.COGNITO_REDIRECT_URI || `${requestOrigin(req)}/api/v1/customer/callback`).trim();
 }
+function cognitoTokenRequest(domain, clientId, parameters) {
+  const headers = { "Content-Type": "application/x-www-form-urlencoded" };
+  const clientSecret = String(process.env.COGNITO_CLIENT_SECRET || "").trim();
+  if (clientSecret) headers.Authorization = `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`;
+  return fetch(`${domain}/oauth2/token`, { method: "POST", headers, body: new URLSearchParams({ client_id: clientId, ...parameters }) });
+}
+async function cognitoTokenError(response) {
+  let data = {};
+  try { data = await response.json(); } catch {}
+  const messages = {
+    invalid_client: "Cognito rejected the app client credentials. If this app client has a secret, set COGNITO_CLIENT_SECRET in Amplify; otherwise check the app client ID.",
+    invalid_grant: "Cognito rejected the authorization code or PKCE proof. Start sign-in again; if it repeats, check that the callback URL exactly matches and the code has not already been used.",
+    unauthorized_client: "This Cognito app client is not enabled for the authorization code grant. Enable the code grant for this app client.",
+    invalid_scope: "Cognito does not allow the openid scope for this app client. Enable openid in its allowed OAuth scopes."
+  };
+  const message = messages[String(data.error || "")] || "Cognito rejected the token exchange. Check the app client grant, callback URL, and PKCE settings.";
+  return Object.assign(new Error(message), { statusCode: 502 });
+}
 function constantTimeEqual(left, right) {
   const a = Buffer.from(String(left || "")), b = Buffer.from(String(right || ""));
   return a.length === b.length && timingSafeEqual(a, b);
@@ -180,8 +198,8 @@ async function managedLoginCallback(req, res, url) {
   const expectedState = readCookie(req, OAUTH_STATE_COOKIE), codeVerifier = readCookie(req, OAUTH_VERIFIER_COOKIE), nonce = readCookie(req, OAUTH_NONCE_COOKIE);
   if (url.searchParams.has("error")) throw Object.assign(new Error("Cognito sign-in was cancelled or could not be completed."), { statusCode: 400 });
   if (!code || !constantTimeEqual(state, expectedState) || !codeVerifier || !nonce) throw Object.assign(new Error("Cognito sign-in could not be verified. Please start again."), { statusCode: 400 });
-  const response = await fetch(`${domain}/oauth2/token`, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: new URLSearchParams({ grant_type: "authorization_code", client_id: clientId, code, redirect_uri: callbackUri(req), code_verifier: codeVerifier }) });
-  if (!response.ok) throw Object.assign(new Error("Cognito could not complete sign-in. Please try again."), { statusCode: 502 });
+  const response = await cognitoTokenRequest(domain, clientId, { grant_type: "authorization_code", code, redirect_uri: callbackUri(req), code_verifier: codeVerifier });
+  if (!response.ok) throw await cognitoTokenError(response);
   const tokenResponse = await response.json();
   const tokens = { IdToken: tokenResponse.id_token, AccessToken: tokenResponse.access_token, RefreshToken: tokenResponse.refresh_token, ExpiresIn: tokenResponse.expires_in };
   if (!tokens.IdToken || !tokens.AccessToken || !tokens.RefreshToken) throw Object.assign(new Error("Cognito did not return a complete sign-in session."), { statusCode: 502 });

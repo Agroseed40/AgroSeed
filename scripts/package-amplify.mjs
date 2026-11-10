@@ -12,6 +12,7 @@ const cognitoClientId = process.env.COGNITO_CLIENT_ID || "6tf8mnnek8c7er59vk2phv
 const cognitoRegion = process.env.COGNITO_REGION || cognitoUserPoolId.split("_")[0];
 const cognitoDomain = process.env.COGNITO_DOMAIN || "https://ap-south-1xbchehaut.auth.ap-south-1.amazoncognito.com";
 const cognitoRedirectUri = process.env.COGNITO_REDIRECT_URI || "https://main.d1r4w0u6vll4kh.amplifyapp.com/api/v1/customer/callback";
+const cognitoClientSecret = process.env.COGNITO_CLIENT_SECRET || "";
 const manifest = {
   version: 1,
   framework: { name: "agroseed-node", version: "1.0.0" },
@@ -43,6 +44,7 @@ await writeFile(path.join(compute, "amplify-entry.mjs"), [
   `process.env.COGNITO_REGION = ${JSON.stringify(cognitoRegion)};`,
   `process.env.COGNITO_DOMAIN = ${JSON.stringify(cognitoDomain)} || process.env.COGNITO_DOMAIN || "";`,
   `process.env.COGNITO_REDIRECT_URI = ${JSON.stringify(cognitoRedirectUri)} || process.env.COGNITO_REDIRECT_URI || "";`,
+  `process.env.COGNITO_CLIENT_SECRET = ${JSON.stringify(cognitoClientSecret)} || process.env.COGNITO_CLIENT_SECRET || "";`,
   'await mkdir(process.env.AGROSEED_STORAGE_DIR, { recursive: true });',
   'await import("./server.mjs");',
   ""

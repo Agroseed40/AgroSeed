@@ -44,3 +44,5 @@
 }
 
 .logo-mark img,.brand-mark img{display:block;width:72%;height:72%;object-fit:contain}
+.account-signout{display:flex;justify-content:flex-end;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+

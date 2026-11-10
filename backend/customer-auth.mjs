@@ -13,6 +13,7 @@ const REFRESH_DAYS = 30;
 const OAUTH_STATE_COOKIE = `${COOKIE}_oauth_state`;
 const OAUTH_VERIFIER_COOKIE = `${COOKIE}_oauth_verifier`;
 const OAUTH_NONCE_COOKIE = `${COOKIE}_oauth_nonce`;
+const CUSTOMER_CLAIMS = new Set(["address", "birthdate", "email", "email_verified", "family_name", "gender", "given_name", "locale", "middle_name", "name", "nickname", "phone_number", "phone_number_verified", "picture", "preferred_username", "profile", "updated_at", "website", "zoneinfo", "cognito:username"]);
 const pool = process.env.DATABASE_URL
   ? mysql.createPool(process.env.DATABASE_URL)
   : process.env.DB_HOST && process.env.DB_NAME && process.env.DB_USER
@@ -117,7 +118,8 @@ async function session(req, res) {
   if (!claims?.sub) return null;
   let csrf = readCookie(req, CSRF_COOKIE);
   if (!csrf) { csrf = randomBytes(24).toString("base64url"); res.setHeader("Set-Cookie", cookieHeader(CSRF_COOKIE, csrf, secureRequest(req), REFRESH_DAYS * 86400)); }
-  return { id: claims.sub, phone: claims.phone_number ? String(claims.phone_number).replace(/^\+/, "") : null, name: claims.name || claims.given_name || null, email: claims.email || null, csrf_token: csrf, access_token: readCookie(req, `${COOKIE}_access`) };
+  const attributes = Object.fromEntries(Object.entries(claims).filter(([key, value]) => (CUSTOMER_CLAIMS.has(key) || key.startsWith("custom:")) && value != null));
+  return { id: claims.sub, phone: claims.phone_number ? String(claims.phone_number).replace(/^\+/, "") : null, name: claims.name || [claims.given_name, claims.family_name].filter(Boolean).join(" ") || null, email: claims.email || null, username: claims["cognito:username"] || claims.preferred_username || null, attributes, csrf_token: csrf, access_token: readCookie(req, `${COOKIE}_access`) };
 }
 function normalizeCartItems(items) {
   if (!Array.isArray(items) || items.length > 50) throw Object.assign(new Error("A cart can contain at most 50 items."), { statusCode: 400 });
@@ -226,7 +228,7 @@ export async function handleCustomerAuth(req, res, pathname) {
     if (method === "GET" && pathname === "/api/v1/customer/session") {
       const current = await session(req, res);
       if (!current) return send(res, 200, { customer: null });
-      return send(res, 200, { customer: { id: current.id, phone: current.phone ? `+${current.phone}` : null, name: current.name, email: current.email, authProvider: "cognito" }, csrf: current.csrf_token });
+      return send(res, 200, { customer: { id: current.id, phone: current.phone ? `+${current.phone}` : null, name: current.name, email: current.email, username: current.username, attributes: current.attributes, authProvider: "cognito" }, csrf: current.csrf_token });
     }
     if (method === "DELETE" && pathname === "/api/v1/customer/session") {
       if (!sameOrigin(req)) return send(res, 403, { error: "Request origin could not be verified." });

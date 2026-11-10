@@ -61,7 +61,7 @@ await writeFile(path.join(compute, "amplify-entry.mjs"), [
   '  const result = await response.json();',
   '  if (typeof result.SecretString !== "string" || !result.SecretString) throw new Error("The Cognito secret must be stored as a Secrets Manager SecretString.");',
   '  process.env.COGNITO_CLIENT_SECRET = result.SecretString;',
-  '},'
+  '}',
   'await mkdir(process.env.AGROSEED_STORAGE_DIR, { recursive: true });',
   'await import("./server.mjs");',
   ""

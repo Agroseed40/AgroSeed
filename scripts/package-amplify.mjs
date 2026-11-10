@@ -1,4 +1,4 @@
-﻿import { cp, mkdir, readdir, rm, stat, writeFile } from "node:fs/promises";
+import { cp, mkdir, readdir, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -10,11 +10,8 @@ const compute = path.join(output, "compute", "default");
 const cognitoUserPoolId = process.env.COGNITO_USER_POOL_ID || "ap-south-1_XbcHEhauT";
 const cognitoClientId = process.env.COGNITO_CLIENT_ID || "6tf8mnnek8c7er59vk2phv0dlh";
 const cognitoRegion = process.env.COGNITO_REGION || cognitoUserPoolId.split("_")[0];
-// Carry Amplify build-time auth configuration into the generated compute runtime.
-// Only the Supabase URL and publishable key belong in this bundle; never include a secret key.
-const customerAuthProvider = String(process.env.CUSTOMER_AUTH_PROVIDER || "").trim();
-const supabaseUrl = String(process.env.SUPABASE_URL || "").trim();
-const supabasePublishableKey = String(process.env.SUPABASE_PUBLISHABLE_KEY || "").trim();
+const cognitoDomain = process.env.COGNITO_DOMAIN || "https://ap-south-1xbchehaut.auth.ap-south-1.amazoncognito.com";
+const cognitoRedirectUri = process.env.COGNITO_REDIRECT_URI || "https://main.d1r4w0u6vll4kh.amplifyapp.com/api/v1/customer/callback";
 const manifest = {
   version: 1,
   framework: { name: "agroseed-node", version: "1.0.0" },
@@ -44,9 +41,8 @@ await writeFile(path.join(compute, "amplify-entry.mjs"), [
   `process.env.COGNITO_USER_POOL_ID = ${JSON.stringify(cognitoUserPoolId)};`,
   `process.env.COGNITO_CLIENT_ID = ${JSON.stringify(cognitoClientId)};`,
   `process.env.COGNITO_REGION = ${JSON.stringify(cognitoRegion)};`,
-  `process.env.CUSTOMER_AUTH_PROVIDER = ${JSON.stringify(customerAuthProvider)} || process.env.CUSTOMER_AUTH_PROVIDER || "supabase";`,
-  `process.env.SUPABASE_URL = ${JSON.stringify(supabaseUrl)} || process.env.SUPABASE_URL || "";`,
-  `process.env.SUPABASE_PUBLISHABLE_KEY = ${JSON.stringify(supabasePublishableKey)} || process.env.SUPABASE_PUBLISHABLE_KEY || "";`,
+  `process.env.COGNITO_DOMAIN = ${JSON.stringify(cognitoDomain)} || process.env.COGNITO_DOMAIN || "";`,
+  `process.env.COGNITO_REDIRECT_URI = ${JSON.stringify(cognitoRedirectUri)} || process.env.COGNITO_REDIRECT_URI || "";`,
   'await mkdir(process.env.AGROSEED_STORAGE_DIR, { recursive: true });',
   'await import("./server.mjs");',
   ""
@@ -60,4 +56,5 @@ if (size > limit) {
   throw new Error(`Amplify compute bundle is ${(size / 1024 / 1024).toFixed(1)} MB; the limit is 220 MB.`);
 }
 console.log(`Created .amplify-hosting (Node.js 22 compute bundle, ${(size / 1024 / 1024).toFixed(1)} MB).`);
+
 

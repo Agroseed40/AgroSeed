@@ -40,8 +40,9 @@ npm run migrate:customers     # Apply customer-account tables to configured MySQ
 
 AWS Amplify uses the `amplify.yml` build settings and deploys `.amplify-hosting/`. Its current entrypoint runs the site as a public preview with temporary data. The app needs a production database and approved service credentials before live customer workflows can be enabled. See [AWS Amplify deployment notes](docs/aws-amplify-deployment.md).
 
-Customer sign-in uses Supabase email OTP and Supabase PostgreSQL for customer profiles, saved carts, and addresses. Configure email delivery, apply the customer SQL migration, and set the Supabase URL and publishable key in the server environment by following [Supabase customer setup](docs/supabase-customer-setup.md). Do not put production secrets in source files.
+Customer sign-in, sign-up, and account recovery use Amazon Cognito Managed Login. The `/account/login` route redirects to Cognito, and successful sign-in returns to the storefront home page. Configure the user-pool domain, public app client, and callback URL using [AWS Amplify deployment notes](docs/aws-amplify-deployment.md). Saved carts and addresses use MySQL when configured; Cognito manages customer identity and credentials.
 
 The obsolete one-page mock storefront, mock catalog page, fake sponsored cards, brand demo graphics, and debug menu have been retired from the app and GoDaddy package. Their source is retained under `docs/archive/retired-prototype/`. The sample seed catalog and sandbox API remain because the current app still uses them when `AGROSEED_DEMO_MODE=true`; replace those services with the live catalog and order database before removing them.
+
 
 

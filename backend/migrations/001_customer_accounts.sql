@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS customers (
   id CHAR(36) NOT NULL PRIMARY KEY,
-  phone VARCHAR(16) NOT NULL UNIQUE,
+  phone VARCHAR(16) NULL UNIQUE,
   name VARCHAR(120) NULL,
   email VARCHAR(254) NULL,
   created_at DATETIME NOT NULL,
@@ -45,3 +45,4 @@ CREATE TABLE IF NOT EXISTS customer_addresses (
   INDEX idx_customer_addresses_owner (customer_id, is_default),
   CONSTRAINT fk_customer_addresses_customer FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+

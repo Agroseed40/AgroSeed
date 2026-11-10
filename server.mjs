@@ -74,6 +74,11 @@ const server = createServer(async (request, response) => {
   }
 
   const routePath = pathname.replace(/\/+$/, "") || "/";
+  if (request.method === "GET" && routePath === "/account/login") {
+    response.writeHead(302, { Location: "/api/v1/customer/login", "Cache-Control": "no-store" });
+    response.end();
+    return;
+  }
   const isAppRoute = routePath === "/" || routePath === "/shop" || routePath === "/cart" || routePath === "/checkout" ||
     routePath === "/search" || routePath === "/help" || routePath === "/contact" || routePath === "/shipping-returns" ||
     routePath === "/privacy" || routePath === "/terms" || routePath === "/guides" || routePath === "/track-order" ||
@@ -123,3 +128,4 @@ const server = createServer(async (request, response) => {
 server.listen(port, host, () => {
   console.log(`AgroSeed sandbox listening on http://${host}:${port}`);
 });
+

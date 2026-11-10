@@ -13,9 +13,7 @@ const REFRESH_COOKIE = `${COOKIE}_refresh`;
 const CSRF_COOKIE = `${COOKIE}_csrf`;
 const REFRESH_DAYS = 30;
 const COGNITO_SECRET_CACHE_MS = 5 * 60 * 1000;
-const OAUTH_STATE_COOKIE = `${COOKIE}_oauth_state`;
-const OAUTH_VERIFIER_COOKIE = `${COOKIE}_oauth_verifier`;
-const OAUTH_NONCE_COOKIE = `${COOKIE}_oauth_nonce`;
+const OAUTH_COOKIE_PREFIX = `${COOKIE}_oauth_`;
 const CUSTOMER_CLAIMS = new Set(["address", "birthdate", "email", "email_verified", "family_name", "gender", "given_name", "locale", "middle_name", "name", "nickname", "phone_number", "phone_number_verified", "picture", "preferred_username", "profile", "updated_at", "website", "zoneinfo", "cognito:username"]);
 const pool = process.env.DATABASE_URL
   ? mysql.createPool(process.env.DATABASE_URL)
@@ -65,17 +63,23 @@ function cookieHeaders(req, tokens, csrf) {
     cookieHeader(CSRF_COOKIE, csrf, secure, refreshSeconds)
   ];
 }
+function oauthCookieNames(state) {
+  // Give each login attempt its own PKCE cookies so another tab or retry
+  // cannot overwrite the state that an in-flight Cognito callback needs.
+  if (!/^[A-Za-z0-9_-]{43}$/.test(String(state || ""))) return null;
+  return { state: `${OAUTH_COOKIE_PREFIX}${state}_state`, verifier: `${OAUTH_COOKIE_PREFIX}${state}_verifier`, nonce: `${OAUTH_COOKIE_PREFIX}${state}_nonce` };
+}
 function oauthCookies(req, state, verifier, nonce) {
-  const secure = secureRequest(req), maxAge = 600;
+  const secure = secureRequest(req), maxAge = 600, names = oauthCookieNames(state);
   return [
-    cookieHeader(OAUTH_STATE_COOKIE, state, secure, maxAge),
-    cookieHeader(OAUTH_VERIFIER_COOKIE, verifier, secure, maxAge),
-    cookieHeader(OAUTH_NONCE_COOKIE, nonce, secure, maxAge)
+    cookieHeader(names.state, state, secure, maxAge),
+    cookieHeader(names.verifier, verifier, secure, maxAge),
+    cookieHeader(names.nonce, nonce, secure, maxAge)
   ];
 }
-function clearOauthCookies(req) {
-  const secure = secureRequest(req);
-  return [OAUTH_STATE_COOKIE, OAUTH_VERIFIER_COOKIE, OAUTH_NONCE_COOKIE].map((name) => cookieHeader(name, "", secure, 0));
+function clearOauthCookies(req, state) {
+  const secure = secureRequest(req), names = oauthCookieNames(state);
+  return names ? Object.values(names).map((name) => cookieHeader(name, "", secure, 0)) : [];
 }
 function clearAuthCookies(req) {
   const secure = secureRequest(req);
@@ -247,7 +251,10 @@ async function managedLogin(req, res) {
 async function managedLoginCallback(req, res, url) {
   const { domain, clientId, verifier } = cognito();
   const code = url.searchParams.get("code"), state = url.searchParams.get("state");
-  const expectedState = readCookie(req, OAUTH_STATE_COOKIE), codeVerifier = readCookie(req, OAUTH_VERIFIER_COOKIE), nonce = readCookie(req, OAUTH_NONCE_COOKIE);
+  const cookieNames = oauthCookieNames(state);
+  const expectedState = cookieNames ? readCookie(req, cookieNames.state) : "";
+  const codeVerifier = cookieNames ? readCookie(req, cookieNames.verifier) : "";
+  const nonce = cookieNames ? readCookie(req, cookieNames.nonce) : "";
   if (url.searchParams.has("error")) throw Object.assign(new Error("Cognito sign-in was cancelled or could not be completed."), { statusCode: 400 });
   if (!code) throw Object.assign(new Error("Cognito did not return an authorization code. Start sign-in again from the site."), { statusCode: 400 });
   if (!state || !expectedState || !constantTimeEqual(state, expectedState)) throw Object.assign(new Error("The Cognito sign-in state did not match this browser session. Start sign-in again from the site in the same browser."), { statusCode: 400 });
@@ -260,7 +267,7 @@ async function managedLoginCallback(req, res, url) {
   const claims = await verifier.verify(tokens.IdToken);
   if (!claims.sub || !constantTimeEqual(claims.nonce, nonce)) throw Object.assign(new Error("Cognito sign-in could not be verified. Please start again."), { statusCode: 401 });
   const csrf = randomBytes(24).toString("base64url");
-  const headers = [...cookieHeaders(req, tokens, csrf), ...clearOauthCookies(req)];
+  const headers = [...cookieHeaders(req, tokens, csrf), ...clearOauthCookies(req, state)];
   res.writeHead(302, { Location: "/", "Cache-Control": "no-store", "Set-Cookie": headers });
   res.end();
 }

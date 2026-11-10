@@ -353,6 +353,14 @@ export async function handleCustomerAuth(req, res, pathname) {
     return send(res, 404, { error: "Customer route not found." });
   } catch (error) {
     if (res.headersSent || res.destroyed) return true;
+    console.error("Customer auth request failed", {
+      route: pathname,
+      name: error?.name || "Error",
+      code: error?.code || error?.Code || "unknown",
+      message: String(error?.message || "Unknown customer-auth error").replace(/(authorization|token|secret|code)=?[^\s&]*/gi, "$1=[redacted]").slice(0, 500),
+      httpStatusCode: error?.$metadata?.httpStatusCode || null,
+      requestId: error?.$metadata?.requestId || null
+    });
     const safeError = error.statusCode ? error : Object.assign(new Error("Customer account service is temporarily unavailable."), { statusCode: 500 });
     return send(res, safeError.statusCode || 500, { error: safeError.message });
   }

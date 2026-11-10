@@ -12,7 +12,7 @@ const cognitoClientId = process.env.COGNITO_CLIENT_ID || "6tf8mnnek8c7er59vk2phv
 const cognitoRegion = process.env.COGNITO_REGION || cognitoUserPoolId.split("_")[0];
 const cognitoDomain = process.env.COGNITO_DOMAIN || "https://ap-south-1xbchehaut.auth.ap-south-1.amazoncognito.com";
 const cognitoRedirectUri = process.env.COGNITO_REDIRECT_URI || "https://main.d1r4w0u6vll4kh.amplifyapp.com/api/v1/customer/callback";
-const cognitoClientSecret = process.env.COGNITO_CLIENT_SECRET || "";
+const cognitoClientSecretArn = process.env.COGNITO_CLIENT_SECRET_ARN || "";
 const manifest = {
   version: 1,
   framework: { name: "agroseed-node", version: "1.0.0" },
@@ -44,7 +44,24 @@ await writeFile(path.join(compute, "amplify-entry.mjs"), [
   `process.env.COGNITO_REGION = ${JSON.stringify(cognitoRegion)};`,
   `process.env.COGNITO_DOMAIN = ${JSON.stringify(cognitoDomain)} || process.env.COGNITO_DOMAIN || "";`,
   `process.env.COGNITO_REDIRECT_URI = ${JSON.stringify(cognitoRedirectUri)} || process.env.COGNITO_REDIRECT_URI || "";`,
-  `process.env.COGNITO_CLIENT_SECRET = ${JSON.stringify(cognitoClientSecret)} || process.env.COGNITO_CLIENT_SECRET || "";`,
+  `process.env.COGNITO_CLIENT_SECRET_ARN = ${JSON.stringify(cognitoClientSecretArn)} || process.env.COGNITO_CLIENT_SECRET_ARN || "";`,
+  'if (process.env.COGNITO_CLIENT_SECRET_ARN) {',
+  '  const { defaultProvider } = await import("@aws-sdk/credential-provider-node");',
+  '  const { SignatureV4 } = await import("@smithy/signature-v4");',
+  '  const { createHash, createHmac } = await import("node:crypto");',
+  '  class NodeSha256 { constructor(secret) { this.hash = secret ? createHmac("sha256", secret) : createHash("sha256"); } update(data) { this.hash.update(data); return this; } digest() { return Promise.resolve(this.hash.digest()); } }',
+  '  const region = process.env.COGNITO_REGION;',
+  '  const host = `secretsmanager.${region}.amazonaws.com`;',
+  '  const target = "secretsmanager.GetSecretValue";',
+  '  const payload = JSON.stringify({ SecretId: process.env.COGNITO_CLIENT_SECRET_ARN });',
+  '  const signer = new SignatureV4({ credentials: defaultProvider(), region, service: "secretsmanager", sha256: NodeSha256 });',
+  '  const request = await signer.sign({ protocol: "https:", hostname: host, method: "POST", path: "/", headers: { "content-type": "application/x-amz-json-1.1", "x-amz-target": target }, body: payload });',
+  '  const response = await fetch(`https://${host}/`, { method: "POST", headers: request.headers, body: payload });',
+  '  if (!response.ok) throw new Error("Unable to load the Cognito secret from AWS Secrets Manager.");',
+  '  const result = await response.json();',
+  '  if (typeof result.SecretString !== "string" || !result.SecretString) throw new Error("The Cognito secret must be stored as a Secrets Manager SecretString.");',
+  '  process.env.COGNITO_CLIENT_SECRET = result.SecretString;',
+  '},'
   'await mkdir(process.env.AGROSEED_STORAGE_DIR, { recursive: true });',
   'await import("./server.mjs");',
   ""

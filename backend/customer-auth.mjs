@@ -170,7 +170,7 @@ async function managedLogin(req, res) {
   const verifier = randomBytes(48).toString("base64url");
   const challenge = createHash("sha256").update(verifier).digest("base64url");
   const authorize = new URL(`${domain}/oauth2/authorize`);
-  authorize.search = new URLSearchParams({ client_id: clientId, response_type: "code", scope: "openid email profile", redirect_uri: callbackUri(req), state, nonce, code_challenge_method: "S256", code_challenge: challenge }).toString();
+  authorize.search = new URLSearchParams({ client_id: clientId, response_type: "code", scope: "openid", redirect_uri: callbackUri(req), state, nonce, code_challenge_method: "S256", code_challenge: challenge }).toString();
   res.writeHead(302, { Location: authorize.toString(), "Cache-Control": "no-store", "Set-Cookie": oauthCookies(req, state, verifier, nonce) });
   res.end();
 }

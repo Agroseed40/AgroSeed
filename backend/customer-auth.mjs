@@ -1,10 +1,9 @@
-import { createHash, createHmac, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
+import { createHash, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
 import {
   CognitoIdentityProviderClient,
   GlobalSignOutCommand
 } from "@aws-sdk/client-cognito-identity-provider";
-import { defaultProvider } from "@aws-sdk/credential-provider-node";
-import { SignatureV4 } from "@smithy/signature-v4";
+import { GetSecretValueCommand, SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
 import { CognitoJwtVerifier } from "aws-jwt-verify";
 import mysql from "mysql2/promise";
 
@@ -20,15 +19,19 @@ const pool = process.env.DATABASE_URL
   : process.env.DB_HOST && process.env.DB_NAME && process.env.DB_USER
     ? mysql.createPool({ host: process.env.DB_HOST, port: Number(process.env.DB_PORT || 3306), database: process.env.DB_NAME, user: process.env.DB_USER, password: process.env.DB_PASSWORD || "", waitForConnections: true, connectionLimit: 8, timezone: "Z", ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: true } : undefined })
     : null;
-
 let cognitoSecretCache = "";
 let cognitoSecretCacheUntil = 0;
 let cognitoSecretLoad;
+let secretsManagerClient;
+let secretsManagerRegion = "";
 
-class NodeSha256 {
-  constructor(secret) { this.hash = secret ? createHmac("sha256", secret) : createHash("sha256"); }
-  update(data) { this.hash.update(data); return this; }
-  digest() { return Promise.resolve(this.hash.digest()); }
+function secretsManager(region) {
+  if (!secretsManagerClient || secretsManagerRegion !== region) {
+    secretsManagerClient?.destroy();
+    secretsManagerClient = new SecretsManagerClient({ region });
+    secretsManagerRegion = region;
+  }
+  return secretsManagerClient;
 }
 
 const send = (res, status, body, extra = {}) => {
@@ -64,13 +67,14 @@ function cookieHeaders(req, tokens, csrf) {
   ];
 }
 function oauthCookieNames(state) {
-  // Give each login attempt its own PKCE cookies so another tab or retry
-  // cannot overwrite the state that an in-flight Cognito callback needs.
+  // Keep each login attempt's PKCE values in its own cookies. A second tab or
+  // a retry must not overwrite the state belonging to an in-flight callback.
   if (!/^[A-Za-z0-9_-]{43}$/.test(String(state || ""))) return null;
   return { state: `${OAUTH_COOKIE_PREFIX}${state}_state`, verifier: `${OAUTH_COOKIE_PREFIX}${state}_verifier`, nonce: `${OAUTH_COOKIE_PREFIX}${state}_nonce` };
 }
 function oauthCookies(req, state, verifier, nonce) {
-  const secure = secureRequest(req), maxAge = 600, names = oauthCookieNames(state);
+  const secure = secureRequest(req), maxAge = 600;
+  const names = oauthCookieNames(state);
   return [
     cookieHeader(names.state, state, secure, maxAge),
     cookieHeader(names.verifier, verifier, secure, maxAge),
@@ -78,7 +82,8 @@ function oauthCookies(req, state, verifier, nonce) {
   ];
 }
 function clearOauthCookies(req, state) {
-  const secure = secureRequest(req), names = oauthCookieNames(state);
+  const secure = secureRequest(req);
+  const names = oauthCookieNames(state);
   return names ? Object.values(names).map((name) => cookieHeader(name, "", secure, 0)) : [];
 }
 function clearAuthCookies(req) {
@@ -190,14 +195,7 @@ async function getCognitoClientSecret() {
     try {
       const region = String(process.env.COGNITO_REGION || process.env.COGNITO_USER_POOL_ID?.split("_")[0] || "").trim();
       if (!region) throw new Error("Missing Cognito region.");
-      const host = `secretsmanager.${region}.amazonaws.com`;
-      const target = "secretsmanager.GetSecretValue";
-      const payload = JSON.stringify({ SecretId: secretArn });
-      const signer = new SignatureV4({ credentials: defaultProvider(), region, service: "secretsmanager", sha256: NodeSha256 });
-      const request = await signer.sign({ protocol: "https:", hostname: host, method: "POST", path: "/", headers: { "content-type": "application/x-amz-json-1.1", "x-amz-target": target }, body: payload });
-      const response = await fetch(`https://${host}/`, { method: "POST", headers: request.headers, body: payload });
-      if (!response.ok) throw new Error("Secrets Manager request failed.");
-      const result = await response.json();
+      const result = await secretsManager(region).send(new GetSecretValueCommand({ SecretId: secretArn }));
       if (typeof result.SecretString !== "string" || !result.SecretString.trim()) throw new Error("SecretString is empty.");
       let secretValue = result.SecretString.trim();
       if (secretValue.startsWith("{")) {
@@ -208,7 +206,15 @@ async function getCognitoClientSecret() {
       cognitoSecretCache = secretValue;
       cognitoSecretCacheUntil = Date.now() + COGNITO_SECRET_CACHE_MS;
       return cognitoSecretCache;
-    } catch {
+    } catch (error) {
+      // Log only the AWS error metadata, never the secret or signed request.
+      console.error("Cognito client-secret retrieval failed", {
+        name: error?.name || "Error",
+        code: error?.code || error?.Code || "unknown",
+        message: String(error?.message || "Unknown Secrets Manager error").slice(0, 500),
+        httpStatusCode: error?.$metadata?.httpStatusCode || null,
+        requestId: error?.$metadata?.requestId || null
+      });
       throw Object.assign(new Error("The site is available, but Cognito sign-in cannot read its client secret. Check COGNITO_CLIENT_SECRET_ARN and the Amplify compute role's Secrets Manager permission."), { statusCode: 503 });
     } finally {
       cognitoSecretLoad = null;
@@ -351,7 +357,6 @@ export async function handleCustomerAuth(req, res, pathname) {
     return send(res, safeError.statusCode || 500, { error: safeError.message });
   }
 }
-
 
 
 

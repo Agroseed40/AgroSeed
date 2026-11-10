@@ -45,4 +45,3 @@ CREATE TABLE IF NOT EXISTS customer_addresses (
   INDEX idx_customer_addresses_owner (customer_id, is_default),
   CONSTRAINT fk_customer_addresses_customer FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-

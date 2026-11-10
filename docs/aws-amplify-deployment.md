@@ -1,4 +1,4 @@
-# AWS Amplify deployment
+﻿# AWS Amplify deployment
 
 The storefront and API run in one Node.js server. Amplify must publish the server compute bundle, not treat the GoDaddy preview ZIP as a static site.
 
@@ -19,9 +19,9 @@ The storefront sends `/account/login` directly to Cognito Managed Login; there i
 Set these non-secret environment variables in Amplify build settings (the package script carries them into the compute bundle):
 
 - `COGNITO_USER_POOL_ID` and `COGNITO_CLIENT_ID`.
-- `COGNITO_DOMAIN=https://ap-south-1xbchehaut.auth.ap-south-1.amazoncognito.com`.
+- `COGNITO_DOMAIN=https://ap-south-1tgeu1mwfd.auth.ap-south-1.amazoncognito.com`.
 - `COGNITO_REDIRECT_URI=https://main.d1r4w0u6vll4kh.amplifyapp.com/api/v1/customer/callback`.
-- `COGNITO_CLIENT_SECRET_ARN`, only if the configured app client has a secret. Store the secret in AWS Secrets Manager as a plain-text `SecretString` or JSON with a `COGNITO_CLIENT_SECRET` field; configure only its ARN as this Amplify environment variable. The compute runtime fetches it during token exchange using its IAM role. The secret value is never embedded in Git or the deployment bundle.
+- `COGNITO_CLIENT_SECRET_ARN`, only if the configured app client has a secret. Store the secret in AWS Secrets Manager as a plain-text `SecretString` or as a JSON object with a `COGNITO_CLIENT_SECRET` field; configure only its ARN as this Amplify environment variable. The compute runtime fetches the secret on the server during token exchange using its IAM role. The secret value is never embedded in Git or the deployment bundle.
 
 ### Allow the Amplify runtime to read the Cognito client secret
 
@@ -42,14 +42,12 @@ Create this IAM policy, replacing the resource with the complete ARN of your sec
 }
 ```
 
-Attach it to an IAM role whose trust policy allows `sts:AssumeRole` from `amplify.amazonaws.com`, then select that role in **Amplify → App settings → IAM roles → Compute role** for the `main` branch. This SSR compute role provides temporary AWS credentials to the server at runtime. Save the role and trigger a new deployment. Secret retrieval happens only during token exchange, so a secret-access issue won’t make the storefront unavailable. See [Adding an SSR Compute role](https://docs.aws.amazon.com/amplify/latest/userguide/amplify-SSR-compute-role.html).
+Attach it to an IAM role whose trust policy allows `sts:AssumeRole` from `amplify.amazonaws.com`, then select that role in **Amplify → App settings → IAM roles → Compute role** for the `main` branch. This SSR compute role provides temporary AWS credentials to the server at runtime. Save the role and trigger a new deployment. Secret retrieval happens only during token exchange, so a secret-access issue won’t make the storefront unavailable. AWS describes this role setup in [Adding an SSR Compute role](https://docs.aws.amazon.com/amplify/latest/userguide/amplify-SSR-compute-role.html).
 
 In the Cognito console, choose **Managed login** branding for the user-pool domain and configure the app client for the authorization code grant with PKCE. The app requests only the required `openid` scope, so it does not depend on optional `email` or `profile` scopes being enabled. Cognito includes all user attributes readable by the app client in the ID token for an `openid`-only request. Add the exact callback URI above to the app client's callback URLs and `https://main.d1r4w0u6vll4kh.amplifyapp.com/` to its sign-out URLs. Cognito handles the customer identity and credentials; MySQL is still required for the app's saved carts and addresses. Apply `npm run migrate:customers` after MySQL is configured to enable those saved customer features.
-
 ## Data persistence and launch readiness
 
 Amplify compute has ephemeral storage and only `/tmp` is writable. Do not use the local JSON preview store or local upload directory as durable production storage. Product, order, and inventory persistence still needs a production database; uploaded product images need durable object storage such as S3. These workflows must be connected before opening checkout to real customers.
-
 
 
 

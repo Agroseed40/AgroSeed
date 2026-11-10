@@ -1,4 +1,4 @@
-import { cp, mkdir, readdir, rm, stat, writeFile } from "node:fs/promises";
+﻿import { cp, mkdir, readdir, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -58,5 +58,4 @@ if (size > limit) {
   throw new Error(`Amplify compute bundle is ${(size / 1024 / 1024).toFixed(1)} MB; the limit is 220 MB.`);
 }
 console.log(`Created .amplify-hosting (Node.js 22 compute bundle, ${(size / 1024 / 1024).toFixed(1)} MB).`);
-
 

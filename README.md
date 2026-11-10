@@ -45,4 +45,3 @@ Customer sign-in, sign-up, and account recovery use Amazon Cognito Managed Login
 The obsolete one-page mock storefront, mock catalog page, fake sponsored cards, brand demo graphics, and debug menu have been retired from the app and GoDaddy package. Their source is retained under `docs/archive/retired-prototype/`. The sample seed catalog and sandbox API remain because the current app still uses them when `AGROSEED_DEMO_MODE=true`; replace those services with the live catalog and order database before removing them.
 
 
-

@@ -1,8 +1,10 @@
-import { createHash, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
 import {
   CognitoIdentityProviderClient,
   GlobalSignOutCommand
 } from "@aws-sdk/client-cognito-identity-provider";
+import { defaultProvider } from "@aws-sdk/credential-provider-node";
+import { SignatureV4 } from "@smithy/signature-v4";
 import { CognitoJwtVerifier } from "aws-jwt-verify";
 import mysql from "mysql2/promise";
 
@@ -10,6 +12,7 @@ const COOKIE = "agroseed_customer";
 const REFRESH_COOKIE = `${COOKIE}_refresh`;
 const CSRF_COOKIE = `${COOKIE}_csrf`;
 const REFRESH_DAYS = 30;
+const COGNITO_SECRET_CACHE_MS = 5 * 60 * 1000;
 const OAUTH_STATE_COOKIE = `${COOKIE}_oauth_state`;
 const OAUTH_VERIFIER_COOKIE = `${COOKIE}_oauth_verifier`;
 const OAUTH_NONCE_COOKIE = `${COOKIE}_oauth_nonce`;
@@ -19,6 +22,16 @@ const pool = process.env.DATABASE_URL
   : process.env.DB_HOST && process.env.DB_NAME && process.env.DB_USER
     ? mysql.createPool({ host: process.env.DB_HOST, port: Number(process.env.DB_PORT || 3306), database: process.env.DB_NAME, user: process.env.DB_USER, password: process.env.DB_PASSWORD || "", waitForConnections: true, connectionLimit: 8, timezone: "Z", ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: true } : undefined })
     : null;
+
+let cognitoSecretCache = "";
+let cognitoSecretCacheUntil = 0;
+let cognitoSecretLoad;
+
+class NodeSha256 {
+  constructor(secret) { this.hash = secret ? createHmac("sha256", secret) : createHash("sha256"); }
+  update(data) { this.hash.update(data); return this; }
+  digest() { return Promise.resolve(this.hash.digest()); }
+}
 
 const send = (res, status, body, extra = {}) => {
   res.writeHead(status, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff", ...extra });
@@ -162,9 +175,46 @@ function requestOrigin(req) {
 function callbackUri(req) {
   return String(process.env.COGNITO_REDIRECT_URI || `${requestOrigin(req)}/api/v1/customer/callback`).trim();
 }
-function cognitoTokenRequest(domain, clientId, parameters) {
+async function getCognitoClientSecret() {
+  const directSecret = String(process.env.COGNITO_CLIENT_SECRET || "").trim();
+  if (directSecret) return directSecret;
+  const secretArn = String(process.env.COGNITO_CLIENT_SECRET_ARN || "").trim();
+  if (!secretArn) return "";
+  if (cognitoSecretCache && Date.now() < cognitoSecretCacheUntil) return cognitoSecretCache;
+  if (cognitoSecretLoad) return cognitoSecretLoad;
+  cognitoSecretLoad = (async () => {
+    try {
+      const region = String(process.env.COGNITO_REGION || process.env.COGNITO_USER_POOL_ID?.split("_")[0] || "").trim();
+      if (!region) throw new Error("Missing Cognito region.");
+      const host = `secretsmanager.${region}.amazonaws.com`;
+      const target = "secretsmanager.GetSecretValue";
+      const payload = JSON.stringify({ SecretId: secretArn });
+      const signer = new SignatureV4({ credentials: defaultProvider(), region, service: "secretsmanager", sha256: NodeSha256 });
+      const request = await signer.sign({ protocol: "https:", hostname: host, method: "POST", path: "/", headers: { "content-type": "application/x-amz-json-1.1", "x-amz-target": target }, body: payload });
+      const response = await fetch(`https://${host}/`, { method: "POST", headers: request.headers, body: payload });
+      if (!response.ok) throw new Error("Secrets Manager request failed.");
+      const result = await response.json();
+      if (typeof result.SecretString !== "string" || !result.SecretString.trim()) throw new Error("SecretString is empty.");
+      let secretValue = result.SecretString.trim();
+      if (secretValue.startsWith("{")) {
+        const parsed = JSON.parse(secretValue);
+        secretValue = String(parsed.COGNITO_CLIENT_SECRET || parsed.client_secret || parsed.ClientSecret || "").trim();
+      }
+      if (!secretValue) throw new Error("SecretString does not contain a Cognito client secret.");
+      cognitoSecretCache = secretValue;
+      cognitoSecretCacheUntil = Date.now() + COGNITO_SECRET_CACHE_MS;
+      return cognitoSecretCache;
+    } catch {
+      throw Object.assign(new Error("The site is available, but Cognito sign-in cannot read its client secret. Check COGNITO_CLIENT_SECRET_ARN and the Amplify compute role's Secrets Manager permission."), { statusCode: 503 });
+    } finally {
+      cognitoSecretLoad = null;
+    }
+  })();
+  return cognitoSecretLoad;
+}
+async function cognitoTokenRequest(domain, clientId, parameters) {
   const headers = { "Content-Type": "application/x-www-form-urlencoded" };
-  const clientSecret = String(process.env.COGNITO_CLIENT_SECRET || "").trim();
+  const clientSecret = await getCognitoClientSecret();
   if (clientSecret) headers.Authorization = `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`;
   return fetch(`${domain}/oauth2/token`, { method: "POST", headers, body: new URLSearchParams({ client_id: clientId, ...parameters }) });
 }

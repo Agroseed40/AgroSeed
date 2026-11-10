@@ -21,11 +21,11 @@ Set these non-secret environment variables in Amplify build settings (the packag
 - `COGNITO_USER_POOL_ID` and `COGNITO_CLIENT_ID`.
 - `COGNITO_DOMAIN=https://ap-south-1xbchehaut.auth.ap-south-1.amazoncognito.com`.
 - `COGNITO_REDIRECT_URI=https://main.d1r4w0u6vll4kh.amplifyapp.com/api/v1/customer/callback`.
-- `COGNITO_CLIENT_SECRET_ARN`, only if the configured app client has a secret. Store the secret value in AWS Secrets Manager as a plain-text `SecretString`; configure only its ARN as this Amplify environment variable. The compute runtime fetches the secret at startup using its IAM role. The secret value is never embedded in Git or the deployment bundle.
+- `COGNITO_CLIENT_SECRET_ARN`, only if the configured app client has a secret. Store the secret in AWS Secrets Manager as a plain-text `SecretString` or JSON with a `COGNITO_CLIENT_SECRET` field; configure only its ARN as this Amplify environment variable. The compute runtime fetches it during token exchange using its IAM role. The secret value is never embedded in Git or the deployment bundle.
 
 ### Allow the Amplify runtime to read the Cognito client secret
 
-If the Cognito app client has a secret, create an AWS Secrets Manager secret in `ap-south-1` containing only the Cognito client secret as its `SecretString`. Copy the complete secret ARN and set `COGNITO_CLIENT_SECRET_ARN` in **Amplify → Hosting → Environment variables**. Do not set the secret value itself as an Amplify environment variable.
+If the Cognito app client has a secret, create an AWS Secrets Manager secret in `ap-south-1` containing the Cognito client secret as its `SecretString` (plain text, or JSON with a `COGNITO_CLIENT_SECRET` field). Copy the complete secret ARN and set `COGNITO_CLIENT_SECRET_ARN` in **Amplify → Hosting → Environment variables**. Do not set the secret value itself as an Amplify environment variable.
 
 Create this IAM policy, replacing the resource with the complete ARN of your secret:
 
@@ -42,7 +42,7 @@ Create this IAM policy, replacing the resource with the complete ARN of your sec
 }
 ```
 
-Attach it to an IAM role whose trust policy allows `sts:AssumeRole` from `amplify.amazonaws.com`, then select that role in **Amplify → App settings → IAM roles → Compute role** for the `main` branch. This SSR compute role provides temporary AWS credentials to the server at runtime. Save the role and trigger a new deployment. The server fails closed at startup if it cannot retrieve the configured secret. See [Adding an SSR Compute role](https://docs.aws.amazon.com/amplify/latest/userguide/amplify-SSR-compute-role.html).
+Attach it to an IAM role whose trust policy allows `sts:AssumeRole` from `amplify.amazonaws.com`, then select that role in **Amplify → App settings → IAM roles → Compute role** for the `main` branch. This SSR compute role provides temporary AWS credentials to the server at runtime. Save the role and trigger a new deployment. Secret retrieval happens only during token exchange, so a secret-access issue won’t make the storefront unavailable. See [Adding an SSR Compute role](https://docs.aws.amazon.com/amplify/latest/userguide/amplify-SSR-compute-role.html).
 
 In the Cognito console, choose **Managed login** branding for the user-pool domain and configure the app client for the authorization code grant with PKCE. The app requests only the required `openid` scope, so it does not depend on optional `email` or `profile` scopes being enabled. Cognito includes all user attributes readable by the app client in the ID token for an `openid`-only request. Add the exact callback URI above to the app client's callback URLs and `https://main.d1r4w0u6vll4kh.amplifyapp.com/` to its sign-out URLs. Cognito handles the customer identity and credentials; MySQL is still required for the app's saved carts and addresses. Apply `npm run migrate:customers` after MySQL is configured to enable those saved customer features.
 

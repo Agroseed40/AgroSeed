@@ -172,7 +172,7 @@ async function cognitoTokenError(response) {
   let data = {};
   try { data = await response.json(); } catch {}
   const messages = {
-    invalid_client: "Cognito rejected the app client credentials. If this app client has a secret, set COGNITO_CLIENT_SECRET in Amplify; otherwise check the app client ID.",
+    invalid_client: "Cognito rejected the app client credentials. Confirm COGNITO_CLIENT_ID matches this user pool; if this client has a secret, configure COGNITO_CLIENT_SECRET_ARN in Amplify and grant the compute role access to that Secrets Manager secret.",
     invalid_grant: "Cognito rejected the authorization code or PKCE proof. Start sign-in again; if it repeats, check that the callback URL exactly matches and the code has not already been used.",
     unauthorized_client: "This Cognito app client is not enabled for the authorization code grant. Enable the code grant for this app client.",
     invalid_scope: "Cognito does not allow the openid scope for this app client. Enable openid in its allowed OAuth scopes."
@@ -199,7 +199,9 @@ async function managedLoginCallback(req, res, url) {
   const code = url.searchParams.get("code"), state = url.searchParams.get("state");
   const expectedState = readCookie(req, OAUTH_STATE_COOKIE), codeVerifier = readCookie(req, OAUTH_VERIFIER_COOKIE), nonce = readCookie(req, OAUTH_NONCE_COOKIE);
   if (url.searchParams.has("error")) throw Object.assign(new Error("Cognito sign-in was cancelled or could not be completed."), { statusCode: 400 });
-  if (!code || !constantTimeEqual(state, expectedState) || !codeVerifier || !nonce) throw Object.assign(new Error("Cognito sign-in could not be verified. Please start again."), { statusCode: 400 });
+  if (!code) throw Object.assign(new Error("Cognito did not return an authorization code. Start sign-in again from the site."), { statusCode: 400 });
+  if (!state || !expectedState || !constantTimeEqual(state, expectedState)) throw Object.assign(new Error("The Cognito sign-in state did not match this browser session. Start sign-in again from the site in the same browser."), { statusCode: 400 });
+  if (!codeVerifier || !nonce) throw Object.assign(new Error("The Cognito PKCE cookies are missing. Start sign-in again from the site in the same browser."), { statusCode: 400 });
   const response = await cognitoTokenRequest(domain, clientId, { grant_type: "authorization_code", code, redirect_uri: callbackUri(req), code_verifier: codeVerifier });
   if (!response.ok) throw await cognitoTokenError(response);
   const tokenResponse = await response.json();

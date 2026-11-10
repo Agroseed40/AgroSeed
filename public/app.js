@@ -1,2173 +1,264 @@
-Y™Áäx-ÆÈ‹j◊ù¢Îi∫⁄+äßj[hëÈ‹¢ÈÌﬂø{—:-jZ.∂õ≠ñ)ﬁ≥V6ˆÁ7BB“á2¬&ˆ˜B“Fˆ7V÷VÁBí”‚&ˆ˜BÁVW'ï6V∆V7F˜"á2ì∞–¶6ˆÁ7B“BÇ"6"ì∞–¶6ˆÁ7BW62“á2“""í”‚7G&ñÊrá2íÁ&W∆6RÇı≤c√‚"u“ˆr¬2”‚á≤"b#¢"f◊≤"¬#¬#¢"f«C≤"¬#‚#¢"fwC≤"¬r"s¢"gV˜C≤"¬"r#¢"b33ì≤'’∂5“íì∞–¶6ˆÁ7B÷ˆÊWí“‚”‚ÊWrñÁF¬‰ÁV÷&W$f˜&÷BÇ&V‚‘î‚"¬≤7Gñ∆S¢&7W'&VÊ7í"¬7W'&VÊ7ì¢$îÂ""¬÷Üñ◊V‘g&7Fñˆ‰FñvóG3£"“íÊf˜&÷BÇÑÁV÷&W"Ü‚ó«√íÛì∞–¶6ˆÁ7B6«Vr“2”‚7G&ñÊrá7«¬""íÁFÙ∆˜vW$66RÇíÁ&W∆6RÇıµÊ◊£”ï“≤ˆr¬"“"íÁ&W∆6RÇı‚◊¬“Bˆr¬""ì∞–¶6ˆÁ7Bñ6ˆÁ2“µ6VVG3¢/	¯À"¬%∆ÁBÁWG&óFñˆ‚#¢/	¯ÀÚ"¬$7&˜&˜FV7Fñˆ‚#¢/	˘∫˚àÚ"¬$f&“Fˆˆ«2#¢/	˙zB"ƒó'&ñvFñˆ„¢/	˘*r"¬$˜&vÊñ2w&˜vñÊr#¢/	¯ÿ2"¬$ÁW'6W'í7W∆ñW2#¢/	˙´B'”∞–¶∆WB77&b“""¬ñ◊˜'E&˜w2“µ“¬&tñ◊˜'E&˜w2“µ“¬ñ◊˜'DW'&˜'2“µ“¬ñ6∂VEf&ñÁB“""¬7W7Fˆ÷W%6W76ñˆ‚“ÁV∆¬¬7W7Fˆ÷W$6'DáñG&FVB“f«6S∞–¶∆WB7F˜&Vg&ˆÁE6WGFñÊw2“∑“¬7F˜&Vg&ˆÁDˆffW'2“µ”∞–¶6ˆÁ7B6'D∂Wí“&w&˜6VVB÷6'B◊c"¬6'DñD∂Wì“&w&˜6VVB÷6'B÷ñB◊c"¬6'EWFFVD∂Wì“&w&˜6VVB÷6'B◊WFFVB◊c"¬Fˆ∂V‰∂Wí“&w&˜6VVB÷˜&FW"◊Fˆ∂VÁ2◊c"¬∆ÊwVvT∂Wí“&w&˜6VVB÷∆ÊwVvR#∞–¶6ˆÁ7B6˜Wˆ‰∂Wí“&w&˜6VVB÷6˜Wˆ‚◊c"¬FG&W74&ˆˆ¥∂Wí“&w&˜6VVB÷FG&W76W2◊c"¬&ˆfñ∆T∂Wí“&w&˜6VVB◊&ˆfñ∆R◊c#∞–¶gVÊ7Fñˆ‚FG&W74&ˆˆ≤Çó∑G'ó∂6ˆÁ7B&˜w3‘•4Ù‚Á'6RÜ∆ˆ6≈7F˜&vRÊvWDóFV“ÜFG&W74&ˆˆ¥∂Wíó«¬&ÁV∆¬"ì∂ñbÑ'&íÊó4'&íá&˜w2íó&WGW&‚&˜w3∂6ˆÁ7Bˆ∆C‘•4Ù‚Á'6RÜ∆ˆ6≈7F˜&vRÊvWDóFV“Ç&w&˜6VVB÷FG&W72"ó«¬'∑“"ì∂ñbÜˆ∆BÊÊ÷Ró∂6ˆÁ7B&˜s◊≤‚‚Êˆ∆B∆ñC¢&∆Vv7í÷FG&W72"∆ó4FVfV«CßG'VW”∂∆ˆ6≈7F˜&vRÁ6WDóFV“ÜFG&W74&ˆˆ¥∂Wíƒ•4Ù‚Á7G&ñÊvñgíÖ∑&˜u“íì∑&WGW&‚∑&˜u”∑◊÷6F6á∑◊&WGW&‚µ”∑––¶gVÊ7Fñˆ‚6fTFG&W74&ˆˆ≤á&˜w2ó∂∆ˆ6≈7F˜&vRÁ6WDóFV“ÜFG&W74&ˆˆ¥∂Wíƒ•4Ù‚Á7G&ñÊvñgíá&˜w2íì∂6ˆÁ7B&ñ÷'ì◊&˜w2ÊfñÊBáÉ”ÁÇÊó4FVfV«Bó««&˜w5≥◊««∑”∂∆ˆ6≈7F˜&vRÁ6WDóFV“Ç&w&˜6VVB÷FG&W72"ƒ•4Ù‚Á7G&ñÊvñgíá&ñ÷'ííì∑––¶gVÊ7Fñˆ‚6fVE&ˆfñ∆RÇó∑G'ó∑&WGW&‚•4Ù‚Á'6RÜ∆ˆ6≈7F˜&vRÊvWDóFV“á&ˆfñ∆T∂Wíó«¬'∑“"ì∑÷6F6á∑&WGW&‚∑”∑◊––¶6ˆÁ7B∆ÊwVvR“Çí”‚∆ˆ6≈7F˜&vRÊvWDóFV“Ü∆ÊwVvT∂Wíí«¬&V‚#∞–¶6ˆÁ7B6í“ÜV‚¬Üíí”‚∆ÊwVvRÇì””“&Üí"ÚÜí¢V„∞–¶6ˆÁ7BÜñÊFî6˜í“∞–¢%$UdîUr5Dı$R#¢.
-JÆ
-X.
-K
-Xﬁ
-K^
-KÓ
-K^
-K.
-Xæ
-I^
-JÇ
-Ké
-Xﬁ
-I˛
-Xæ
-K"¬%6◊∆R&ˆGV7G2ÊB&ñ6W2+r6ÜV6∂˜WB7&VFW2∆ˆ6¬FV÷Ú˜&FW"ˆÊ«í‚#¢.
-Jé
-JÓ
-X.
-Jé
-K‚
-Hû
-JN
-Xﬁ
-JÆ
-KÓ
-Jb
-IN
-K
-I^
-X
-JÓ
-JN
-X~
-H"+r
-IÆ
-X~
-I^
-Hn
-Hû
-IÚ
-I^
-X~
-K^
-K"
-H˛
-IR
-J
-X~
-JÓ
-X≤
-I
-K
-Xﬁ
-J
-K
-JŒ
-Jé
-KÓ
-JN
-K‚
-Kû
-Xé
-ZB"¿–¢$66˜VÁB#¢.
-In
-KÓ
-JN
-K‚"¬$&r#¢.
-I^
-KÓ
-K
-Xﬁ
-IÚ"¬%6Ü˜∆¬#¢.
-Ké
-Jﬁ
-X
-Hû
-JN
-Xﬁ
-JÆ
-KÓ
-Jb"¬%6VVG2#¢.
-JŒ
-X
-I¬"¬%∆ÁBÁWG&óFñˆ‚#¢.
-JÆ
-XŒ
-J~
-Xæ
-H"
-I^
-K‚
-JÆ
-Xæ
-K~
-J2"¬$7&˜&˜FV7Fñˆ‚#¢.
-Jæ
-Ké
-K"
-Ké
-X
-K
-I^
-Xﬁ
-K~
-K‚"¬$f&“Fˆˆ«2#¢.
-In
-X~
-JN
-X
-I^
-Xr
-IN
-IŒ
-KŒ
-KÓ
-K"¬$ó'&ñvFñˆ‚#¢.
-Ké
-K˛
-H.
-IÆ
-KÓ
-HÇ"¬%G&6≤˜&FW"#¢.
-I
-K
-Xﬁ
-J
-K
-I˛
-Xﬁ
-K
-Xé
-IR
-I^
-K
-X~
-H""¬%6V&6Ç#¢.
-In
-Xæ
-IŒ
-X~
-H""¬%6V&6Ç&ˆGV7G2#¢.
-Hû
-JN
-Xﬁ
-JÆ
-KÓ
-Jb
-In
-Xæ
-IŒ
-X~
-H""¿–¢$u$ırtTƒ¬+rƒïdRtTƒ¬#¢.
-H^
-IÆ
-Xﬁ
-Iæ
-X
-In
-X~
-JN
-X+r
-JŒ
-X~
-Kû
-JN
-K
-IŒ
-X
-K^
-JÇ"¬$vˆˆBw&˜vñÊr#¢.
-JŒ
-X~
-Kû
-JN
-K
-In
-X~
-JN
-X"¬'7F'G2#¢.
-Kn
-X
-K
-X"
-Kû
-Xæ
-JN
-X
-Kû
-XÇ"¬&ÜW&R‚#¢.
-J˛
-Kû
-KÓ
-H
-Ké
-X~
-ZB"¬$f&“&ˆGV7G2#¢.
-I^
-Xé
-I˛
-K.
-Xû
-Ir
-Jn
-X~
-In
-X~
-H""¬$vWBw&˜vñÊrGfñ6R#¢.
-In
-X~
-JN
-X
-I^
-X
-Ké
-K.
-KÓ
-Kí
-K.
-X~
-H""¬%6VVG2ÊBf&“7W∆ñW2#¢.
-IÆ
-X
-Jé
-Xr
-Kû
-X
-HÚ
-I^
-X>
-K~
-KÚ
-Hû
-JN
-Xﬁ
-JÆ
-KÓ
-Jb"¬$6ˆ◊&R6≤6ó¶W2ÊB&ñ6W2#¢.
-Hû
-JN
-Xﬁ
-JÆ
-KÓ
-Jb
-I^
-X
-Ké
-KÓ
-Jæ
-K¬
-IŒ
-KÓ
-Jé
-I^
-KÓ
-K
-X"¬$ÜñÊFíbVÊv∆ó6Ç#¢.
-Kû
-K˛
-H.
-Jn
-X
-IN
-K
-H^
-H.
-I~
-Xﬁ
-K
-X~
-IŒ
-KŒ
-X"¬$dî‰BîıU"dîTƒB#¢.
-H^
-JÆ
-Jé
-X
-IŒ
-KŒ
-K
-X.
-K
-JB
-IÆ
-X
-Jé
-X~
-H""¬%6Ü˜'í6FVv˜'í#¢.
-Kn
-Xﬁ
-K
-X~
-J>
-X
-I^
-Xr
-H^
-Jé
-X
-Ké
-KÓ
-K
-In
-K
-X
-Jn
-X~
-H""¬%7F'BvóFÇvÜBñ˜W"7&˜ÊVVG2FˆFí‚#¢.
-Hn
-I¬
-H^
-JÆ
-Jé
-X
-Jæ
-Ké
-K"
-I^
-X
-IŒ
-KŒ
-K
-X.
-K
-JB
-Ké
-Xr
-Kn
-X
-K
-X
-Hn
-JB
-I^
-K
-X~
-H.
-ZB"¬$'&˜w6R&ˆGV7G2#¢.
-Hû
-JN
-Xﬁ
-JÆ
-KÓ
-Jb
-Jn
-X~
-In
-X~
-H""¬$d$‘U"î4µ2#¢.
-Hn
-JÆ
-I^
-Xr
-K.
-K˛
-HÚ
-IÆ
-X
-Jé
-Xr
-I~
-HÚ"¬$f&“&ˆGV7G2#¢.
-I^
-Xé
-I˛
-K.
-Xû
-Ir
-Jn
-X~
-In
-X~
-H""¬%6◊∆R∆ó7FñÊw2f˜"&WfñWr‚7Ffb6‚÷ÊvR&ˆGV7G2ñ‚FÜRF÷ñ‚6ˆÁ6ˆ∆R‚#¢.
-JÆ
-X.
-K
-Xﬁ
-K^
-KÓ
-K^
-K.
-Xæ
-I^
-JÇ
-I^
-Xr
-Jé
-JÓ
-X.
-Jé
-X~
-ZB
-I^
-K
-Xﬁ
-JÓ
-IÆ
-KÓ
-K
-X
-H˛
-J
-JÓ
-K˛
-JÇ
-JÆ
-Xé
-Jé
-K"
-JÓ
-X~
-H"
-Hû
-JN
-Xﬁ
-JÆ
-KÓ
-Jb
-Ké
-H.
-Jﬁ
-KÓ
-K"
-Ké
-I^
-JN
-Xr
-Kû
-Xé
-H.
-ZB"¬%6Ü˜∆¬#¢.
-Ké
-Jﬁ
-X
-Hû
-JN
-Xﬁ
-JÆ
-KÓ
-Jb"¬$ÊVVBÜÊB6Üˆ˜6ñÊsÚ#¢.
-IÆ
-X
-Jé
-Jé
-Xr
-JÓ
-X~
-H"
-JÓ
-Jn
-Jb
-IÆ
-KÓ
-Kû
-K˛
-HÛÚ"¬%FV∆¬W2vÜBñ˜^(	ó&Rw&˜vñÊrÊBv^(	ñ∆¬ˆñÁBñ˜RFÚFÜR&ñváB∆6R‚#¢.
-Hn
-J¢
-I^
-Xﬁ
-J˛
-K‚
-Hû
-I~
-K‚
-K
-Kû
-Xr
-Kû
-Xé
-H"¬
-Kû
-JÓ
-X~
-H"
-JŒ
-JN
-KÓ
-H~
-HÚ(	B
-Kû
-J‚
-Ké
-Kû
-X
-Hû
-JN
-Xﬁ
-JÆ
-KÓ
-Jb
-In
-Xæ
-IŒ
-Jé
-Xr
-JÓ
-X~
-H"
-JÓ
-Jn
-Jb
-I^
-K
-X~
-H.
-I~
-X~
-ZB"¬%F∆≤FÚw&ı6VVB#¢$w&ı6VVB
-Ké
-Xr
-JŒ
-KÓ
-JB
-I^
-K
-X~
-H""¬$vˆˆBf«VR#¢.
-H^
-IÆ
-Xﬁ
-Iæ
-K‚
-JÓ
-X.
-K.
-Xﬁ
-JÚ"¬$FWFñ«2#¢.
-K^
-K˛
-K^
-K
-J2"¬$FBFÚ6'B#¢.
-I^
-KÓ
-K
-Xﬁ
-IÚ
-JÓ
-X~
-H"
-IŒ
-Xæ
-J
-KŒ
-X~
-H""¬$FBFÚ&r#¢.
-I^
-KÓ
-K
-Xﬁ
-IÚ
-JÓ
-X~
-H"
-IŒ
-Xæ
-J
-KŒ
-X~
-H""¬&fñ∆&∆R#¢.
-Hû
-JÆ
-K.
-JŒ
-Xﬁ
-Jr"¬$˜WBˆb7Fˆ6≤#¢.
-Ké
-Xﬁ
-I˛
-Xû
-IR
-JÓ
-X~
-H"
-Jé
-Kû
-X
-H""¬%6V&6Ç6VVG2¬ÁWG&óFñˆ‚¬Fˆˆ«>(
-b#¢.
-JŒ
-X
-I¬¬
-JÆ
-Xæ
-K~
-J2
-IN
-K
-IN
-IŒ
-KŒ
-KÓ
-K
-In
-Xæ
-IŒ
-X~
-H.(
-b"¿–¢%6Ü˜∆¬&ˆGV7G2#¢.
-Ké
-Jﬁ
-X
-Hû
-JN
-Xﬁ
-JÆ
-KÓ
-Jb"¬%&W7V«G2f˜"#¢.
-H~
-Jé
-I^
-Xr
-JÆ
-K
-K˛
-J>
-KÓ
-J‚"¬$6FVv˜&ñW2#¢.
-Kn
-Xﬁ
-K
-X~
-J>
-K˛
-J˛
-KÓ
-H"¬$'&ÊG2#¢.
-JŒ
-Xﬁ
-K
-KÓ
-H.
-J"¬%6˜'B'í#¢.
-I^
-Xﬁ
-K
-JÓ
-JŒ
-Jn
-Xﬁ
-Jr
-I^
-K
-X~
-H""¬$fVGW&VB#¢.
-K^
-K˛
-Kn
-X~
-Kr"¬%&ñ6S¢∆˜rFÚÜñvÇ#¢.
-I^
-J‚
-I^
-X
-JÓ
-JB
-JÆ
-Kû
-K.
-Xr"¬%&ñ6S¢ÜñvÇFÚ∆˜r#¢.
-IŒ
-KŒ
-Xﬁ
-J˛
-KÓ
-Jn
-K‚
-I^
-X
-JÓ
-JB
-JÆ
-Kû
-K.
-Xr"¬$Ê÷R#¢.
-Jé
-KÓ
-J‚"¬'&ˆGV7G2#¢.
-Hû
-JN
-Xﬁ
-JÆ
-KÓ
-Jb"¬$ÊÚ÷F6ÜW2ñWB#¢.
-H^
-Jﬁ
-X
-I^
-Xæ
-HÇ
-Hû
-JN
-Xﬁ
-JÆ
-KÓ
-Jb
-Jé
-Kû
-X
-H"
-JÓ
-K˛
-K.
-K‚"¬%G'íÊ˜FÜW"6V&6Ç˜"'&˜w6RFÜRgV∆¬6F∆ˆr‚#¢.
-Jn
-X.
-Ké
-K
-X
-In
-Xæ
-I¬
-I^
-K
-X~
-H"
-J˛
-K‚
-JÆ
-X.
-K
-K‚
-I^
-Xé
-I˛
-K.
-Xû
-Ir
-Jn
-X~
-In
-X~
-H.
-ZB"¬$6∆V"fñ«FW'2#¢.
-Jæ
-KŒ
-K˛
-K.
-Xﬁ
-I˛
-K
-Kû
-I˛
-KÓ
-H˛
-H"¬%&ˆGV7BÊ˜Bf˜VÊB#¢.
-Hû
-JN
-Xﬁ
-JÆ
-KÓ
-Jb
-Jé
-Kû
-X
-H"
-JÓ
-K˛
-K.
-K‚"¬$'&˜w6R6F∆ˆr#¢.
-I^
-Xé
-I˛
-K.
-Xû
-Ir
-Jn
-X~
-In
-X~
-H""¬%ñ˜W"&r#¢.
-Hn
-JÆ
-I^
-K‚
-I^
-KÓ
-K
-Xﬁ
-IÚ"¬$6ˆÁFñÁVR'&˜w6ñÊr#¢.
-In
-K
-X
-Jn
-KÓ
-K
-X
-IŒ
-KÓ
-K
-X
-K
-In
-X~
-H""¬$˜&FW"&WfñWr#¢.
-I
-K
-Xﬁ
-J
-K
-JÆ
-X.
-K
-Xﬁ
-K^
-KÓ
-K^
-K.
-Xæ
-I^
-JÇ"¬$W7Fñ÷FVB7V'F˜F¬#¢.
-H^
-Jé
-X
-JÓ
-KÓ
-Jé
-K˛
-JB
-Hû
-J¢ﬁ
-J˛
-Xæ
-Ir"¬$FV∆ófW'í#¢.
-J
-K˛
-K.
-X
-K^
-K
-X"¬$6∆7V∆FVBB6ÜV6∂˜WB#¢.
-IÆ
-X~
-I^
-Hn
-Hû
-IÚ
-JÆ
-K
-I~
-J>
-Jé
-K‚
-Kû
-Xæ
-I~
-X"¬$W7Fñ÷FVBF˜F¬#¢.
-H^
-Jé
-X
-JÓ
-KÓ
-Jé
-K˛
-JB
-I^
-X
-K""¬$6ˆÁFñÁVRFÚ6ÜV6∂˜WB#¢.
-IÆ
-X~
-I^
-Hn
-Hû
-IÚ
-JÆ
-K
-IŒ
-KÓ
-H˛
-H"¬$ÊÚñ÷VÁBó26ˆ∆∆V7FVBñ‚FÜó2&WfñWr7F˜&R‚#¢.
-H~
-KÇ
-JÆ
-X.
-K
-Xﬁ
-K^
-KÓ
-K^
-K.
-Xæ
-I^
-JÇ
-Ké
-Xﬁ
-I˛
-Xæ
-K
-JÓ
-X~
-H"
-Jﬁ
-X
-I~
-JN
-KÓ
-JÇ
-Jé
-Kû
-X
-H"
-K.
-K˛
-J˛
-K‚
-IŒ
-KÓ
-JN
-KÓ
-ZB"¿–¢$6ÜV6∂˜WB&WfñWr#¢.
-IÆ
-X~
-I^
-Hn
-Hû
-IÚ
-JÆ
-X.
-K
-Xﬁ
-K^
-KÓ
-K^
-K.
-Xæ
-I^
-JÇ"¬$FV∆ófW'íFG&W72#¢.
-J
-K˛
-K.
-X
-K^
-K
-X
-I^
-K‚
-JÆ
-JN
-K‚"¬$gV∆¬Ê÷R¢#¢.
-JÆ
-X.
-K
-K‚
-Jé
-KÓ
-J‚¢"¬$÷ˆ&ñ∆RÁV÷&W"¢#¢.
-JÓ
-Xæ
-JŒ
-KÓ
-H~
-K"
-Jé
-H.
-JŒ
-K¢"¬$FG&W72¢#¢.
-JÆ
-JN
-K‚¢"¬%fñ∆∆vRÚ6óGí¢#¢.
-I~
-KÓ
-H
-KRÚ
-Kn
-Kû
-K¢"¬%7FFR¢#¢.
-K
-KÓ
-IŒ
-Xﬁ
-JÚ¢"¬%î‚6ˆFR¢#¢.
-JÆ
-K˛
-JÇ
-I^
-Xæ
-J¢"¬%&ˆ÷˜Fñˆ‚6ˆFR#¢.
-JÆ
-Xﬁ
-K
-JÓ
-Xæ
-Kn
-JÇ
-I^
-Xæ
-J"¬$FV∆ófW'íÊ˜FW2#¢.
-J
-K˛
-K.
-X
-K^
-K
-X
-I^
-Xr
-K.
-K˛
-HÚ
-Jé
-Xæ
-IÚ"¬%&WfñWr&WfñWrF˜F¬#¢.
-JÆ
-X.
-K
-Xﬁ
-K^
-KÓ
-K^
-K.
-Xæ
-I^
-JÇ
-I^
-X
-K"
-Jn
-X~
-In
-X~
-H""¬$7&VFR6ÊF&˜Ç&WfñWr˜&FW"#¢.
-J
-X~
-JÓ
-X≤
-I
-K
-Xﬁ
-J
-K
-JŒ
-Jé
-KÓ
-H˛
-H"¬$6ˆÁF7Bw&ı6VVB#¢$w&ı6VVB
-Ké
-Xr
-Ké
-H.
-JÆ
-K
-Xﬁ
-IR
-I^
-K
-X~
-H""¬%6VÊB÷W76vR#¢.
-Ké
-H.
-Jn
-X~
-Kb
-Jﬁ
-X~
-IŒ
-X~
-H""¬$ÜV«6VÁG&R#¢.
-Ké
-Kû
-KÓ
-J˛
-JN
-K‚
-I^
-X~
-H.
-Jn
-Xﬁ
-K"¬%ñ˜W"66˜VÁB#¢.
-Hn
-JÆ
-I^
-K‚
-In
-KÓ
-JN
-K‚"¬$˜fW'fñWr#¢.
-H^
-K^
-K.
-Xæ
-I^
-JÇ"¬$◊í˜&FW'2#¢.
-JÓ
-X~
-K
-Xr
-I
-K
-Xﬁ
-J
-K"¬$FG&W76W2#¢.
-JÆ
-JN
-Xr"¬%6ñv‚ñ‚#¢.
-Ké
-KÓ
-H~
-JÇ
-H~
-JÇ"¬%G&6≤‚˜&FW"#¢.
-I
-K
-Xﬁ
-J
-K
-I˛
-Xﬁ
-K
-Xé
-IR
-I^
-K
-X~
-H""¬%G&6≤ñ˜W"˜&FW"#¢.
-H^
-JÆ
-Jé
-K‚
-I
-K
-Xﬁ
-J
-K
-I˛
-Xﬁ
-K
-Xé
-IR
-I^
-K
-X~
-H""¬$˜&FW"ÁV÷&W"#¢.
-I
-K
-Xﬁ
-J
-K
-Jé
-H.
-JŒ
-K"¬%&ófFRG&6∂ñÊr6ˆFR#¢.
-Jé
-K˛
-IŒ
-X
-I˛
-Xﬁ
-K
-Xé
-I^
-K˛
-H.
-Ir
-I^
-Xæ
-J"¬$fñÊB˜&FW"#¢.
-I
-K
-Xﬁ
-J
-K
-In
-Xæ
-IŒ
-X~
-H""¬%6ÜóñÊrb&WGW&Á2#¢.
-Kn
-K˛
-JÆ
-K˛
-H.
-Ir
-IN
-K
-K
-K˛
-I˛
-K
-Xﬁ
-JÇ"¬%&óf7í#¢.
-I~
-Xæ
-JÆ
-Jé
-X
-J˛
-JN
-K‚"¬%FW&◊2ˆb6W'fñ6R#¢.
-Ké
-X~
-K^
-K‚
-I^
-X
-Kn
-K
-Xﬁ
-JN
-X~
-H""¬$6ˆÁF7BW2#¢.
-Ké
-H.
-JÆ
-K
-Xﬁ
-IR
-I^
-K
-X~
-H""¬$&6≤FÚÜˆ÷R#¢.
-JÓ
-X
-In
-JÆ
-X>
-K~
-Xﬁ
-J
-JÆ
-K
-IŒ
-KÓ
-H˛
-H"¬$6ˆÁFñÁVR#¢.
-IŒ
-KÓ
-K
-X
-K
-In
-X~
-H" –ß”∞–§ˆ&¶V7BÊ76ñv‚ÜÜñÊFî6˜í¬∞–¢%&ˆfñ∆RFWFñ«2#¢.
-JÆ
-Xﬁ
-K
-Xæ
-Jæ
-KŒ
-KÓ
-H~
-K"
-K^
-K˛
-K^
-K
-J2"¬$gV∆¬Ê÷R#¢.
-JÆ
-X.
-K
-K‚
-Jé
-KÓ
-J‚"¬$V÷ñ¬#¢.
-Hé
-JÓ
-X~
-K""¬$÷ˆ&ñ∆RÁV÷&W"#¢.
-JÓ
-Xæ
-JŒ
-KÓ
-H~
-K"
-Jé
-H.
-JŒ
-K"¬%W6W&Ê÷R#¢.
-Hû
-JÆ
-J˛
-Xæ
-I~
-I^
-K
-Xﬁ
-JN
-K‚
-Jé
-KÓ
-J‚"¬$7W7Fˆ÷W"îB#¢.
-I~
-Xﬁ
-K
-KÓ
-Kû
-IR
-Hn
-Hé
-J
-X"¬$6ˆvÊóFÚW6W&Ê÷R#¢$6ˆvÊóFÚ
-Hû
-JÆ
-J˛
-Xæ
-I~
-I^
-K
-Xﬁ
-JN
-K‚
-Jé
-KÓ
-J‚"¬$V÷ñ¬fW&ñfñVB#¢.
-Hé
-JÓ
-X~
-K"
-Ké
-JN
-Xﬁ
-J˛
-KÓ
-JÆ
-K˛
-JB"¬$÷ˆ&ñ∆RfW&ñfñVB#¢.
-JÓ
-Xæ
-JŒ
-KÓ
-H~
-K"
-Ké
-JN
-Xﬁ
-J˛
-KÓ
-JÆ
-K˛
-JB"¬$FFRˆb&ó'FÇ#¢.
-IŒ
-Jé
-Xﬁ
-J‚
-JN
-K˛
-J^
-KÚ"¬$f÷ñ«íÊ÷R#¢.
-Hû
-JÆ
-Jé
-KÓ
-J‚"¬$fó'7BÊ÷R#¢.
-JÆ
-Kû
-K.
-K‚
-Jé
-KÓ
-J‚"¬$vVÊFW"#¢.
-K.
-K˛
-H.
-Ir"¬$∆ÊwVvR#¢.
-Jﬁ
-KÓ
-K~
-K‚"¬$÷ñFF∆RÊ÷R#¢.
-JÓ
-J~
-Xﬁ
-JÚ
-Jé
-KÓ
-J‚"¬$Êñ6∂Ê÷R#¢.
-Hû
-JÆ
-Jé
-KÓ
-J‚"¬%&VfW'&VBW6W&Ê÷R#¢.
-JÆ
-Ké
-H.
-Jn
-X
-Jn
-K‚
-Hû
-JÆ
-J˛
-Xæ
-I~
-I^
-K
-Xﬁ
-JN
-K‚
-Jé
-KÓ
-J‚"¬%&ˆfñ∆Rñ÷vR#¢.
-JÆ
-Xﬁ
-K
-Xæ
-Jæ
-KŒ
-KÓ
-H~
-K"
-Iæ
-K^
-KÚ"¬%&ˆfñ∆RWFFVB#¢.
-JÆ
-Xﬁ
-K
-Xæ
-Jæ
-KŒ
-KÓ
-H~
-K"
-H^
-JÆ
-J
-X~
-IÚ"¬%Fñ÷R¶ˆÊR#¢.
-Ké
-JÓ
-JÚ
-I^
-Xﬁ
-K~
-X~
-JN
-Xﬁ
-K"¬%vV'6óFR#¢.
-K^
-X~
-JŒ
-Ké
-KÓ
-H~
-IÚ"¬%FÜW6RFWFñ«26ˆ÷Rg&ˆ“ñ˜W"6ˆvÊóFÚ&ˆfñ∆R‚÷ÊvR6ñv‚÷ñ‚7&VFVÁFñ«2ñ‚6ˆvÊóFÚ‚#¢.
-J˛
-Xr
-K^
-K˛
-K^
-K
-J2
-Hn
-JÆ
-I^
-Xr6ˆvÊóFÚ
-JÆ
-Xﬁ
-K
-Xæ
-Jæ
-KŒ
-KÓ
-H~
-K"
-Ké
-Xr
-Hn
-JN
-Xr
-Kû
-Xé
-H.
-ZB
-Ké
-KÓ
-H~
-JÇﬁ
-H~
-JÇ
-IŒ
-KÓ
-Jé
-I^
-KÓ
-K
-X6ˆvÊóFÚ
-JÓ
-X~
-H"
-JÆ
-Xﬁ
-K
-JŒ
-H.
-J~
-K˛
-JB
-I^
-K
-X~
-H.
-ZB"¬$6ˆvÊóFÚÜ2Ê˜B&˜fñFVB&ˆfñ∆RGG&ñ'WFW2f˜"FÜó266˜VÁBñWB‚#¢$6ˆvÊóFÚ
-Jé
-Xr
-H^
-Jﬁ
-X
-H~
-KÇ
-In
-KÓ
-JN
-Xr
-I^
-Xr
-K.
-K˛
-HÚ
-JÆ
-Xﬁ
-K
-Xæ
-Jæ
-KŒ
-KÓ
-H~
-K"
-K^
-K˛
-K^
-K
-J2
-Jé
-Kû
-X
-H"
-Jn
-K˛
-HÚ
-Kû
-Xé
-H.
-ZB"¬%ñW2#¢.
-Kû
-KÓ
-H"¬$ÊÚ#¢.
-Jé
-Kû
-X
-H""¿–¢$f&“7W∆ñW2f˜"ñ˜W"6V6ˆ‚#¢.
-H~
-KÇ
-JÓ
-XŒ
-Ké
-J‚
-I^
-X
-In
-X~
-JN
-X
-I^
-Xr
-K.
-K˛
-HÚ
-IŒ
-KŒ
-K
-X.
-K
-X
-Ké
-KÓ
-JÓ
-KÓ
-JÇ"¿–¢$fñÊB6VVG2¬∆ÁBÁWG&óFñˆ‚¬7&˜6&R¬Fˆˆ«2ÊBó'&ñvFñˆ‚7W∆ñW2‚6ˆ◊&R6≤6ó¶W2ÊB&ñ6W2&Vf˜&RFFñÊr&ˆGV7G2FÚñ˜W"&r‚#¢.
-JŒ
-X
-I¬¬
-JÆ
-XŒ
-Jr
-JÆ
-Xæ
-K~
-J2¬
-Jæ
-Ké
-K"
-Ké
-X
-K
-I^
-Xﬁ
-K~
-K‚¬
-IN
-IŒ
-KŒ
-KÓ
-K
-IN
-K
-Ké
-K˛
-H.
-IÆ
-KÓ
-HÇ
-I^
-K‚
-Ké
-KÓ
-JÓ
-KÓ
-JÇ
-Jn
-X~
-In
-X~
-H.
-ZB
-I^
-KÓ
-K
-Xﬁ
-IÚ
-JÓ
-X~
-H"
-IŒ
-Xæ
-J
-KŒ
-Jé
-Xr
-Ké
-Xr
-JÆ
-Kû
-K.
-Xr
-JÆ
-Xé
-IR
-IN
-K
-I^
-X
-JÓ
-JN
-Xæ
-H"
-I^
-X
-JN
-X
-K.
-Jé
-K‚
-I^
-K
-X~
-H.
-ZB"¿–¢$'&˜w6RFÜR6F∆ˆr#¢.
-Hû
-JN
-Xﬁ
-JÆ
-KÓ
-Jb
-Jn
-X~
-In
-X~
-H""¿–¢%6V&6Ç'í&ˆGV7B¬6FVv˜'í˜"7&˜ÊVVB‚#¢.
-Hû
-JN
-Xﬁ
-JÆ
-KÓ
-Jb¬
-Kn
-Xﬁ
-K
-X~
-J>
-X
-J˛
-K‚
-Jæ
-Ké
-K"
-I^
-X
-IŒ
-KŒ
-K
-X.
-K
-JB
-Ké
-Xr
-In
-Xæ
-IŒ
-X~
-H.
-ZB"¿–¢%5T4î¬$î4U2#¢.
-K^
-K˛
-Kn
-X~
-Kr
-I^
-X
-JÓ
-JN
-X~
-H""¿–¢$ˆffW'2ˆ‚f&“7W∆ñW2#¢.
-In
-X~
-JN
-X
-I^
-Xr
-Ké
-KÓ
-JÓ
-KÓ
-JÇ
-JÆ
-K
-I
-Jæ
-KŒ
-K"¿–¢$6ˆ◊&RFÜR∆ó7FVB&ñ6RvóFÇ’%‚&WfñWr&ñ6W2◊W7B&R6ˆÊfó&÷VB&Vf˜&R∆VÊ6Ç‚#¢.
-Ké
-X.
-IÆ
-X
-JŒ
-Jn
-Xﬁ
-Jr
-I^
-X
-JÓ
-JB
-IN
-K’%
-I^
-X
-JN
-X
-K.
-Jé
-K‚
-I^
-K
-X~
-H.
-ZB
-JÆ
-X.
-K
-Xﬁ
-K^
-KÓ
-K^
-K.
-Xæ
-I^
-JÇ
-I^
-X
-JÓ
-JN
-Xæ
-H"
-I^
-X
-JŒ
-K˛
-I^
-Xﬁ
-K
-X
-Ké
-Xr
-JÆ
-Kû
-K.
-Xr
-JÆ
-X
-K~
-Xﬁ
-I˛
-KÚ
-IŒ
-KŒ
-K
-X.
-K
-X
-Kû
-Xé
-ZB"¿–¢%6VR∆¬&ˆGV7G2(i"#¢.
-Ké
-Jﬁ
-X
-Hû
-JN
-Xﬁ
-JÆ
-KÓ
-Jb
-Jn
-X~
-In
-X~
-H"(i""¿–¢$'&˜w6RWfW'óFÜñÊr(i"#¢.
-Ké
-J¬
-I^
-X
-I≤
-Jn
-X~
-In
-X~
-H"(i""¿–¢$'&˜w6R&ˆGV7G2(ir#¢.
-Hû
-JN
-Xﬁ
-JÆ
-KÓ
-Jb
-Jn
-X~
-In
-X~
-H"(ir"¿–¢%F∆≤FÚw&ı6VVB(i"#¢$w&ı6VVB
-Ké
-Xr
-JŒ
-KÓ
-JB
-I^
-K
-X~
-H"(i""¿–¢.(…R6V&6Ç#¢.(…R
-In
-Xæ
-IŒ
-X~
-H""¿–¢$Üˆ÷R#¢.
-JÓ
-X
-In
-Xﬁ
-JÚ
-JÆ
-X>
-K~
-Xﬁ
-J"¿–¢%6Ü˜#¢.
-Jn
-X
-I^
-KÓ
-JÇ"¿–¢$w&ı6VVB&WfñWr6F∆ˆr&ˆGV7B‚#¢$w&ı6VVB
-I^
-Xr
-JÆ
-X.
-K
-Xﬁ
-K^
-KÓ
-K^
-K.
-Xæ
-I^
-JÇ
-I^
-Xé
-I˛
-K.
-Xû
-Ir
-I^
-K‚
-Hû
-JN
-Xﬁ
-JÆ
-KÓ
-Jn
-ZB"¿–¢$&WfñWr6F∆ˆr∆ó7FñÊr‚&ˆGV7BFWFñ«2vñ∆¬&R6ˆÊfó&÷VB'íw&ı6VVB‚#¢.
-JÆ
-X.
-K
-Xﬁ
-K^
-KÓ
-K^
-K.
-Xæ
-I^
-JÇ
-I^
-Xé
-I˛
-K.
-Xû
-Ir
-I^
-X
-Ké
-X.
-IÆ
-X
-ZB
-Hû
-JN
-Xﬁ
-JÆ
-KÓ
-Jb
-I^
-X
-IŒ
-KÓ
-Jé
-I^
-KÓ
-K
-X
-I^
-X
-JÆ
-X
-K~
-Xﬁ
-I˛
-KÚw&ı6VVB
-I^
-K
-X~
-I~
-KÓ
-ZB –ß“ì∞–§ˆ&¶V7BÊ76ñv‚ÜÜñÊFî6˜í¬∞–¢$'&˜w6RFÜR6◊∆Rw&ı6VVB6F∆ˆr‚#¢$w&ı6VVB
-I^
-Xr
-Jé
-JÓ
-X.
-Jé
-K‚
-I^
-Xé
-I˛
-K.
-Xû
-Ir
-I^
-X≤
-Jn
-X~
-In
-X~
-H.
-ZB"¿–¢$∆¬&ˆGV7G2#¢.
-Ké
-Jﬁ
-X
-Hû
-JN
-Xﬁ
-JÆ
-KÓ
-Jb"¬$ÜV«#¢.
-Ké
-Kû
-KÓ
-J˛
-JN
-K‚"¬$ñÊf˜&÷Fñˆ‚#¢.
-IŒ
-KÓ
-Jé
-I^
-KÓ
-K
-X"¬%FW&◊2#¢.
-Jé
-K˛
-J˛
-J‚
-IN
-K
-Kn
-K
-Xﬁ
-JN
-X~
-H""¿–¢%&WfñWrVÁfó&ˆÊ÷VÁB#¢.
-JÆ
-X.
-K
-Xﬁ
-K^
-KÓ
-K^
-K.
-Xæ
-I^
-JÇ
-K^
-KÓ
-JN
-KÓ
-K^
-K
-J2"¬$FV÷Ú˜&FW'2FÚÊ˜B66WBñ÷VÁG2‚#¢.
-J
-X~
-JÓ
-X≤
-I
-K
-Xﬁ
-J
-K
-JÓ
-X~
-H"
-Jﬁ
-X
-I~
-JN
-KÓ
-JÇ
-Ké
-Xﬁ
-K^
-X
-I^
-KÓ
-K
-Jé
-Kû
-X
-H"
-I^
-K˛
-J˛
-K‚
-IŒ
-KÓ
-JN
-KÓ
-ZB"¿–¢,*íw&ı6VVB+r&WfñWrVÁfó&ˆÊ÷VÁB#¢,*íw&ı6VVB+r
-JÆ
-X.
-K
-Xﬁ
-K^
-KÓ
-K^
-K.
-Xæ
-I^
-JÇ
-K^
-KÓ
-JN
-KÓ
-K^
-K
-J2"¿–¢%6Ü˜f&“7W∆ñW2¬6ˆ◊&R6≤6ó¶W2ÊB6VR7W'&VÁBˆffW'2‚#¢.
-In
-X~
-JN
-X
-I^
-K‚
-Ké
-KÓ
-JÓ
-KÓ
-JÇ
-Jn
-X~
-In
-X~
-H"¬
-JÆ
-Xé
-IR
-IN
-K
-I^
-X
-JÓ
-JN
-Xæ
-H"
-I^
-X
-JN
-X
-K.
-Jé
-K‚
-I^
-K
-X~
-H"
-IN
-K
-JÓ
-XŒ
-IŒ
-X.
-Jn
-K‚
-I
-Jæ
-KŒ
-K
-IŒ
-KÓ
-Jé
-X~
-H.
-ZB –ß“ì∞–¶gVÊ7Fñˆ‚G&Á6∆FT7W7Fˆ÷W"Çí∞–¢6ˆÁ7Bv∆∂W#÷Fˆ7V÷VÁBÊ7&VFUG&VUv∆∂W"ÜƒÊˆFTfñ«FW"Â4ÑıuıDUÖBì∂∆WBÊˆFS∞–¢vÜñ∆RÇÜÊˆFS◊v∆∂W"ÊÊWáDÊˆFRÇííí∂6ˆÁ7B&s÷ÊˆFRÊÊˆFUf«VRÁG&ñ“Çì∂ñbÜÜñÊFî6˜ï∑&u“ñÊˆFRÊÊˆFUf«VS÷ÊˆFRÊÊˆFUf«VRÁ&W∆6Rá&r∆ÜñÊFî6˜ï∑&u“ì∂V«6RÊˆFRÊÊˆFUf«VS÷ÊˆFRÊÊˆFUf«VRÁ&W∆6RÇı∆"Ö∆B≤í&ˆGV7G5∆"ˆr¬"C
-Hû
-JN
-Xﬁ
-JÆ
-KÓ
-Jb"ì∑––¢ÁVW'ï6V∆V7F˜$∆¬Ç"Á7Fˆ6≤÷Ê˜FR¬6FWFñ¬◊7Fˆ6≤"íÊf˜$V6ÇÜV√”Á∂6ˆÁ7Bf«VS÷V¬ÁFWáD6ˆÁFVÁBÁG&ñ“Çí∆÷F6É◊f«VRÊ÷F6ÇÇı‚Ç‚£ÚíÉÛ•«2¨+u«2¢ìÚÖ∆B≤ï«2∂fñ∆&∆RBˆíì∂ñbÜ÷F6ÇñV¬ÁFWáD6ˆÁFVÁC÷G∂÷F6Ö≥“Á&W∆6RÇı∆'6µ∆"ˆví¬.
-JÆ
-Xé
-IR"íÁG&ñ“Çó“G∂÷F6Ö≥“ÁG&ñ“ÇìÚ"+r#¢"'“G∂÷F6Ö≥%◊“
-Hû
-JÆ
-K.
-JŒ
-Xﬁ
-Jv∂V«6Rñbáf«VS””“$7W'&VÁF«íVÊfñ∆&∆R"ñV¬ÁFWáD6ˆÁFVÁC“.
-H^
-Jﬁ
-X
-Hû
-JÆ
-K.
-JŒ
-Xﬁ
-Jr
-Jé
-Kû
-X
-H"#∑“ì∞–¢ÁVW'ï6V∆V7F˜$∆¬Ç"Áf&ñÁB÷6Üˆñ6R∆&V¬¬Ê6'B÷∆ñÊR"íÊf˜$V6ÇÜV√”Á∂V¬Ê6Üñ∆DÊˆFW2Êf˜$V6ÇÜ6Üñ∆C”Á∂ñbÜ6Üñ∆BÊÊˆFUGóS””‘ÊˆFRÂDUÖEÙ‰ÙDRñ6Üñ∆BÊÊˆFUf«VS÷6Üñ∆BÊÊˆFUf«VRÁ&W∆6RÇı∆'6µ∆"ˆví¬.
-JÆ
-Xé
-IR"ì∑“ì∑“ì∞–¢ÁVW'ï6V∆V7F˜$∆¬Ç&ñÁWE∑∆6VÜˆ∆FW%“«FWáF&V∑∆6VÜˆ∆FW%“∆'WGFˆÂ∂&ñ÷∆&V≈“∆∂&ñ÷∆&V≈“"íÊf˜$V6ÇÜV√”Á∂f˜"Ü6ˆÁ7BGG"ˆb≤'∆6VÜˆ∆FW""¬&&ñ÷∆&V¬%“ó∂6ˆÁ7Bf«VS÷V¬ÊvWDGG&ñ'WFRÜGG"ì∂ñbáf«VRbfÜñÊFî6˜ï∑f«VU“ñV¬Á6WDGG&ñ'WFRÜGG"∆ÜñÊFî6˜ï∑f«VU“ì∑◊“ì∞–ß––¶7ñÊ2gVÊ7Fñˆ‚íáW&¬¬˜FñˆÁ3◊∑“í∞–¢6ˆÁ7BÜVFW'2“≤‚‚‚Ü˜FñˆÁ2Ê&ˆGíÚ≤$6ˆÁFVÁB’GóR#¢&∆ñ6Fñˆ‚ˆß6ˆ‚'”ß∑“í¬‚‚‚Ü˜FñˆÁ2ÊÜVFW'7««∑“í”∞–¢ñbÜ77&bbb˜FñˆÁ2Ê÷WFÜˆBbb˜FñˆÁ2Ê÷WFÜˆB”“$tUB"íÜVFW'5≤'Ç÷w&˜6VVB÷77&b%““77&c∞–¢6ˆÁ7B&W2“vóBfWF6ÇáW&¬¬≤7&VFVÁFñ«3¢'6÷R÷˜&ñvñ‚"¬‚‚Ê˜FñˆÁ2¬ÜVFW'2“ì∞–¢∆WBFF◊∑”≤G'í≤FF÷vóB&W2Êß6ˆ‚Çì≤“6F6Ç∑––¢ñbÇ&W2Êˆ≤íFá&˜rÊWrW'&˜"ÜFFÊW'&˜"«¬&WVW7Bfñ∆VBÇG∑&W2Á7FGW7“ñì∞–¢&WGW&‚FF∞–ß––¶6ˆÁ7BFˆ7B“Ü÷W76vR¬W'&˜#÷f«6Rí”‚≤6ˆÁ7B„÷Fˆ7V÷VÁBÊ7&VFTV∆V÷VÁBÇ&Fób"ì≤‚Ê6∆74Ê÷S“'Fˆ7B"≤ÜW'&˜#Ú"W'&˜"#¢""ì≤‚ÁFWáD6ˆÁFVÁC÷÷W76vS≤BÇ"7Fˆ7B◊&Vvñˆ‚"íÊVÊBÜ‚ì≤6WEFñ÷V˜WBÇÇì”Ê‚Á&V÷˜fRÇí√C3ì≤”∞–¶6ˆÁ7B6'B“Çí”‚≤G'í≤6ˆÁ7B&˜w3‘•4Ù‚Á'6RÜ∆ˆ6≈7F˜&vRÊvWDóFV“Ü6'D∂Wíó«¬%µ“"ì≤&WGW&‚'&íÊó4'&íá&˜w2ì˜&˜w3•µ”≤“6F6Ç≤&WGW&‚µ”≤“”∞–¶7ñÊ2gVÊ7Fñˆ‚÷ñw&FT∆Vv7î6'BÇó∑G'ó∂6ˆÁ7B&s‘•4Ù‚Á'6RÜ∆ˆ6≈7F˜&vRÊvWDóFV“Ü6'D∂Wíó«¬&ÁV∆¬"ì∂ñbÇ&w«ƒ'&íÊó4'&íá&ró««GóVˆb&r”“&ˆ&¶V7B"ó&WGW&‚ÁV∆√∂6ˆÁ7BVÁG&ñW3‘ˆ&¶V7BÊVÁG&ñW2á&ríÊfñ«FW"ÇÖ≤«VÁFóGï“ì”‰ÁV÷&W"Êó4fñÊóFRÑÁV÷&W"áVÁFóGíííbdÁV÷&W"áVÁFóGíì„ì∂ñbÇVÁG&ñW2Ê∆VÊwFÇó&WGW&‚µ”∂6ˆÁ7B∂óFV◊3’µ◊”÷vóBíÇ"ˆí˜c˜&ˆGV7G3ˆ∆ñ÷óC”S"ì∂6ˆÁ7B&˜w3’µ”∂f˜"Ü6ˆÁ7B∂∂Wí«f«VU“ˆbVÁG&ñW2ó∂6ˆÁ7B∂ñB¬‚‚Á6ó¶U'G5”’7G&ñÊrÜ∂WííÁ7∆óBÇ#£¢"ì∂∆WB6ó¶S“"#∑G'ó∑6ó¶S÷FV6ˆFUU$î6ˆ◊ˆÊVÁBá6ó¶U'G2Ê¶ˆñ‚Ç#£¢"íì∑÷6F6á∑6ó¶S◊6ó¶U'G2Ê¶ˆñ‚Ç#£¢"ì∑÷6ˆÁ7B&ˆGV7C÷óFV◊2ÊfñÊBÜóFV””‰ÁV÷&W"ÜóFV“ÊñBì””‘ÁV÷&W"ÜñBíì∂ñbÇ&ˆGV7Bñ6ˆÁFñÁVS∂6ˆÁ7Bf&ñÁC“á&ˆGV7BÁf&ñÁG7«≈µ“íÊfñÊBÜóFV””Á6ó¶RbfóFV“Á6≥””◊6ó¶Ró«¬á&ˆGV7BÁf&ñÁG7«≈µ“íÊfñÊBÜóFV””ÊóFV“Ê7FófR”÷f«6RbfóFV“Á7Fˆ6≥„ì∂ñbÇf&ñÁBñ6ˆÁFñÁVS∂6ˆÁ7BVÁFóGì‘÷FÇÊ÷ñ‚Éìíƒ÷FÇÊf∆ˆ˜"ÑÁV÷&W"áf«VRííì∂ñbáVÁFóGì„ó&˜w2ÁW6Çá∑6∑Sßf&ñÁBÁ6∑R«VÁFóGó“ì∑◊&WGW&‚&˜w3∑÷6F6á∑&WGW&‚ÁV∆√∑◊––¶gVÊ7Fñˆ‚wVW7D6'DñBÇó∑G'ó∂∆WBñC÷∆ˆ6≈7F˜&vRÊvWDóFV“Ü6'DñD∂Wíì∂ñbÇñBó∂ñC÷7'óFÚÁ&ÊFˆ’UTîBÇíÁ&W∆6T∆¬Ç"“"¬""ì∂∆ˆ6≈7F˜&vRÁ6WDóFV“Ü6'DñD∂Wí∆ñBì∑◊&WGW&‚ñC∑÷6F6á∑&WGW&‚7'óFÚÁ&ÊFˆ’UTîBÇíÁ&W∆6T∆¬Ç"“"¬""ì∑◊––¶gVÊ7Fñˆ‚6fT6'D∆ˆ6¬á&˜w2«WFFVDC‘FFRÊÊ˜rÇíó∂∆ˆ6≈7F˜&vRÁ6WDóFV“Ü6'D∂Wíƒ•4Ù‚Á7G&ñÊvñgíá&˜w2íì∂∆ˆ6≈7F˜&vRÁ6WDóFV“Ü6'EWFFVD∂Wí≈7G&ñÊráGóVˆbWFFVDC””“&ÁV÷&W"#˜WFFVDC§FFRÁ'6RáWFFVDBó«ƒFFRÊÊ˜rÇííì∑––¶7ñÊ2gVÊ7Fñˆ‚7ñÊ4wVW7D6'Bá&˜w2ó∑G'ó∂6ˆÁ7B&W7ˆÁ6S÷vóBfWF6ÇÇ"ˆí˜cˆ6'B"«∂÷WFÜˆC¢%UB"∆7&VFVÁFñ«3¢'6÷R÷˜&ñvñ‚"∆ÜVFW'3ß≤$6ˆÁFVÁB’GóR#¢&∆ñ6Fñˆ‚ˆß6ˆ‚"¬'Ç÷w&˜6VVB÷6'B÷ñB#¶wVW7D6'DñBÇó“∆&ˆGì§•4Ù‚Á7G&ñÊvñgíá∂óFV◊3ß&˜w7“ó“ì∂ñbÇ&W7ˆÁ6RÊˆ≤óFá&˜rÊWrW'&˜"Ü6'B7ñÊ2fñ∆VBÇG∑&W7ˆÁ6RÁ7FGW7“íÊì∑&WGW&‚G'VS∑÷6F6á∑&WGW&‚f«6S∑◊––¶∆WB6'DáñG&FVC÷f«6S∞–¶7ñÊ2gVÊ7Fñˆ‚áñG&FTwVW7D6'BÇó∂ñbÜ6'DáñG&FVBó&WGW&„∂6'DáñG&FVC◊G'VS∑G'ó∂6ˆÁ7BñC÷wVW7D6'DñBÇí∆∆Vv7ì÷vóB÷ñw&FT∆Vv7î6'BÇì∂∆WB∆ˆ6√÷6'BÇì∂ñbÜ∆Vv7í”÷ÁV∆¬ó∂∆ˆ6√÷∆Vv7ì∑6fT6'D∆ˆ6¬Ü∆ˆ6¬ì∂vóB7ñÊ4wVW7D6'BÜ∆ˆ6¬ì∑&WGW&„∑÷6ˆÁ7B∆ˆ6≈7F◊‘ÁV÷&W"Ü∆ˆ6≈7F˜&vRÊvWDóFV“Ü6'EWFFVD∂Wíó«√ì∂6ˆÁ7B&W7ˆÁ6S÷vóBfWF6ÇÇ"ˆí˜cˆ6'B"«∂7&VFVÁFñ«3¢'6÷R÷˜&ñvñ‚"∆ÜVFW'3ß≤'Ç÷w&˜6VVB÷6'B÷ñB#¶ñG“«6ñvÊ√§&˜'E6ñvÊ¬ÁFñ÷V˜WBÉ#Só“í«&V÷˜FS◊&W7ˆÁ6RÊˆ≥ˆvóB&W7ˆÁ6RÊß6ˆ‚Çì¶ÁV∆√∂ñbá&V÷˜FSÚÁWFFVDBbd'&íÊó4'&íá&V÷˜FRÊóFV◊2íó∂ñbÜ∆ˆ6≈7F◊‰FFRÁ'6Rá&V÷˜FRÁWFFVDBíó∂vóB7ñÊ4wVW7D6'BÜ∆ˆ6¬ì∑&WGW&„∑◊6fT6'D∆ˆ6¬á&V÷˜FRÊóFV◊2«&V÷˜FRÁWFFVDBì∑&WGW&„∑÷ñbÜ∆ˆ6¬Ê∆VÊwFÇñvóB7ñÊ4wVW7D6'BÜ∆ˆ6¬ì∑÷6F6á∑◊––¶7ñÊ2gVÊ7Fñˆ‚÷W&vT7W7Fˆ÷W$6'EvóFÑwVW7BÇó∂ñbÇ7W7Fˆ÷W%6W76ñˆ‚ó&WGW&‚G'VS∑G'ó∂6ˆÁ7B&W7V«C÷vóBíÇ"ˆí˜cˆ7W7Fˆ÷W"ˆ6'Bˆ÷W&vR"«∂÷WFÜˆC¢%ı5B"∆&ˆGì§•4Ù‚Á7G&ñÊvñgíá∂óFV◊3¶6'BÇó“í«6ñvÊ√§&˜'E6ñvÊ¬ÁFñ÷V˜WBÉÉó“ì∑6fT6'D∆ˆ6¬á&W7V«BÊóFV◊7«≈µ“ì∂vóB7ñÊ4wVW7D6'Bá&W7V«BÊóFV◊7«≈µ“ì∑&WGW&‚G'VS∑÷6F6á∑&WGW&‚f«6S∑◊––¶7ñÊ2gVÊ7Fñˆ‚áñG&FT7W7Fˆ÷W$6'BÇó∂ñbÜ7W7Fˆ÷W$6'DáñG&FVBó&WGW&„∂7W7Fˆ÷W$6'DáñG&FVC◊G'VS∑G'ó∂6ˆÁ7B7W'&VÁC÷vóBíÇ"ˆí˜cˆ7W7Fˆ÷W"˜6W76ñˆ‚"«∑6ñvÊ√§&˜'E6ñvÊ¬ÁFñ÷V˜WBÉCó“ì∂7W7Fˆ÷W%6W76ñˆ„÷7W'&VÁBÊ7W7Fˆ÷W'«∆ÁV∆√∂77&c÷7W'&VÁBÊ77&g«¬"#∂ñbÜ7W7Fˆ÷W%6W76ñˆ‚ñvóB÷W&vT7W7Fˆ÷W$6'EvóFÑwVW7BÇì∑÷6F6á∂7W7Fˆ÷W$6'DáñG&FVC÷f«6S∑◊––¶7ñÊ2gVÊ7Fñˆ‚7ñÊ47W7Fˆ÷W$6'Bá&˜w2ó∂ñbÇ7W7Fˆ÷W%6W76ñˆ‚ó&WGW&‚G'VS∑G'ó∂vóBíÇ"ˆí˜cˆ7W7Fˆ÷W"ˆ6'B"«∂÷WFÜˆC¢%UB"∆&ˆGì§•4Ù‚Á7G&ñÊvñgíá∂óFV◊3ß&˜w7“í«6ñvÊ√§&˜'E6ñvÊ¬ÁFñ÷V˜WBÉÉó“ì∑&WGW&‚G'VS∑÷6F6á∑&WGW&‚f«6S∑◊––¶6ˆÁ7B6fT6'B“7ñÊ2&˜w2”‚≤6fT6'D∆ˆ6¬á&˜w2ì∂6ˆÁ7B∂wVW7E6fVB∆66˜VÁE6fVE”÷vóB&ˆ÷ó6RÊ∆¬Ö∑7ñÊ4wVW7D6'Bá&˜w2í«7ñÊ47W7Fˆ÷W$6'Bá&˜w2ï“ì∑&WGW&‚wVW7E6fVBbf66˜VÁE6fVC≤”∞–¶6ˆÁ7B˜&FW%Fˆ∂VÁ2“Çí”‚≤G'ó∑&WGW&‚•4Ù‚Á'6RÜ∆ˆ6≈7F˜&vRÊvWDóFV“áFˆ∂V‰∂Wíó«¬%µ“"ì∑÷6F6á∑&WGW&‚µ”∑“”∞–¶6ˆÁ7B6fT˜&FW%Fˆ∂V‚“˜&FW"”‚≤6ˆÁ7B&˜w3÷˜&FW%Fˆ∂VÁ2ÇíÊfñ«FW"áÉ”ÁÇÊ˜&FW$ÁV÷&W"”÷˜&FW"Ê˜&FW$ÁV÷&W"ì≤&˜w2ÁVÁ6ÜñgBá∂˜&FW$ÁV÷&W#¶˜&FW"Ê˜&FW$ÁV÷&W"«Fˆ∂V„¶˜&FW"Ê∆ˆˆ∑WFˆ∂VÁ“ì≤∆ˆ6≈7F˜&vRÁ6WDóFV“áFˆ∂V‰∂Wíƒ•4Ù‚Á7G&ñÊvñgíá&˜w2Á6∆ñ6RÉ√3ííì≤”∞–¶6ˆÁ7B6'D6˜VÁB“Çí”‚6'BÇíÁ&VGV6RÇÜ‚«Çì”Ê‚¥ÁV÷&W"áÇÁVÁFóGó«√í√ì∞–¶6ˆÁ7B&ˆDÊ÷R“”‚∆ÊwVvRÇì””“&Üí"ÚáÊÊ÷W««ÊÊ÷TV‚í¢áÊÊ÷TVÁ««ÊÊ÷Rì∞–¶gVÊ7Fñˆ‚&ˆGV7Dñ÷vRá¬∆&vS÷f«6Rí∞–¢6ˆÁ7Bñ÷vTVÁG'ì◊Êñ÷vW3ÚÂ≥“∆ñ÷vS◊GóVˆbñ÷vTVÁG'ì””“'7G&ñÊr#ˆñ÷vTVÁG'ì¶ñ÷vTVÁG'ìÚÁW&¬∆ñ÷vT«C◊Êñ÷vT«CÚÂ≥◊«∆ñ÷vTVÁG'ìÚÊ«G««&ˆDÊ÷Ráì∞–¢&WGW&‚ñ÷vRÚ∆ñ÷r7&3“"G∂W62Üñ÷vRó“"«C“"G∂W62Üñ÷vT«Bó“#Ê¢«7‚6∆73“'&ˆGV7B÷V÷ˆ¶í#‚G∂ñ6ˆÁ5∑Ê6FVv˜'îVÂ◊«¬/	¯À‚'”¬˜7„Ê∞–ß––¶gVÊ7Fñˆ‚&ˆGV7D6&Báí∞–¢6ˆÁ7Bc“áÁf&ñÁG7«≈µ“íÊfñÊBáÉ”ÁÇÊ7FófR”÷f«6Rí«¬Áf&ñÁG3ÚÂ≥“«¬∑6∑SßÁ6∑R«&ñ6Uó6SßÁ&ñ6Uó6R∆◊'ó6SßÊ◊'ó6R«7Fˆ6≥ßÁ7Fˆ6≤«6≥¢#6≤'”∞–¢&WGW&‚∆'Fñ6∆R6∆73“'&ˆGV7B÷6&B#„∆á&Vc“"˜&ˆGV7BÚG∂W62áÁ6«Vró“#„∆Fób6∆73“'&ˆGV7B◊fó7V¬#‚G∑ÊfVGW&VCÚs«7‚6∆73“'&ˆGV7B÷&FvR#‰fVGW&VC¬˜7„‚s¢ábÊ◊'ó6SÁbÁ&ñ6Uó6SÚs«7‚6∆73“'&ˆGV7B÷&FvR#‰vˆˆBf«VS¬˜7„‚s¢rró“G∑&ˆGV7Dñ÷vRáó”¬ˆFóc„∆Fób6∆73“'&ˆGV7B÷6&B÷&ˆGí#„∆Fób6∆73“'&ˆGV7B÷'&ÊB#‚G∂W62áÊ'&ÊDVÁ««Ê'&ÊBó”¬ˆFóc„∆"6∆73“'&ˆGV7B◊FóF∆R#‚G∂W62á&ˆDÊ÷Ráíó”¬ˆ#„∆Fób6∆73“'&ˆGV7B÷6FVv˜'í#‚G∂W62Ü∆ÊwVvRÇì””“&Üí#˜Ê6FVv˜'ìßÊ6FVv˜'îV‚ó”¬ˆFóc„∆Fób6∆73“'&ˆGV7B◊&ñ6R#„∆#‚G∂÷ˆÊWíábÁ&ñ6Uó6Ró”¬ˆ#‚G∑bÊ◊'ó6SÁbÁ&ñ6Uó6Sˆ∆FV√‚G∂÷ˆÊWíábÊ◊'ó6Ró”¬ˆFV√Ê¢"'”¬ˆFóc„∆Fób6∆73“'7Fˆ6≤÷Ê˜FR#‚G∑bÁ7Fˆ6≥„ˆG∂W62ábÁ6≤ó“+rG∑bÁ7Fˆ6∑“fñ∆&∆V¢$7W'&VÁF«íVÊfñ∆&∆R'”¬ˆFóc„¬ˆFóc„¬ˆ„∆Fób6∆73“'&ˆGV7B÷7FñˆÁ2#„∆6∆73“&'F‚'F‚◊6V6ˆÊF'í"á&Vc“"˜&ˆGV7BÚG∂W62áÁ6«Vró“#‰FWFñ«3¬ˆ„∆'WGFˆ‚6∆73“&'F‚'F‚◊&ñ÷'í"FF÷FC“"G∂W62ábÁ6∑Ró“"G∑bÁ7Fˆ6≥√Ú&Fó6&∆VB#¢"'”‰FBFÚ6'C¬ˆ'WGFˆ„„¬ˆFóc„¬ˆ'Fñ6∆SÊ∞–ß––¶gVÊ7Fñˆ‚ÜVFW"Çí∞–¢6ˆÁ7B&WfñWs◊vñÊF˜r‰u$ı4TTEÙ4Ù‰dîsÚÊFV÷Ù÷ˆFR”÷f«6Sˆ∆Fób6∆73“'&WfñWr◊7G&ó#„∆#Â$UdîUr5Dı$S¬ˆ#‚6◊∆R&ˆGV7G2ÊB&ñ6W2+r6ÜV6∂˜WB7&VFW2∆ˆ6¬FV÷Ú˜&FW"ˆÊ«í„¬ˆFócÊ¢"#∞–¢&WGW&‚G∑&WfñWw”∆ÜVFW"6∆73“'6óFR÷ÜVFW"#„∆Fób6∆73“&ÜVFW"÷÷ñ‚#„∆'WGFˆ‚6∆73“&÷VÁR÷'WGFˆ‚"FF÷÷VÁR&ñ÷∆&V√“$÷VÁR#Ó)ã¬ˆ'WGFˆ„„∆6∆73“&∆ˆvÚ"á&Vc“"Ú#„«7‚6∆73“&∆ˆvÚ÷÷&≤#„∆ñ÷r7&3“"ˆw&˜6VVB÷÷&≤◊c"ÁÊr"«C“""&ñ÷ÜñFFV„“'G'VR#„¬˜7„„«7„‰u$Ú∆#Â4TTC¬ˆ#„¬˜7„„¬ˆ„∆f˜&“6∆73“'6V&6Ü&""7Fñˆ„“"˜6V&6Ç#„∆∆&V¬6∆73“'7"÷ˆÊ«í"f˜#“'6óFR◊6V&6Ç#Â6V&6Ç&ˆGV7G3¬ˆ∆&V√„∆ñÁWBñC“'6óFR◊6V&6Ç"GóS“'6V&6Ç"Ê÷S“'"∆6VÜˆ∆FW#“%6V&6Ç6VVG2¬ÁWG&óFñˆ‚¬Fˆˆ«>(
-b#„∆'WGFˆ„Ó(…R6V&6É¬ˆ'WGFˆ„„¬ˆf˜&”„∆Fób6∆73“&ÜVFW"÷7FñˆÁ2#„∆6∆73“&ÜVFW"÷∆ñÊ≤"á&Vc“"ˆ66˜VÁB#‰66˜VÁC¬ˆ„∆6∆73“&6'B÷∆ñÊ≤"á&Vc“"ˆ6'B#‰&r«7‚6∆73“&6'B÷6˜VÁB#‚G∂6'D6˜VÁBÇó”¬˜7„„¬ˆ„¬ˆFóc„¬ˆFóc„∆Fób6∆73“&Êb◊&˜r#„∆Êb6∆73“&Êb÷∆ñÊ∑2#„∆á&Vc“"˜6Ü˜#Â6Ü˜∆√¬ˆ„∆á&Vc“"ˆ6FVv˜'í˜6VVG2#Â6VVG3¬ˆ„∆á&Vc“"ˆ6FVv˜'í˜∆ÁB÷ÁWG&óFñˆ‚#Â∆ÁBÁWG&óFñˆ„¬ˆ„∆á&Vc“"ˆ6FVv˜'íˆ7&˜◊&˜FV7Fñˆ‚#‰7&˜&˜FV7Fñˆ„¬ˆ„∆á&Vc“"ˆ6FVv˜'íˆf&“◊Fˆˆ«2#‰f&“Fˆˆ«3¬ˆ„∆á&Vc“"ˆ6FVv˜'íˆó'&ñvFñˆ‚#‰ó'&ñvFñˆ„¬ˆ„«7‚6∆73“&Êb◊76W"#„¬˜7„„∆á&Vc“"˜G&6≤÷˜&FW"#ÂG&6≤˜&FW#¬ˆ„∆'WGFˆ‚6∆73“&∆ÊwVvR÷'F‚"FF÷∆ÊwVvS‚G∂∆ÊwVvRÇì””“&V‚#Ú.
-Kû
-K˛
-Jé
-Xﬁ
-Jn
-X#¢$VÊv∆ó6Ç'”¬ˆ'WGFˆ„„¬ˆÊc„¬ˆFóc„¬ˆÜVFW#Ê∞–ß––¶gVÊ7Fñˆ‚fˆ˜FW"Çó∑&WGW&‚∆fˆ˜FW"6∆73“'6óFR÷fˆ˜FW"#„∆Fób6∆73“&6ˆÁFñÊW"#„∆Fób6∆73“&fˆ˜FW"÷w&ñB#„∆Fób6∆73“&fˆ˜FW"÷'&ÊB#„∆6∆73“&∆ˆvÚ"á&Vc“"Ú#„«7‚6∆73“&∆ˆvÚ÷÷&≤#„∆ñ÷r7&3“"ˆw&˜6VVB÷÷&≤◊c"ÁÊr"«C“""&ñ÷ÜñFFV„“'G'VR#„¬˜7„„«7„‰u$Ú∆#Â4TTC¬ˆ#„¬˜7„„¬ˆ„«‚G∂W62á7F˜&Vg&ˆÁE6WGFñÊw2Á7F˜&T&˜WG«¬%6Ü˜f&“7W∆ñW2¬6ˆ◊&R6≤6ó¶W2ÊB6VR7W'&VÁBˆffW'2‚"ó”¬˜„¬ˆFóc„∆Fób6∆73“&fˆ˜FW"÷6ˆ¬#„∆É3Â6Ü˜¬ˆÉ3„∆á&Vc“"˜6Ü˜#‰∆¬&ˆGV7G3¬ˆ„∆á&Vc“"ˆ6FVv˜'í˜6VVG2#Â6VVG3¬ˆ„∆á&Vc“"ˆ6FVv˜'í˜∆ÁB÷ÁWG&óFñˆ‚#Â∆ÁBÁWG&óFñˆ„¬ˆ„¬ˆFóc„∆Fób6∆73“&fˆ˜FW"÷6ˆ¬#„∆É3‰ÜV«¬ˆÉ3„∆á&Vc“"˜G&6≤÷˜&FW"#ÂG&6≤‚˜&FW#¬ˆ„∆á&Vc“"ˆÜV«#‰ÜV«6VÁG&S¬ˆ„∆á&Vc“"ˆ6ˆÁF7B#‰6ˆÁF7BW3¬ˆ„¬ˆFóc„∆Fób6∆73“&fˆ˜FW"÷6ˆ¬#„∆É3‰ñÊf˜&÷Fñˆ„¬ˆÉ3„∆á&Vc“"˜6ÜóñÊr◊&WGW&Á2#Â6ÜóñÊrb&WGW&Á3¬ˆ„∆á&Vc“"˜&óf7í#Â&óf7ì¬ˆ„∆á&Vc“"˜FW&◊2#ÂFW&◊3¬ˆ„¬ˆFóc„¬ˆFóc„∆Fób6∆73“&fˆ˜FW"÷&˜GFˆ“#„«7„Ï*íw&ı6VVB+r&WfñWrVÁfó&ˆÊ÷VÁC¬˜7„„«7„‰FV÷Ú˜&FW'2FÚÊ˜B66WBñ÷VÁG2„¬˜7„„¬ˆFóc„¬ˆFóc„¬ˆfˆ˜FW#Ê∑––¶gVÊ7Fñˆ‚ˆffW%7G&óÇó∂ñbÇ7F˜&Vg&ˆÁDˆffW'2Ê∆VÊwFÇó&WGW&‚"#∑&WGW&‚«6V7Fñˆ‚6∆73“&FV¬◊7G&ó"&ñ÷∆&V√“$7W'&VÁB6˜Wˆ‚ˆffW'2#„∆Fób6∆73“&FV¬◊7G&ó÷ÜVB#„∆#‰FV«2f˜"ñ˜W"f&”¬ˆ#„∆á&Vc“"˜6Ü˜#Â6Ü˜&ˆGV7G2(i#¬ˆ„¬ˆFóc„∆Fób6∆73“&FV¬÷∆ó7B#‚G∑7F˜&Vg&ˆÁDˆffW'2Ê÷ÜˆffW#”Ê∆6∆73“&FV¬÷6&B"á&Vc“"˜6Ü˜ˆ6˜Wˆ„“G∂VÊ6ˆFUU$î6ˆ◊ˆÊVÁBÜˆffW"Ê6ˆFRó“#„«7‚6∆73“&FV¬÷÷&≤#‰ÙddU#¬˜7„„∆#‚G∂ˆffW"ÁGóS””“'W&6VÁB#ˆG∂W62ÜˆffW"Áf«VRó“Rˆff¶G∂÷ˆÊWíÜˆffW"Áf«VRó“ˆff”¬ˆ#„«7„‰6ˆFR«7G&ˆÊs‚G∂W62ÜˆffW"Ê6ˆFRó”¬˜7G&ˆÊs„¬˜7„‚G∂ˆffW"Ê÷ñÂ7V'F˜F≈ó6Sˆ«6÷∆√‰ˆ‚˜&FW'2&˜fRG∂÷ˆÊWíÜˆffW"Ê÷ñÂ7V'F˜F≈ó6Ró”¬˜6÷∆√Ê¢"'”¬ˆÊíÊ¶ˆñ‚Ç""ó”¬ˆFóc„¬˜6V7Fñˆ„Ê∑––¶gVÊ7Fñˆ‚Fó66˜VÁE6ÜV∆bÜóFV◊2ó∂6ˆÁ7BFó66˜VÁFVC÷óFV◊2Êfñ«FW"á”‚áÁf&ñÁG7«≈µ“íÁ6ˆ÷Rác”ÁbÊ7FófR”÷f«6RbgbÊ◊'ó6SÁbÁ&ñ6Uó6RííÁ6∆ñ6RÉ√Çì∂ñbÇFó66˜VÁFVBÊ∆VÊwFÇó&WGW&‚"#∑&WGW&‚«6V7Fñˆ‚6∆73“'6V7Fñˆ‚6∆R◊6ÜV∆b#„∆Fób6∆73“'6V7Fñˆ‚÷ÜVB#„∆Fóc„«6∆73“&WñV'&˜r#Â5T4î¬$î4U3¬˜„∆É#‰ˆffW'2ˆ‚f&“7W∆ñW3¬ˆÉ#„«‰6ˆ◊&RFÜR∆ó7FVB&ñ6RvóFÇ’%‚&WfñWr&ñ6W2◊W7B&R6ˆÊfó&÷VB&Vf˜&R∆VÊ6Ç„¬˜„¬ˆFóc„∆6∆73“'FWáB÷∆ñÊ≤"á&Vc“"˜6Ü˜#Â6VR∆¬&ˆGV7G2(i#¬ˆ„¬ˆFóc„∆Fób6∆73“'&ˆGV7B÷w&ñB#‚G∂Fó66˜VÁFVBÊ÷á&ˆGV7D6&BíÊ¶ˆñ‚Ç""ó”¬ˆFóc„¬˜6V7Fñˆ„Ê∑––¶gVÊ7Fñˆ‚7W7Fˆ÷W$&˜GFˆ‘ÊbÇó∞–¢6ˆÁ7BFÉ÷FV6ˆFUU$íÜ∆ˆ6Fñˆ‚ÁFÜÊ÷RÁ&W∆6RÇı¬Ú≤BÚ¬""íó«¬"Ú#∞–¢6ˆÁ7B7FófS◊∂Üˆ÷SßFÉ””“"Ú"«6Ü˜ßFÉ””“"˜6Ü˜'««FÇÁ7F'G5vóFÇÇ"ˆ6FVv˜'íÚ"ó««FÇÁ7F'G5vóFÇÇ"ˆ'&ÊBÚ"ó««FÇÁ7F'G5vóFÇÇ"˜&ˆGV7BÚ"íÕµ˜Ω-¢Gß≤⁄Óù∆≠y›"setting-${name}" name="${name}" maxlength="20000" placeholder="Not configured. Enter approved text here.">${esc(settings[name]||"")}</textarea></div>`).join("")}`).join("");save?.insertAdjacentHTML("beforebegin",markup);}catch{}}
+const $ = (s, root = document) => root.querySelector(s);
+const app = $("#app");
+const esc = (s = "") => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money = n => new Intl.NumberFormat("en-IN", { style:"currency", currency:"INR", maximumFractionDigits:2 }).format((Number(n)||0)/100);
+const slug = s => String(s||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const icons = {Seeds:"üå±","Plant nutrition":"üåø","Crop protection":"üõ°Ô∏è","Farm tools":"üß§",Irrigation:"üíß","Organic growing":"üçÉ","Nursery supplies":"ü™¥"};
+let csrf = "", importRows = [], rawImportRows = [], importErrors = [], pickedVariant = "", customerSession = null, customerCartHydrated = false;
+let storefrontSettings = {}, storefrontOffers = [];
+const cartKey = "agroseed-cart-v1", cartIdKey="agroseed-cart-id-v1", cartUpdatedKey="agroseed-cart-updated-v1", tokenKey = "agroseed-order-tokens-v1", languageKey = "agroseed-language";
+const couponKey = "agroseed-coupon-v1", addressBookKey = "agroseed-addresses-v1", profileKey = "agroseed-profile-v1";
+function addressBook(){try{const rows=JSON.parse(localStorage.getItem(addressBookKey)||"null");if(Array.isArray(rows))return rows;const old=JSON.parse(localStorage.getItem("agroseed-address")||"{}");if(old.name){const row={...old,id:"legacy-address",isDefault:true};localStorage.setItem(addressBookKey,JSON.stringify([row]));return [row];}}catch{}return [];}
+function saveAddressBook(rows){localStorage.setItem(addressBookKey,JSON.stringify(rows));const primary=rows.find(x=>x.isDefault)||rows[0]||{};localStorage.setItem("agroseed-address",JSON.stringify(primary));}
+function savedProfile(){try{return JSON.parse(localStorage.getItem(profileKey)||"{}");}catch{return {};}}
+const language = () => localStorage.getItem(languageKey) || "en";
+const say = (en, hi) => language()==="hi" ? hi : en;
+const hindiCopy = {
+ "PREVIEW STORE":"‡§™‡•Ç‡§∞‡•ç‡§µ‡§æ‡§µ‡§≤‡•ã‡§ï‡§® ‡§∏‡•ç‡§ü‡•ã‡§∞","Sample products and prices ¬∑ Checkout creates a local demo order only.":"‡§®‡§Æ‡•Ç‡§®‡§æ ‡§â‡§§‡•ç‡§™‡§æ‡§¶ ‡§î‡§∞ ‡§ï‡•Ä‡§Æ‡§§‡•á‡§Ç ¬∑ ‡§ö‡•á‡§ï‡§Ü‡§â‡§ü ‡§ï‡•á‡§µ‡§≤ ‡§è‡§ï ‡§°‡•á‡§Æ‡•ã ‡§ë‡§∞‡•ç‡§°‡§∞ ‡§¨‡§®‡§æ‡§§‡§æ ‡§π‡•à‡•§",
+ "Account":"‡§ñ‡§æ‡§§‡§æ","Bag":"‡§ï‡§æ‡§∞‡•ç‡§ü","Shop all":"‡§∏‡§≠‡•Ä ‡§â‡§§‡•ç‡§™‡§æ‡§¶","Seeds":"‡§¨‡•Ä‡§ú","Plant nutrition":"‡§™‡•å‡§ß‡•ã‡§Ç ‡§ï‡§æ ‡§™‡•ã‡§∑‡§£","Crop protection":"‡§´‡§∏‡§≤ ‡§∏‡•Å‡§∞‡§ï‡•ç‡§∑‡§æ","Farm tools":"‡§ñ‡•á‡§§‡•Ä ‡§ï‡•á ‡§î‡§ú‡§º‡§æ‡§∞","Irrigation":"‡§∏‡§ø‡§Ç‡§ö‡§æ‡§à","Track order":"‡§ë‡§∞‡•ç‡§°‡§∞ ‡§ü‡•ç‡§∞‡•à‡§ï ‡§ï‡§∞‡•á‡§Ç","Search":"‡§ñ‡•ã‡§ú‡•á‡§Ç","Search products":"‡§â‡§§‡•ç‡§™‡§æ‡§¶ ‡§ñ‡•ã‡§ú‡•á‡§Ç",
+ "GROW WELL ¬∑ LIVE WELL":"‡§Ö‡§ö‡•ç‡§õ‡•Ä ‡§ñ‡•á‡§§‡•Ä ¬∑ ‡§¨‡•á‡§π‡§§‡§∞ ‡§ú‡•Ä‡§µ‡§®","Good growing":"‡§¨‡•á‡§π‡§§‡§∞ ‡§ñ‡•á‡§§‡•Ä","starts":"‡§∂‡•Å‡§∞‡•Ç ‡§π‡•ã‡§§‡•Ä ‡§π‡•à","here.":"‡§Ø‡§π‡§æ‡§Å ‡§∏‡•á‡•§","Farm products":"‡§ï‡•à‡§ü‡§≤‡•â‡§ó ‡§¶‡•á‡§ñ‡•á‡§Ç","Get growing advice":"‡§ñ‡•á‡§§‡•Ä ‡§ï‡•Ä ‡§∏‡§≤‡§æ‡§π ‡§≤‡•á‡§Ç","Seeds and farm supplies":"‡§ö‡•Å‡§®‡•á ‡§π‡•Å‡§è ‡§ï‡•É‡§∑‡§ø ‡§â‡§§‡•ç‡§™‡§æ‡§¶","Compare pack sizes and prices":"‡§â‡§§‡•ç‡§™‡§æ‡§¶ ‡§ï‡•Ä ‡§∏‡§æ‡§´‡§º ‡§ú‡§æ‡§®‡§ï‡§æ‡§∞‡•Ä","Hindi & English":"‡§π‡§ø‡§Ç‡§¶‡•Ä ‡§î‡§∞ ‡§Ö‡§Ç‡§ó‡•ç‡§∞‡•á‡§ú‡§º‡•Ä","FIND YOUR FIELD":"‡§Ö‡§™‡§®‡•Ä ‡§ú‡§º‡§∞‡•Ç‡§∞‡§§ ‡§ö‡•Å‡§®‡•á‡§Ç","Shop by category":"‡§∂‡•ç‡§∞‡•á‡§£‡•Ä ‡§ï‡•á ‡§Ö‡§®‡•Å‡§∏‡§æ‡§∞ ‡§ñ‡§∞‡•Ä‡§¶‡•á‡§Ç","Start with what your crop needs today.":"‡§Ü‡§ú ‡§Ö‡§™‡§®‡•Ä ‡§´‡§∏‡§≤ ‡§ï‡•Ä ‡§ú‡§º‡§∞‡•Ç‡§∞‡§§ ‡§∏‡•á ‡§∂‡•Å‡§∞‡•Å‡§Ü‡§§ ‡§ï‡§∞‡•á‡§Ç‡•§","Browse products":"‡§â‡§§‡•ç‡§™‡§æ‡§¶ ‡§¶‡•á‡§ñ‡•á‡§Ç","FARMER PICKS":"‡§Ü‡§™‡§ï‡•á ‡§≤‡§ø‡§è ‡§ö‡•Å‡§®‡•á ‡§ó‡§è","Farm products":"‡§ï‡•à‡§ü‡§≤‡•â‡§ó ‡§¶‡•á‡§ñ‡•á‡§Ç","Sample listings for preview. Staff can manage products in the admin console.":"‡§™‡•Ç‡§∞‡•ç‡§µ‡§æ‡§µ‡§≤‡•ã‡§ï‡§® ‡§ï‡•á ‡§®‡§Æ‡•Ç‡§®‡•á‡•§ ‡§ï‡§∞‡•ç‡§Æ‡§ö‡§æ‡§∞‡•Ä ‡§è‡§°‡§Æ‡§ø‡§® ‡§™‡•à‡§®‡§≤ ‡§Æ‡•á‡§Ç ‡§â‡§§‡•ç‡§™‡§æ‡§¶ ‡§∏‡§Ç‡§≠‡§æ‡§≤ ‡§∏‡§ï‡§§‡•á ‡§π‡•à‡§Ç‡•§","Shop all":"‡§∏‡§≠‡•Ä ‡§â‡§§‡•ç‡§™‡§æ‡§¶","Need a hand choosing?":"‡§ö‡•Å‡§®‡§®‡•á ‡§Æ‡•á‡§Ç ‡§Æ‡§¶‡§¶ ‡§ö‡§æ‡§π‡§ø‡§è?","Tell us what you‚Äôre growing and we‚Äôll point you to the right place.":"‡§Ü‡§™ ‡§ï‡•ç‡§Ø‡§æ ‡§â‡§ó‡§æ ‡§∞‡§π‡•á ‡§π‡•à‡§Ç, ‡§π‡§Æ‡•á‡§Ç ‡§¨‡§§‡§æ‡§á‡§è ‚Äî ‡§π‡§Æ ‡§∏‡§π‡•Ä ‡§â‡§§‡•ç‡§™‡§æ‡§¶ ‡§ñ‡•ã‡§ú‡§®‡•á ‡§Æ‡•á‡§Ç ‡§Æ‡§¶‡§¶ ‡§ï‡§∞‡•á‡§Ç‡§ó‡•á‡•§","Talk to AgroSeed":"AgroSeed ‡§∏‡•á ‡§¨‡§æ‡§§ ‡§ï‡§∞‡•á‡§Ç","Good value":"‡§Ö‡§ö‡•ç‡§õ‡§æ ‡§Æ‡•Ç‡§≤‡•ç‡§Ø","Details":"‡§µ‡§ø‡§µ‡§∞‡§£","Add to cart":"‡§ï‡§æ‡§∞‡•ç‡§ü ‡§Æ‡•á‡§Ç ‡§ú‡•ã‡§°‡§º‡•á‡§Ç","Add to bag":"‡§ï‡§æ‡§∞‡•ç‡§ü ‡§Æ‡•á‡§Ç ‡§ú‡•ã‡§°‡§º‡•á‡§Ç","available":"‡§â‡§™‡§≤‡§¨‡•ç‡§ß","Out of stock":"‡§∏‡•ç‡§ü‡•â‡§ï ‡§Æ‡•á‡§Ç ‡§®‡§π‡•Ä‡§Ç","Search seeds, nutrition, tools‚Ä¶":"‡§¨‡•Ä‡§ú, ‡§™‡•ã‡§∑‡§£ ‡§î‡§∞ ‡§î‡§ú‡§º‡§æ‡§∞ ‡§ñ‡•ã‡§ú‡•á‡§Ç‚Ä¶",
+ "Shop all products":"‡§∏‡§≠‡•Ä ‡§â‡§§‡•ç‡§™‡§æ‡§¶","Results for":"‡§á‡§®‡§ï‡•á ‡§™‡§∞‡§ø‡§£‡§æ‡§Æ","Categories":"‡§∂‡•ç‡§∞‡•á‡§£‡§ø‡§Ø‡§æ‡§Å","Brands":"‡§¨‡•ç‡§∞‡§æ‡§Ç‡§°","Sort by":"‡§ï‡•ç‡§∞‡§Æ‡§¨‡§¶‡•ç‡§ß ‡§ï‡§∞‡•á‡§Ç","Featured":"‡§µ‡§ø‡§∂‡•á‡§∑","Price: low to high":"‡§ï‡§Æ ‡§ï‡•Ä‡§Æ‡§§ ‡§™‡§π‡§≤‡•á","Price: high to low":"‡§ú‡§º‡•ç‡§Ø‡§æ‡§¶‡§æ ‡§ï‡•Ä‡§Æ‡§§ ‡§™‡§π‡§≤‡•á","Name":"‡§®‡§æ‡§Æ","products":"‡§â‡§§‡•ç‡§™‡§æ‡§¶","No matches yet":"‡§Ö‡§≠‡•Ä ‡§ï‡•ã‡§à ‡§â‡§§‡•ç‡§™‡§æ‡§¶ ‡§®‡§π‡•Ä‡§Ç ‡§Æ‡§ø‡§≤‡§æ","Try another search or browse the full catalog.":"‡§¶‡•Ç‡§∏‡§∞‡•Ä ‡§ñ‡•ã‡§ú ‡§ï‡§∞‡•á‡§Ç ‡§Ø‡§æ ‡§™‡•Ç‡§∞‡§æ ‡§ï‡•à‡§ü‡§≤‡•â‡§ó ‡§¶‡•á‡§ñ‡•á‡§Ç‡•§","Clear filters":"‡§´‡§º‡§ø‡§≤‡•ç‡§ü‡§∞ ‡§π‡§ü‡§æ‡§è‡§Å","Product not found":"‡§â‡§§‡•ç‡§™‡§æ‡§¶ ‡§®‡§π‡•Ä‡§Ç ‡§Æ‡§ø‡§≤‡§æ","Browse catalog":"‡§ï‡•à‡§ü‡§≤‡•â‡§ó ‡§¶‡•á‡§ñ‡•á‡§Ç","Your bag":"‡§Ü‡§™‡§ï‡§æ ‡§ï‡§æ‡§∞‡•ç‡§ü","Continue browsing":"‡§ñ‡§∞‡•Ä‡§¶‡§æ‡§∞‡•Ä ‡§ú‡§æ‡§∞‡•Ä ‡§∞‡§ñ‡•á‡§Ç","Order preview":"‡§ë‡§∞‡•ç‡§°‡§∞ ‡§™‡•Ç‡§∞‡•ç‡§µ‡§æ‡§µ‡§≤‡•ã‡§ï‡§®","Estimated subtotal":"‡§Ö‡§®‡•Å‡§Æ‡§æ‡§®‡§ø‡§§ ‡§â‡§™-‡§Ø‡•ã‡§ó","Delivery":"‡§°‡§ø‡§≤‡•Ä‡§µ‡§∞‡•Ä","Calculated at checkout":"‡§ö‡•á‡§ï‡§Ü‡§â‡§ü ‡§™‡§∞ ‡§ó‡§£‡§®‡§æ ‡§π‡•ã‡§ó‡•Ä","Estimated total":"‡§Ö‡§®‡•Å‡§Æ‡§æ‡§®‡§ø‡§§ ‡§ï‡•Å‡§≤","Continue to checkout":"‡§ö‡•á‡§ï‡§Ü‡§â‡§ü ‡§™‡§∞ ‡§ú‡§æ‡§è‡§Å","No payment is collected in this preview store.":"‡§á‡§∏ ‡§™‡•Ç‡§∞‡•ç‡§µ‡§æ‡§µ‡§≤‡•ã‡§ï‡§® ‡§∏‡•ç‡§ü‡•ã‡§∞ ‡§Æ‡•á‡§Ç ‡§≠‡•Å‡§ó‡§§‡§æ‡§® ‡§®‡§π‡•Ä‡§Ç ‡§≤‡§ø‡§Ø‡§æ ‡§ú‡§æ‡§§‡§æ‡•§",
+ "Checkout preview":"‡§ö‡•á‡§ï‡§Ü‡§â‡§ü ‡§™‡•Ç‡§∞‡•ç‡§µ‡§æ‡§µ‡§≤‡•ã‡§ï‡§®","Delivery address":"‡§°‡§ø‡§≤‡•Ä‡§µ‡§∞‡•Ä ‡§ï‡§æ ‡§™‡§§‡§æ","Full name *":"‡§™‡•Ç‡§∞‡§æ ‡§®‡§æ‡§Æ *","Mobile number *":"‡§Æ‡•ã‡§¨‡§æ‡§á‡§≤ ‡§®‡§Ç‡§¨‡§∞ *","Address *":"‡§™‡§§‡§æ *","Village / city *":"‡§ó‡§æ‡§Å‡§µ / ‡§∂‡§π‡§∞ *","State *":"‡§∞‡§æ‡§ú‡•ç‡§Ø *","PIN code *":"‡§™‡§ø‡§® ‡§ï‡•ã‡§° *","Promotion code":"‡§™‡•ç‡§∞‡§Æ‡•ã‡§∂‡§® ‡§ï‡•ã‡§°","Delivery notes":"‡§°‡§ø‡§≤‡•Ä‡§µ‡§∞‡•Ä ‡§ï‡•á ‡§≤‡§ø‡§è ‡§®‡•ã‡§ü","Review preview total":"‡§™‡•Ç‡§∞‡•ç‡§µ‡§æ‡§µ‡§≤‡•ã‡§ï‡§® ‡§ï‡•Å‡§≤ ‡§¶‡•á‡§ñ‡•á‡§Ç","Create sandbox preview order":"‡§°‡•á‡§Æ‡•ã ‡§ë‡§∞‡•ç‡§°‡§∞ ‡§¨‡§®‡§æ‡§è‡§Å","Contact AgroSeed":"AgroSeed ‡§∏‡•á ‡§∏‡§Ç‡§™‡§∞‡•ç‡§ï ‡§ï‡§∞‡•á‡§Ç","Send message":"‡§∏‡§Ç‡§¶‡•á‡§∂ ‡§≠‡•á‡§ú‡•á‡§Ç","Help centre":"‡§∏‡§π‡§æ‡§Ø‡§§‡§æ ‡§ï‡•á‡§Ç‡§¶‡•ç‡§∞","Your account":"‡§Ü‡§™‡§ï‡§æ ‡§ñ‡§æ‡§§‡§æ","Overview":"‡§Ö‡§µ‡§≤‡•ã‡§ï‡§®","My orders":"‡§Æ‡•á‡§∞‡•á ‡§ë‡§∞‡•ç‡§°‡§∞","Addresses":"‡§™‡§§‡•á","Sign in":"‡§∏‡§æ‡§á‡§® ‡§á‡§®","Track an order":"‡§ë‡§∞‡•ç‡§°‡§∞ ‡§ü‡•ç‡§∞‡•à‡§ï ‡§ï‡§∞‡•á‡§Ç","Track your order":"‡§Ö‡§™‡§®‡§æ ‡§ë‡§∞‡•ç‡§°‡§∞ ‡§ü‡•ç‡§∞‡•à‡§ï ‡§ï‡§∞‡•á‡§Ç","Order number":"‡§ë‡§∞‡•ç‡§°‡§∞ ‡§®‡§Ç‡§¨‡§∞","Private tracking code":"‡§®‡§ø‡§ú‡•Ä ‡§ü‡•ç‡§∞‡•à‡§ï‡§ø‡§Ç‡§ó ‡§ï‡•ã‡§°","Find order":"‡§ë‡§∞‡•ç‡§°‡§∞ ‡§ñ‡•ã‡§ú‡•á‡§Ç","Shipping & returns":"‡§∂‡§ø‡§™‡§ø‡§Ç‡§ó ‡§î‡§∞ ‡§∞‡§ø‡§ü‡§∞‡•ç‡§®","Privacy":"‡§ó‡•ã‡§™‡§®‡•Ä‡§Ø‡§§‡§æ","Terms of service":"‡§∏‡•á‡§µ‡§æ ‡§ï‡•Ä ‡§∂‡§∞‡•ç‡§§‡•á‡§Ç","Contact us":"‡§∏‡§Ç‡§™‡§∞‡•ç‡§ï ‡§ï‡§∞‡•á‡§Ç","Back to home":"‡§Æ‡•Å‡§ñ‡§™‡•É‡§∑‡•ç‡§† ‡§™‡§∞ ‡§ú‡§æ‡§è‡§Å","Continue":"‡§ú‡§æ‡§∞‡•Ä ‡§∞‡§ñ‡•á‡§Ç"
+};
+Object.assign(hindiCopy, {
+ "Profile details":"‡§™‡•ç‡§∞‡•ã‡§´‡§º‡§æ‡§á‡§≤ ‡§µ‡§ø‡§µ‡§∞‡§£","Full name":"‡§™‡•Ç‡§∞‡§æ ‡§®‡§æ‡§Æ","Email":"‡§à‡§Æ‡•á‡§≤","Mobile number":"‡§Æ‡•ã‡§¨‡§æ‡§á‡§≤ ‡§®‡§Ç‡§¨‡§∞","Username":"‡§â‡§™‡§Ø‡•ã‡§ó‡§ï‡§∞‡•ç‡§§‡§æ ‡§®‡§æ‡§Æ","Customer ID":"‡§ó‡•ç‡§∞‡§æ‡§π‡§ï ‡§Ü‡§à‡§°‡•Ä","Cognito username":"Cognito ‡§â‡§™‡§Ø‡•ã‡§ó‡§ï‡§∞‡•ç‡§§‡§æ ‡§®‡§æ‡§Æ","Email verified":"‡§à‡§Æ‡•á‡§≤ ‡§∏‡§§‡•ç‡§Ø‡§æ‡§™‡§ø‡§§","Mobile verified":"‡§Æ‡•ã‡§¨‡§æ‡§á‡§≤ ‡§∏‡§§‡•ç‡§Ø‡§æ‡§™‡§ø‡§§","Date of birth":"‡§ú‡§®‡•ç‡§Æ ‡§§‡§ø‡§•‡§ø","Family name":"‡§â‡§™‡§®‡§æ‡§Æ","First name":"‡§™‡§π‡§≤‡§æ ‡§®‡§æ‡§Æ","Gender":"‡§≤‡§ø‡§Ç‡§ó","Language":"‡§≠‡§æ‡§∑‡§æ","Middle name":"‡§Æ‡§ß‡•ç‡§Ø ‡§®‡§æ‡§Æ","Nickname":"‡§â‡§™‡§®‡§æ‡§Æ","Preferred username":"‡§™‡§∏‡§Ç‡§¶‡•Ä‡§¶‡§æ ‡§â‡§™‡§Ø‡•ã‡§ó‡§ï‡§∞‡•ç‡§§‡§æ ‡§®‡§æ‡§Æ","Profile image":"‡§™‡•ç‡§∞‡•ã‡§´‡§º‡§æ‡§á‡§≤ ‡§õ‡§µ‡§ø","Profile updated":"‡§™‡•ç‡§∞‡•ã‡§´‡§º‡§æ‡§á‡§≤ ‡§Ö‡§™‡§°‡•á‡§ü","Time zone":"‡§∏‡§Æ‡§Ø ‡§ï‡•ç‡§∑‡•á‡§§‡•ç‡§∞","Website":"‡§µ‡•á‡§¨‡§∏‡§æ‡§á‡§ü","These details come from your Cognito profile. Manage sign-in credentials in Cognito.":"‡§Ø‡•á ‡§µ‡§ø‡§µ‡§∞‡§£ ‡§Ü‡§™‡§ï‡•á Cognito ‡§™‡•ç‡§∞‡•ã‡§´‡§º‡§æ‡§á‡§≤ ‡§∏‡•á ‡§Ü‡§§‡•á ‡§π‡•à‡§Ç‡•§ ‡§∏‡§æ‡§á‡§®-‡§á‡§® ‡§ú‡§æ‡§®‡§ï‡§æ‡§∞‡•Ä Cognito ‡§Æ‡•á‡§Ç ‡§™‡•ç‡§∞‡§¨‡§Ç‡§ß‡§ø‡§§ ‡§ï‡§∞‡•á‡§Ç‡•§","Cognito has not provided profile attributes for this account yet.":"Cognito ‡§®‡•á ‡§Ö‡§≠‡•Ä ‡§á‡§∏ ‡§ñ‡§æ‡§§‡•á ‡§ï‡•á ‡§≤‡§ø‡§è ‡§™‡•ç‡§∞‡•ã‡§´‡§º‡§æ‡§á‡§≤ ‡§µ‡§ø‡§µ‡§∞‡§£ ‡§®‡§π‡•Ä‡§Ç ‡§¶‡§ø‡§è ‡§π‡•à‡§Ç‡•§","Yes":"‡§π‡§æ‡§Å","No":"‡§®‡§π‡•Ä‡§Ç",
+ "Farm supplies for your season":"‡§á‡§∏ ‡§Æ‡•å‡§∏‡§Æ ‡§ï‡•Ä ‡§ñ‡•á‡§§‡•Ä ‡§ï‡•á ‡§≤‡§ø‡§è ‡§ú‡§º‡§∞‡•Ç‡§∞‡•Ä ‡§∏‡§æ‡§Æ‡§æ‡§®",
+ "Find seeds, plant nutrition, crop care, tools and irrigation supplies. Compare pack sizes and prices before adding products to your bag.":"‡§¨‡•Ä‡§ú, ‡§™‡•å‡§ß ‡§™‡•ã‡§∑‡§£, ‡§´‡§∏‡§≤ ‡§∏‡•Å‡§∞‡§ï‡•ç‡§∑‡§æ, ‡§î‡§ú‡§º‡§æ‡§∞ ‡§î‡§∞ ‡§∏‡§ø‡§Ç‡§ö‡§æ‡§à ‡§ï‡§æ ‡§∏‡§æ‡§Æ‡§æ‡§® ‡§¶‡•á‡§ñ‡•á‡§Ç‡•§ ‡§ï‡§æ‡§∞‡•ç‡§ü ‡§Æ‡•á‡§Ç ‡§ú‡•ã‡§°‡§º‡§®‡•á ‡§∏‡•á ‡§™‡§π‡§≤‡•á ‡§™‡•à‡§ï ‡§î‡§∞ ‡§ï‡•Ä‡§Æ‡§§‡•ã‡§Ç ‡§ï‡•Ä ‡§§‡•Å‡§≤‡§®‡§æ ‡§ï‡§∞‡•á‡§Ç‡•§",
+ "Browse the catalog":"‡§â‡§§‡•ç‡§™‡§æ‡§¶ ‡§¶‡•á‡§ñ‡•á‡§Ç",
+ "Search by product, category or crop need.":"‡§â‡§§‡•ç‡§™‡§æ‡§¶, ‡§∂‡•ç‡§∞‡•á‡§£‡•Ä ‡§Ø‡§æ ‡§´‡§∏‡§≤ ‡§ï‡•Ä ‡§ú‡§º‡§∞‡•Ç‡§∞‡§§ ‡§∏‡•á ‡§ñ‡•ã‡§ú‡•á‡§Ç‡•§",
+ "SPECIAL PRICES":"‡§µ‡§ø‡§∂‡•á‡§∑ ‡§ï‡•Ä‡§Æ‡§§‡•á‡§Ç",
+ "Offers on farm supplies":"‡§ñ‡•á‡§§‡•Ä ‡§ï‡•á ‡§∏‡§æ‡§Æ‡§æ‡§® ‡§™‡§∞ ‡§ë‡§´‡§º‡§∞",
+ "Compare the listed price with MRP. Preview prices must be confirmed before launch.":"‡§∏‡•Ç‡§ö‡•Ä‡§¨‡§¶‡•ç‡§ß ‡§ï‡•Ä‡§Æ‡§§ ‡§î‡§∞ MRP ‡§ï‡•Ä ‡§§‡•Å‡§≤‡§®‡§æ ‡§ï‡§∞‡•á‡§Ç‡•§ ‡§™‡•Ç‡§∞‡•ç‡§µ‡§æ‡§µ‡§≤‡•ã‡§ï‡§® ‡§ï‡•Ä‡§Æ‡§§‡•ã‡§Ç ‡§ï‡•Ä ‡§¨‡§ø‡§ï‡•ç‡§∞‡•Ä ‡§∏‡•á ‡§™‡§π‡§≤‡•á ‡§™‡•Å‡§∑‡•ç‡§ü‡§ø ‡§ú‡§º‡§∞‡•Ç‡§∞‡•Ä ‡§π‡•à‡•§",
+ "See all products ‚Üí":"‡§∏‡§≠‡•Ä ‡§â‡§§‡•ç‡§™‡§æ‡§¶ ‡§¶‡•á‡§ñ‡•á‡§Ç ‚Üí",
+ "Browse everything ‚Üí":"‡§∏‡§¨ ‡§ï‡•Å‡§õ ‡§¶‡•á‡§ñ‡•á‡§Ç ‚Üí",
+ "Browse products ‚Üó":"‡§â‡§§‡•ç‡§™‡§æ‡§¶ ‡§¶‡•á‡§ñ‡•á‡§Ç ‚Üó",
+ "Talk to AgroSeed ‚Üí":"AgroSeed ‡§∏‡•á ‡§¨‡§æ‡§§ ‡§ï‡§∞‡•á‡§Ç ‚Üí",
+ "‚åï Search":"‚åï ‡§ñ‡•ã‡§ú‡•á‡§Ç",
+ "Home":"‡§Æ‡•Å‡§ñ‡•ç‡§Ø ‡§™‡•É‡§∑‡•ç‡§†",
+ "Shop":"‡§¶‡•Å‡§ï‡§æ‡§®",
+ "AgroSeed preview catalog product.":"AgroSeed ‡§ï‡•á ‡§™‡•Ç‡§∞‡•ç‡§µ‡§æ‡§µ‡§≤‡•ã‡§ï‡§® ‡§ï‡•à‡§ü‡§≤‡•â‡§ó ‡§ï‡§æ ‡§â‡§§‡•ç‡§™‡§æ‡§¶‡•§",
+ "A preview catalog listing. Product details will be confirmed by AgroSeed.":"‡§™‡•Ç‡§∞‡•ç‡§µ‡§æ‡§µ‡§≤‡•ã‡§ï‡§® ‡§ï‡•à‡§ü‡§≤‡•â‡§ó ‡§ï‡•Ä ‡§∏‡•Ç‡§ö‡•Ä‡•§ ‡§â‡§§‡•ç‡§™‡§æ‡§¶ ‡§ï‡•Ä ‡§ú‡§æ‡§®‡§ï‡§æ‡§∞‡•Ä ‡§ï‡•Ä ‡§™‡•Å‡§∑‡•ç‡§ü‡§ø AgroSeed ‡§ï‡§∞‡•á‡§ó‡§æ‡•§"
+});
+Object.assign(hindiCopy, {
+ "Browse the sample AgroSeed catalog.":"AgroSeed ‡§ï‡•á ‡§®‡§Æ‡•Ç‡§®‡§æ ‡§ï‡•à‡§ü‡§≤‡•â‡§ó ‡§ï‡•ã ‡§¶‡•á‡§ñ‡•á‡§Ç‡•§",
+ "All products":"‡§∏‡§≠‡•Ä ‡§â‡§§‡•ç‡§™‡§æ‡§¶","Help":"‡§∏‡§π‡§æ‡§Ø‡§§‡§æ","Information":"‡§ú‡§æ‡§®‡§ï‡§æ‡§∞‡•Ä","Terms":"‡§®‡§ø‡§Ø‡§Æ ‡§î‡§∞ ‡§∂‡§∞‡•ç‡§§‡•á‡§Ç",
+ "Preview environment":"‡§™‡•Ç‡§∞‡•ç‡§µ‡§æ‡§µ‡§≤‡•ã‡§ï‡§® ‡§µ‡§æ‡§§‡§æ‡§µ‡§∞‡§£","Demo orders do not accept payments.":"‡§°‡•á‡§Æ‡•ã ‡§ë‡§∞‡•ç‡§°‡§∞ ‡§Æ‡•á‡§Ç ‡§≠‡•Å‡§ó‡§§‡§æ‡§® ‡§∏‡•ç‡§µ‡•Ä‡§ï‡§æ‡§∞ ‡§®‡§π‡•Ä‡§Ç ‡§ï‡§ø‡§Ø‡§æ ‡§ú‡§æ‡§§‡§æ‡•§",
+ "¬© AgroSeed ¬∑ Preview environment":"¬© AgroSeed ¬∑ ‡§™‡•Ç‡§∞‡•ç‡§µ‡§æ‡§µ‡§≤‡•ã‡§ï‡§® ‡§µ‡§æ‡§§‡§æ‡§µ‡§∞‡§£",
+ "Shop farm supplies, compare pack sizes and see current offers.":"‡§ñ‡•á‡§§‡•Ä ‡§ï‡§æ ‡§∏‡§æ‡§Æ‡§æ‡§® ‡§¶‡•á‡§ñ‡•á‡§Ç, ‡§™‡•à‡§ï ‡§î‡§∞ ‡§ï‡•Ä‡§Æ‡§§‡•ã‡§Ç ‡§ï‡•Ä ‡§§‡•Å‡§≤‡§®‡§æ ‡§ï‡§∞‡•á‡§Ç ‡§î‡§∞ ‡§Æ‡•å‡§ú‡•Ç‡§¶‡§æ ‡§ë‡§´‡§º‡§∞ ‡§ú‡§æ‡§®‡•á‡§Ç‡•§"
+});
+function translateCustomer() {
+ const walker=document.createTreeWalker(app,NodeFilter.SHOW_TEXT);let node;
+ while((node=walker.nextNode())) {const raw=node.nodeValue.trim();if(hindiCopy[raw])node.nodeValue=node.nodeValue.replace(raw,hindiCopy[raw]);else node.nodeValue=node.nodeValue.replace(/\b(\d+) products\b/g,"$1 ‡§â‡§§‡•ç‡§™‡§æ‡§¶");}
+ app.querySelectorAll(".stock-note,#detail-stock").forEach(el=>{const value=el.textContent.trim(),match=value.match(/^(.*?)(?:\s*¬∑\s*)?(\d+)\s+available$/i);if(match)el.textContent=`${match[1].replace(/\bpack\b/gi,"‡§™‡•à‡§ï").trim()}${match[1].trim()?" ¬∑ ":""}${match[2]} ‡§â‡§™‡§≤‡§¨‡•ç‡§ß`;else if(value==="Currently unavailable")el.textContent="‡§Ö‡§≠‡•Ä ‡§â‡§™‡§≤‡§¨‡•ç‡§ß ‡§®‡§π‡•Ä‡§Ç";});
+ app.querySelectorAll(".variant-choice label,.cart-line p").forEach(el=>{el.childNodes.forEach(child=>{if(child.nodeType===Node.TEXT_NODE)child.nodeValue=child.nodeValue.replace(/\bpack\b/gi,"‡§™‡•à‡§ï");});});
+ app.querySelectorAll("input[placeholder],textarea[placeholder],button[aria-label],a[aria-label]").forEach(el=>{for(const attr of ["placeholder","aria-label"]){const value=el.getAttribute(attr);if(value&&hindiCopy[value])el.setAttribute(attr,hindiCopy[value]);}});
+}
+async function api(url, options={}) {
+  const headers = { ...(options.body ? {"Content-Type":"application/json"}:{}), ...(options.headers||{}) };
+  if (csrf && options.method && options.method !== "GET") headers["x-agroseed-csrf"] = csrf;
+  const res = await fetch(url, { credentials:"same-origin", ...options, headers });
+  let data={}; try { data=await res.json(); } catch {}
+  if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+  return data;
+}
+const toast = (message, error=false) => { const n=document.createElement("div"); n.className="toast"+(error?" error":""); n.textContent=message; $("#toast-region").append(n); setTimeout(()=>n.remove(),4300); };
+const cart = () => { try { const rows=JSON.parse(localStorage.getItem(cartKey)||"[]"); return Array.isArray(rows)?rows:[]; } catch { return []; } };
+async function migrateLegacyCart(){try{const raw=JSON.parse(localStorage.getItem(cartKey)||"null");if(!raw||Array.isArray(raw)||typeof raw!=="object")return null;const entries=Object.entries(raw).filter(([,quantity])=>Number.isFinite(Number(quantity))&&Number(quantity)>0);if(!entries.length)return [];const {items=[]}=await api("/api/v1/products?limit=500");const rows=[];for(const [key,value] of entries){const [id,...sizeParts]=String(key).split("::");let size="";try{size=decodeURIComponent(sizeParts.join("::"));}catch{size=sizeParts.join("::");}const product=items.find(item=>Number(item.id)===Number(id));if(!product)continue;const variant=(product.variants||[]).find(item=>size&&item.pack===size)|| (product.variants||[]).find(item=>item.active!==false&&item.stock>0);if(!variant)continue;const quantity=Math.min(99,Math.floor(Number(value)));if(quantity>0)rows.push({sku:variant.sku,quantity});}return rows;}catch{return null;}}
+function guestCartId(){try{let id=localStorage.getItem(cartIdKey);if(!id){id=crypto.randomUUID().replaceAll("-","");localStorage.setItem(cartIdKey,id);}return id;}catch{return crypto.randomUUID().replaceAll("-","");}}
+function saveCartLocal(rows,updatedAt=Date.now()){localStorage.setItem(cartKey,JSON.stringify(rows));localStorage.setItem(cartUpdatedKey,String(typeof updatedAt==="number"?updatedAt:Date.parse(updatedAt)||Date.now()));}
+async function syncGuestCart(rows){try{const response=await fetch("/api/v1/cart",{method:"PUT",credentials:"same-origin",headers:{"Content-Type":"application/json","x-agroseed-cart-id":guestCartId()},body:JSON.stringify({items:rows})});if(!response.ok)throw new Error(`Cart sync failed (${response.status}).`);return true;}catch{return false;}}
+let cartHydrated=false;
+async function hydrateGuestCart(){if(cartHydrated)return;cartHydrated=true;try{const id=guestCartId(),legacy=await migrateLegacyCart();let local=cart();if(legacy!==null){local=legacy;saveCartLocal(local);await syncGuestCart(local);return;}const localStamp=Number(localStorage.getItem(cartUpdatedKey)||0);const response=await fetch("/api/v1/cart",{credentials:"same-origin",headers:{"x-agroseed-cart-id":id},signal:AbortSignal.timeout(2500)}),remote=response.ok?await response.json():null;if(remote?.updatedAt&&Array.isArray(remote.items)){if(localStamp>Date.parse(remote.updatedAt)){await syncGuestCart(local);return;}saveCartLocal(remote.items,remote.updatedAt);return;}if(local.length)await syncGuestCart(local);}catch{}}
+async function mergeCustomerCartWithGuest(){if(!customerSession)return true;try{const result=await api("/api/v1/customer/cart/merge",{method:"POST",body:JSON.stringify({items:cart()}),signal:AbortSignal.timeout(8000)});saveCartLocal(result.items||[]);await syncGuestCart(result.items||[]);return true;}catch{return false;}}
+async function hydrateCustomerCart(){if(customerCartHydrated)return;customerCartHydrated=true;try{const current=await api("/api/v1/customer/session",{signal:AbortSignal.timeout(4000)});customerSession=current.customer||null;csrf=current.csrf||"";if(customerSession)await mergeCustomerCartWithGuest();}catch{customerCartHydrated=false;}}
+async function syncCustomerCart(rows){if(!customerSession)return true;try{await api("/api/v1/customer/cart",{method:"PUT",body:JSON.stringify({items:rows}),signal:AbortSignal.timeout(8000)});return true;}catch{return false;}}
+const saveCart = async rows => { saveCartLocal(rows);const [guestSaved,accountSaved]=await Promise.all([syncGuestCart(rows),syncCustomerCart(rows)]);return guestSaved&&accountSaved; };
+const orderTokens = () => { try{return JSON.parse(localStorage.getItem(tokenKey)||"[]");}catch{return [];} };
+const saveOrderToken = order => { const rows=orderTokens().filter(x=>x.orderNumber!==order.orderNumber); rows.unshift({orderNumber:order.orderNumber,token:order.lookupToken}); localStorage.setItem(tokenKey,JSON.stringify(rows.slice(0,30))); };
+const cartCount = () => cart().reduce((n,x)=>n+Number(x.quantity||0),0);
+const prodName = p => language()==="hi" ? (p.name||p.nameEn) : (p.nameEn||p.name);
+function productImage(p, large=false) {
+  const imageEntry=p.images?.[0],image=typeof imageEntry==="string"?imageEntry:imageEntry?.url,imageAlt=p.imageAlt?.[0]||imageEntry?.alt||prodName(p);
+  return image ? `<img src="${esc(image)}" alt="${esc(imageAlt)}">` : `<span class="product-emoji">${icons[p.categoryEn]||"üåæ"}</span>`;
+}
+function productCard(p) {
+  const v=(p.variants||[]).find(x=>x.active!==false) || p.variants?.[0] || {sku:p.sku,pricePaise:p.pricePaise,mrpPaise:p.mrpPaise,stock:p.stock,pack:"1 pack"};
+  return `<article class="product-card"><a href="/product/${esc(p.slug)}"><div class="product-visual">${p.featured?'<span class="product-badge">Featured</span>':(v.mrpPaise>v.pricePaise?'<span class="product-badge">Good value</span>':'')}${productImage(p)}</div><div class="product-card-body"><div class="product-brand">${esc(p.brandEn||p.brand)}</div><b class="product-title">${esc(prodName(p))}</b><div class="product-category">${esc(language()==="hi"?p.category:p.categoryEn)}</div><div class="product-price"><b>${money(v.pricePaise)}</b>${v.mrpPaise>v.pricePaise?`<del>${money(v.mrpPaise)}</del>`:""}</div><div class="stock-note">${v.stock>0?`${esc(v.pack)} ¬∑ ${v.stock} available`:"Currently unavailable"}</div></div></a><div class="product-actions"><a class="btn btn-secondary" href="/product/${esc(p.slug)}">Details</a><button class="btn btn-primary" data-add="${esc(v.sku)}" ${v.stock<1?"disabled":""}>Add to cart</button></div></article>`;
+}
+function header() {
+ const preview=window.AGROSEED_CONFIG?.demoMode!==false?`<div class="preview-strip"><b>PREVIEW STORE</b> Sample products and prices ¬∑ Checkout creates a local demo order only.</div>`:"";
+ return `${preview}<header class="site-header"><div class="header-main"><button class="menu-button" data-menu aria-label="Menu">‚ò∞</button><a class="logo" href="/"><span class="logo-mark"><img src="/agroseed-mark-v2.png" alt="" aria-hidden="true"></span><span>AGRO <b>SEED</b></span></a><form class="searchbar" action="/search"><label class="sr-only" for="site-search">Search products</label><input id="site-search" type="search" name="q" placeholder="Search seeds, nutrition, tools‚Ä¶"><button>‚åï Search</button></form><div class="header-actions"><a class="header-link" href="/account">Account</a><a class="cart-link" href="/cart">Bag <span class="cart-count">${cartCount()}</span></a></div></div><div class="nav-row"><nav class="nav-links"><a href="/shop">Shop all</a><a href="/category/seeds">Seeds</a><a href="/category/plant-nutrition">Plant nutrition</a><a href="/category/crop-protection">Crop protection</a><a href="/category/farm-tools">Farm tools</a><a href="/category/irrigation">Irrigation</a><span class="nav-spacer"></span><a href="/track-order">Track order</a><button class="language-btn" data-language>${language()==="en"?"‡§π‡§ø‡§®‡•ç‡§¶‡•Ä":"English"}</button></nav></div></header>`;
+}
+function footer(){return `<footer class="site-footer"><div class="container"><div class="footer-grid"><div class="footer-brand"><a class="logo" href="/"><span class="logo-mark"><img src="/agroseed-mark-v2.png" alt="" aria-hidden="true"></span><span>AGRO <b>SEED</b></span></a><p>${esc(storefrontSettings.storeAbout||"Shop farm supplies, compare pack sizes and see current offers.")}</p></div><div class="footer-col"><h3>Shop</h3><a href="/shop">All products</a><a href="/category/seeds">Seeds</a><a href="/category/plant-nutrition">Plant nutrition</a></div><div class="footer-col"><h3>Help</h3><a href="/track-order">Track an order</a><a href="/help">Help centre</a><a href="/contact">Contact us</a></div><div class="footer-col"><h3>Information</h3><a href="/shipping-returns">Shipping & returns</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></div></div><div class="footer-bottom"><span>¬© AgroSeed ¬∑ Preview environment</span><span>Demo orders do not accept payments.</span></div></div></footer>`;}
+function offerStrip(){if(!storefrontOffers.length)return "";return `<section class="deal-strip" aria-label="Current coupon offers"><div class="deal-strip-head"><b>Deals for your farm</b><a href="/shop">Shop products ‚Üí</a></div><div class="deal-list">${storefrontOffers.map(offer=>`<a class="deal-card" href="/shop?coupon=${encodeURIComponent(offer.code)}"><span class="deal-mark">OFFER</span><b>${offer.type==="percent"?`${esc(offer.value)}% off`:`${money(offer.value)} off`}</b><span>Code <strong>${esc(offer.code)}</strong></span>${offer.minSubtotalPaise?`<small>On orders above ${money(offer.minSubtotalPaise)}</small>`:""}</a>`).join("")}</div></section>`;}
+function discountShelf(items){const discounted=items.filter(p=>(p.variants||[]).some(v=>v.active!==false&&v.mrpPaise>v.pricePaise)).slice(0,8);if(!discounted.length)return "";return `<section class="section sale-shelf"><div class="section-head"><div><p class="eyebrow">SPECIAL PRICES</p><h2>Offers on farm supplies</h2><p>Compare the listed price with MRP. Preview prices must be confirmed before launch.</p></div><a class="text-link" href="/shop">See all products ‚Üí</a></div><div class="product-grid">${discounted.map(productCard).join("")}</div></section>`;}
+function customerBottomNav(){
+ const path=decodeURI(location.pathname.replace(/\/+$/,""))||"/";
+ const active={home:path==="/",shop:path==="/shop"||path.startsWith("/category/")||path.startsWith("/brand/")||path.startsWith("/product/"),search:path==="/search",bag:path==="/cart"||path==="/checkout"||path.startsWith("/order/"),account:path==="/account"||path.startsWith("/account/")};
+ const item=(key,href,icon,label)=>`<a href="${href}"${active[key]?' aria-current="page"':''}><span aria-hidden="true">${icon}</span><small>${label}</small></a>`;
+ return `<nav class="customer-bottom-nav" aria-label="Main navigation">${item("home","/","‚åÇ","Home")}${item("shop","/shop","‚ñ¶","Shop")}${item("search","/search","‚åï","Search")}${item("bag","/cart","üõí","Bag")}${item("account","/account","‚ôô","Account")}</nav>`;
+}
+const wrap = (content, cls="") => `${header()}<main class="site-main ${cls}">${content}</main>${footer()}${customerBottomNav()}`;
+function pageTitle(title,sub="",action=""){return `<div class="page-title"><div><h1>${title}</h1>${sub?`<p>${sub}</p>`:""}</div>${action}</div>`;}
+function updatePageMetadata(path){
+ const storeName=String(storefrontSettings.storeName||"AgroSeed").trim()||"AgroSeed",title=app.querySelector("main h1")?.textContent.trim()||`${storeName} preview store`,description=(app.querySelector(".page-title p")||app.querySelector(".detail-copy>p")||app.querySelector("main p"))?.textContent.trim().replace(/\s+/g," ").slice(0,160)||"Browse farm and garden essentials in the AgroSeed preview catalog.",pageTitleText=`${title} | ${storeName}`;
+ document.title=pageTitleText;document.documentElement.lang=language()==="hi"?"hi":"en";
+ const setMeta=(kind,key,value)=>{let node=document.head.querySelector(`meta[${kind}="${key}"]`);if(!value){node?.remove();return;}if(!node){node=document.createElement("meta");node.setAttribute(kind,key);document.head.append(node);}node.content=value;};
+ setMeta("name","description",description);setMeta("property","og:site_name",storeName);setMeta("property","og:title",pageTitleText);setMeta("property","og:description",description);setMeta("property","og:type",path.startsWith("/product/")?"product":"website");setMeta("name","twitter:title",pageTitleText);setMeta("name","twitter:description",description);
+ const base=String(storefrontSettings.publicDomain||"").trim().replace(/\/+$/,"");let canonical=document.head.querySelector('link[rel="canonical"]');if(base){if(!canonical){canonical=document.createElement("link");canonical.rel="canonical";document.head.append(canonical);}const route=location.pathname.replace(/\/+$/,"")||"/";canonical.href=`${base}${route}`;setMeta("property","og:url",canonical.href);}else{canonical?.remove();setMeta("property","og:url","");}
+ const imageSource=path.startsWith("/product/")?app.querySelector(".detail-image img")?.getAttribute("src"):"";let imageUrl="";if(imageSource){try{imageUrl=new URL(imageSource,`${base||location.origin}/`).href;}catch{}}
+ setMeta("property","og:image",imageUrl);setMeta("property","og:image:alt",imageUrl?(app.querySelector(".detail-image img")?.alt||title):"");setMeta("name","twitter:card",imageUrl?"summary_large_image":"summary");setMeta("name","twitter:image",imageUrl);
+}
+async function home(){
+ let data; try{data=await api("/api/v1/products?limit=24");}catch(e){return wrap(`<section class="container page-wrap">${empty("Catalog preview unavailable",e.message)}</section>`);}
+ const cats=data.categories||[];
+ return wrap(`<div class="container"><section class="hero"><div class="hero-copy"><p class="eyebrow">${esc(storefrontSettings.homeHeroEyebrow||"AgroSeed")}</p><h1>${esc(storefrontSettings.homeHeroHeadline||"Farm supplies for your season").replace(/\r?\n/g,"<br>")}</h1><p>${esc(storefrontSettings.homeHeroBody||"Find seeds, plant nutrition, crop care, tools and irrigation supplies. Compare pack sizes and prices before adding products to your bag.")}</p><div class="hero-actions"><a class="btn btn-primary" href="/shop">${esc(storefrontSettings.homeHeroPrimaryCta||"Browse the catalog")} <span>‚Üó</span></a><a class="btn btn-secondary" href="/help">Get growing advice</a></div><div class="trust-row"><span>Seeds and farm supplies</span><span>Compare pack sizes and prices</span><span>Hindi & English</span></div></div><div class="hero-art"><div class="sun"></div><div class="field"></div><div class="harvest">üåæ</div><div class="hero-tag">${esc(storefrontSettings.homeHeroNote||"Search by product, category or crop need.")}</div></div></section>${offerStrip()}${discountShelf(data.items)}<section class="section"><div class="section-head"><div><p class="eyebrow">FIND YOUR FIELD</p><h2>Shop by category</h2><p>Start with what your crop needs today.</p></div><a class="text-link" href="/shop">Browse everything ‚Üí</a></div><div class="category-grid">${cats.map(c=>`<a class="category-card" href="/category/${esc(c.slug||slug(c.nameEn))}"><span class="category-icon">${icons[c.nameEn]||"üåæ"}</span><b>${esc(language()==="hi"?c.name:c.nameEn)}</b><small>Browse products&nbsp; ‚Üó</small></a>`).join("")||"<p class='muted'>Categories will appear as products are approved.</p>"}</div></section><section class="section"><div class="section-head"><div><p class="eyebrow">FARMER PICKS</p><h2>Farm products</h2><p>Sample listings for preview. Staff can manage products in the admin console.</p></div><a class="text-link" href="/shop">Shop all ‚Üí</a></div><div class="product-grid">${data.items.map(productCard).join("")||empty("No published preview products yet","Add and publish products in the staff console.")}</div></section><section class="promo-band"><div><h3>Need a hand choosing?</h3><p>Tell us what you‚Äôre growing and we‚Äôll point you to the right place.</p></div><a class="btn btn-secondary" href="/contact">Talk to AgroSeed ‚Üí</a></section></div>`);
+}
+function empty(title,desc,button="") {return `<div class="empty-state"><div class="empty-icon">üå±</div><h2>${esc(title)}</h2><p>${esc(desc)}</p>${button}</div>`;}
+function pagination(page,pages,total,base=location.href){if(pages<2)return `<p class="pagination-meta">${total} products</p>`;const href=n=>{const u=new URL(base);u.searchParams.set("page",n);return u.pathname+u.search;};return `<nav class="pagination" aria-label="Catalog pages"><span>Page ${page} of ${pages} ¬∑ ${total} products</span><div>${page>1?`<a class="btn btn-secondary btn-small" href="${esc(href(page-1))}">‚Üê Previous</a>`:""}${page<pages?`<a class="btn btn-secondary btn-small" href="${esc(href(page+1))}">Next ‚Üí</a>`:""}</div></nav>`;}
+async function listing(pathname){
+ const params=new URLSearchParams(location.search); let category="",brand="",title="Shop all products",description="Browse the sample AgroSeed catalog.";
+ if(pathname==="/search"){title=`Results for ‚Äú${esc(params.get("q")||"")}‚Äù`;}
+ if(pathname.startsWith("/category/")){category=decodeURIComponent(pathname.split("/").pop()); title=category.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase()); description=`Farm and garden products in ${title}.`;}
+ if(pathname.startsWith("/brand/")){brand=decodeURIComponent(pathname.split("/").pop()); title=brand.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase()); description=`Products from ${title}.`;}
+ const q=params.get("q")||"";const sort=params.get("sort")||"featured";
+ const query=new URLSearchParams({limit:"24",sort,page:String(Math.max(1,Number(params.get("page"))||1))});if(q)query.set("q",q);if(category)query.set("category",category);if(brand)query.set("brand",brand);
+ try{const data=await api(`/api/v1/products?${query}`);return wrap(`<div class="container page-wrap"><div class="breadcrumbs"><a href="/">Home</a><span>‚Ä∫</span><span>${esc(title)}</span></div>${offerStrip()}${pageTitle(esc(title),description)}<div class="catalog-layout"><aside class="filter-panel"><h3>Categories</h3>${(data.categories||[]).map(c=>`<a class="filter-option" href="/category/${esc(c.slug)}">${esc(c.nameEn)}</a>`).join("")}<h3>Brands</h3>${(data.brands||[]).map(b=>`<a class="filter-option" href="/brand/${esc(b.slug)}">${esc(b.nameEn)}</a>`).join("")}</aside><section><div class="filter-search"><span>${data.total} products</span><span class="nav-spacer"></span><label for="sort-list">Sort by</label><select class="control" id="sort-list" style="width:auto;padding:8px" data-sort><option value="featured" ${sort==="featured"?"selected":""}>Featured</option><option value="price-low" ${sort==="price-low"?"selected":""}>Price: low to high</option><option value="price-high" ${sort==="price-high"?"selected":""}>Price: high to low</option><option value="name" ${sort==="name"?"selected":""}>Name</option></select></div><div class="product-grid">${data.items.map(productCard).join("")||empty("No matches yet","Try another search or browse the full catalog.",'<a class="btn btn-secondary" href="/shop">Clear filters</a>')}</div>${pagination(data.page,data.pages,data.total)}</section></div></div>`);}catch(e){return wrap(`<div class="container page-wrap">${empty("Catalog preview unavailable",e.message)}</div>`);}
+}
+async function productPage(pathname){
+ const id=decodeURIComponent(pathname.split("/").pop());try{const p=await api(`/api/v1/products/${encodeURIComponent(id)}`);const variants=p.variants||[];const v=variants.find(x=>x.active!==false)||variants[0];pickedVariant=v?.sku;const localized=(en,hi)=>language()==="hi"?(hi||en||""):(en||hi||"");const labelInfo=localized(p.labelInfo,p.labelInfoHi),directions=localized(p.directions,p.directionsHi),safetyInfo=localized(p.safetyInfo,p.safetyInfoHi),labelSection=(title,value)=>`<section class="panel-card product-info-section"><h2>${title}</h2>${value?`<p>${esc(value).replace(/\r?\n/g,"<br>")}</p>`:`<p class="muted">${say("Not provided for this product yet.","‡§á‡§∏ ‡§â‡§§‡•ç‡§™‡§æ‡§¶ ‡§ï‡•á ‡§≤‡§ø‡§è ‡§Ö‡§≠‡•Ä ‡§ú‡§æ‡§®‡§ï‡§æ‡§∞‡•Ä ‡§â‡§™‡§≤‡§¨‡•ç‡§ß ‡§®‡§π‡•Ä‡§Ç ‡§π‡•à‡•§")}</p>`}</section>`;return wrap(`<div class="container page-wrap"><div class="breadcrumbs"><a href="/">Home</a><span>‚Ä∫</span><a href="/shop">Shop</a><span>‚Ä∫</span><span>${esc(prodName(p))}</span></div><div class="detail-layout"><div class="detail-image">${productImage(p,true)}</div><section class="detail-copy"><div class="product-brand">${esc(p.brandEn||p.brand)}</div><h1>${esc(prodName(p))}</h1><p>${esc(language()==="hi"?(p.description||p.descriptionEn||"AgroSeed preview catalog product."):(p.descriptionEn||"A preview catalog listing. Product details will be confirmed by AgroSeed."))}</p><div class="variant-choice">${variants.map((x,i)=>`<label><input type="radio" name="variant" value="${esc(x.sku)}" ${i===0?"checked":""} ${x.stock<1?"disabled":""} data-variant> ${esc(x.pack)} ¬∑ ${money(x.pricePaise)}</label>`).join("")}</div><div class="detail-price" id="detail-price">${money(v?.pricePaise)} ${v?.mrpPaise>v?.pricePaise?`<del>${money(v.mrpPaise)}</del>`:""}</div><div class="detail-meta"><span>SKU <b id="detail-sku">${esc(v?.sku||"")}</b></span><span id="detail-stock">${v?.stock>0?`${v.stock} available`:"Out of stock"}</span><span>${esc(p.categoryEn)}</span></div><div class="buy-row"><div class="quantity-control"><button data-detail-qty="-1">‚àí</button><output id="detail-qty">1</output><button data-detail-qty="1">+</button></div><button class="btn btn-primary" data-detail-add ${v?.stock<1?"disabled":""}>Add to bag</button><a class="btn btn-secondary" href="/cart">View bag</a></div></section></div><div class="product-info-grid">${labelSection(say("Label information","‡§≤‡•á‡§¨‡§≤ ‡§ï‡•Ä ‡§ú‡§æ‡§®‡§ï‡§æ‡§∞‡•Ä"),labelInfo)}${labelSection(say("Directions for use","‡§â‡§™‡§Ø‡•ã‡§ó ‡§ï‡•á ‡§®‡§ø‡§∞‡•ç‡§¶‡•á‡§∂"),directions)}${labelSection(say("Safety and precautions","‡§∏‡•Å‡§∞‡§ï‡•ç‡§∑‡§æ ‡§î‡§∞ ‡§∏‡§æ‡§µ‡§ß‡§æ‡§®‡§ø‡§Ø‡§æ‡§Ç"),safetyInfo)}</div></div>`);}catch(e){return wrap(`<div class="container page-wrap">${empty("Product not found",e.message,'<a class="btn btn-primary" href="/shop">Browse products</a>')}</div>`);}
+}
+async function cartPage(){
+ const rows=cart();if(!rows.length)return wrap(`<div class="container page-wrap">${pageTitle("Your bag","A little room for everything you need.")} ${empty("Your bag is waiting","Browse the preview catalog and add products you need.",'<a class="btn btn-primary" href="/shop">Explore products</a>')}</div>`);
+ let products=[];try{products=(await api("/api/v1/products?limit=100")).items;}catch(e){return wrap(`<div class="container page-wrap">${empty("Bag unavailable",e.message)}</div>`);}
+ const lines=[];for(const row of rows){const p=products.find(x=>x.variants.some(v=>v.sku===row.sku));const v=p?.variants.find(x=>x.sku===row.sku);if(p&&v)lines.push({p,v,q:row.quantity});}
+ if(lines.length!==rows.length)saveCart(lines.map(x=>({sku:x.v.sku,quantity:x.q})));
+ const items=lines.map(({p,v,q})=>`<div class="cart-line"><a class="cart-thumb" href="/product/${esc(p.slug)}">${productImage(p)}</a><div><h3>${esc(prodName(p))}</h3><p>${esc(v.pack)} ¬∑ ${esc(v.sku)}</p><div class="line-tools"><div class="quantity-control"><button data-cart-step="-1" data-sku="${esc(v.sku)}">‚àí</button><output>${q}</output><button data-cart-step="1" data-sku="${esc(v.sku)}">+</button></div><button class="link-button text-danger" data-remove="${esc(v.sku)}">Remove</button></div></div><div class="line-price">${money(v.pricePaise*q)}</div></div>`).join("");
+ const estimate=lines.reduce((a,x)=>a+x.v.pricePaise*x.q,0);
+ return wrap(`<div class="container page-wrap">${pageTitle("Your bag",`${cartCount()} item${cartCount()===1?"":"s"} ¬∑ prices are rechecked at checkout.`)}<div class="cart-layout"><section class="panel-card">${items}<a class="text-link" href="/shop">‚Üê Continue browsing</a></section><aside class="summary-card"><h2>Order preview</h2><div class="summary-row"><span>Estimated subtotal</span><b>${money(estimate)}</b></div><div class="summary-row"><span>Delivery</span><span>Calculated at checkout</span></div><div class="summary-row total"><span>Estimated total</span><b>${money(estimate)}</b></div><a class="btn btn-primary" href="/checkout">Continue to checkout</a><p class="hint">No payment is collected in this preview store.</p></aside></div></div>`);
+}
+async function checkoutPage(){
+ const rows=cart();if(!rows.length)return wrap(`<div class="container page-wrap">${empty("Your bag is empty","Add a product before checking out.",'<a class="btn btn-primary" href="/shop">Browse catalog</a>')}</div>`);
+ let saved={};try{saved=JSON.parse(localStorage.getItem("agroseed-address")||"{}");}catch{}
+ return wrap(`<div class="container page-wrap">${pageTitle("Checkout preview","Add delivery details to review a server-calculated demo total.")}<form class="checkout-layout" id="checkout-form"><div><section class="form-card"><h2>Delivery address</h2><div class="field-grid"><div class="field"><label for="c-name">Full name *</label><input id="c-name" name="name" required autocomplete="name" value="${esc(saved.name||"")}"></div><div class="field"><label for="c-phone">Mobile number *</label><input id="c-phone" name="phone" required inputmode="tel" autocomplete="tel" value="${esc(saved.phone||"")}"></div><div class="field span-2"><label for="c-line">Address *</label><input id="c-line" name="line1" required autocomplete="street-address" value="${esc(saved.line1||"")}"></div><div class="field"><label for="c-city">Village / city *</label><input id="c-city" name="city" required value="${esc(saved.city||"")}"></div><div class="field"><label for="c-state">State *</label><input id="c-state" name="state" required value="${esc(saved.state||"")}"></div><div class="field"><label for="c-pin">PIN code *</label><input id="c-pin" name="pincode" required inputmode="numeric" pattern="[0-9]{6}" maxlength="6" value="${esc(saved.pincode||"")}"></div><div class="field"><label for="c-coupon">Promotion code</label><input id="c-coupon" name="couponCode" autocomplete="off"></div><div class="field span-2"><label for="c-notes">Delivery notes</label><input id="c-notes" name="notes" maxlength="180"></div></div></section><div class="callout">This is a local preview checkout. It does not send a real order to AgroSeed, reserve production stock, or collect payment.</div></div><aside class="summary-card"><h2>Order summary</h2><div id="checkout-summary"><div class="checkout-lines">${rows.map(x=>`<div class="checkout-line"><span>${esc(x.quantity)} √ó ${esc(x.sku)}</span><span>Repriced on review</span></div>`).join("")}</div><p class="hint">Review the total after entering your address.</p></div><button class="btn btn-primary" type="submit" id="quote-button">Review preview total</button></aside></form></div>`);
+}
+function policyPage(path){
+ const policies={"/shipping-returns":["Shipping & returns","Shipping regions, rates, delivery estimates, cancellation and return rules still need AgroSeed‚Äôs approval. The preview does not accept paid orders."],"/privacy":["Privacy","AgroSeed‚Äôs approved privacy notice and business contact details have not been supplied. This preview stores demo cart and address details in this browser, and sample orders in a local development file."],"/terms":["Terms of service","AgroSeed‚Äôs approved terms and legal business identity have not been supplied. Do not use this preview to make a real purchase."],"/help":["Help centre","Find your order with its order number and private tracking code. Product directions on sample listings are not approved for real-world use."]};const [title,desc]=policies[path]||policies["/help"];
+ if(path==="/help")return wrap(`<div class="container page-wrap">${pageTitle(title,"A few quick ways to find the help you need.")}<div class="category-grid"><a class="category-card" href="/track-order"><span class="category-icon">üì¶</span><b>Track a preview order</b><small>Use your order number and private code</small></a><a class="category-card" href="/contact"><span class="category-icon">‚úâÔ∏è</span><b>Send a message</b><small>Requests are saved in the local preview</small></a><a class="category-card" href="/shop"><span class="category-icon">üå±</span><b>Browse catalog</b><small>Sample products and details</small></a></div><div class="callout">${esc(desc)}</div></div>`);
+ return wrap(`<div class="container page-wrap"><div class="policy-copy">${pageTitle(title)}<div class="callout">Draft status: client-approved policy text has not been provided.</div><p>${esc(desc)}</p><p>For questions, use the contact form. The local preview stores the request for staff review; it does not send email notifications.</p></div></div>`);
+}
+function contactPage(){return wrap(`<div class="container page-wrap">${pageTitle("Contact AgroSeed","Send a question to the local preview inbox.")}<form id="support-form" class="form-card" style="max-width:680px"><div class="field-grid"><div class="field"><label>Name</label><input name="name" required autocomplete="name"></div><div class="field"><label>Email</label><input name="email" required type="email" autocomplete="email"></div><div class="field span-2"><label>What can we help with?</label><select class="control" name="topic"><option>Product question</option><option>Order support</option><option>Delivery</option><option>Other</option></select></div><div class="field span-2"><label>Message</label><textarea name="message" required minlength="10" maxlength="4000"></textarea></div></div><button class="btn btn-primary" style="margin-top:14px">Send message</button><p class="hint">Preview messages are visible to staff in Admin ‚Üí Support. Email delivery is not configured.</p></form></div>`);}
+function customerDetails(session){
+ const labels={address:"Address",birthdate:"Date of birth",email_verified:"Email verified",family_name:"Family name",gender:"Gender",given_name:"First name",locale:"Language",middle_name:"Middle name",name:"Full name",nickname:"Nickname",phone_number_verified:"Mobile verified",picture:"Profile image",preferred_username:"Preferred username",profile:"Profile",updated_at:"Profile updated",website:"Website",zoneinfo:"Time zone","cognito:username":"Cognito username"};
+ const valueText=value=>{if(typeof value==="boolean")return value?"Yes":"No";if(value&&typeof value==="object")return Object.values(value).filter(Boolean).join(", ");if(typeof value==="string"&&value.startsWith("{")){try{return Object.values(JSON.parse(value)).filter(Boolean).join(", ");}catch{}}return String(value??"");};
+ const rows=[["Full name",session.name],["Email",session.email],["Mobile number",session.phone],["Username",session.username]];
+ for(const [key,value] of Object.entries(session.attributes||{}))if(!["name","email","phone_number","cognito:username","preferred_username","given_name","family_name"].includes(key))rows.push([labels[key]||key.replace(/^custom:/,"" ).replaceAll("_"," ").replace(/^./,c=>c.toUpperCase()),valueText(value)]);
+ rows.push(["Customer ID",session.id]);
+ const visible=rows.filter(([,value])=>value!==null&&value!==undefined&&value!=="");
+ return `<section class="panel-card"><h2>Profile details</h2>${visible.length?visible.map(([label,value])=>`<div class="summary-row"><span>${esc(label)}</span><b>${esc(value)}</b></div>`).join(""):'<p class="hint">Cognito has not provided profile attributes for this account yet.</p>'}<p class="hint">These details come from your Cognito profile. Manage sign-in credentials in Cognito.</p></section>`;
+}
+async function accountPage(path){
+ let current;try{current=await api("/api/v1/customer/session");}catch(error){return wrap(`<div class="container page-wrap">${pageTitle("Your account","Secure access with your Cognito customer account.")}<div class="callout">${esc(error.message)}</div><p><a class="btn btn-primary" href="/account/login">Sign in / create account</a></p></div>`);}
+ customerSession=current.customer;csrf=current.csrf||"";
+ if(!customerSession)return wrap(`<div class="container page-wrap">${pageTitle("Your account","Sign in to see your saved details across devices.")}<div class="panel-card"><p>Use your Cognito customer account to access saved details across devices.</p><a class="btn btn-primary" href="/account/login">Sign in / create account</a></div></div>`);
+ const tabs=[["/account","Overview"],["/account/orders","My orders"],["/account/addresses","Addresses"]];let body="";
+ if(path==="/account/orders")body=`<div class="panel-card"><p>Orders placed while signed in will appear here.</p><p class="hint">Order history will connect when the production order database flow is enabled.</p></div>`;
+ else if(path==="/account/addresses"){
+  const {items:rows=[]}=await api("/api/v1/customer/addresses"),editId=new URLSearchParams(location.search).get("edit"),editing=rows.find(x=>x.id===editId)||{},field=(name,label,required=true)=>`<div class="field"><label>${label}${required?" *":""}</label><input name="${name}" ${required?"required":""} value="${esc(editing[name]||"")}"></div>`;
+  body=`<form id="address-form" class="form-card"><h2>${editing.id?"Edit address":"Add an address"}</h2><input type="hidden" name="id" value="${esc(editing.id||"")}"><div class="field-grid">${field("name","Full name")}${field("phone","Mobile number")}${field("line1","Address")}${field("line2","Landmark",false)}${field("city","Village / city")}${field("state","State")}${field("pincode","PIN code")}</div><label class="filter-option"><input type="checkbox" name="isDefault" ${editing.isDefault||!rows.length?"checked":""}> Use as default checkout address</label><div class="table-actions"><button class="btn btn-primary">${editing.id?"Save address":"Add address"}</button>${editing.id?'<a class="btn btn-secondary" href="/account/addresses">Cancel</a>':""}</div><p class="hint">Saved securely to your account.</p></form>${rows.length?`<div class="panel-card">${rows.map(a=>`<div class="cart-line"><div class="category-icon">‚åÇ</div><div><h3>${esc(a.name)} ${a.isDefault?'<span class="status-pill">Default</span>':""}</h3><p>${esc([a.line1,a.line2,a.city,a.state,a.pincode].filter(Boolean).join(", "))}</p><p>${esc(a.phone||"")}</p></div><div class="table-actions"><a class="btn btn-secondary btn-small" href="/account/addresses?edit=${encodeURIComponent(a.id)}">Edit</a><button class="btn btn-danger btn-small" data-delete-address="${esc(a.id)}">Delete</button>${!a.isDefault?`<button class="btn btn-secondary btn-small" data-default-address="${esc(a.id)}">Make default</button>`:""}</div></div>`).join("")}</div>`:empty("No saved addresses","Add an address to reuse it when ordering.")}`;
+ } else body=customerDetails(customerSession);
+ const signedInAs=customerSession.name||customerSession.email||customerSession.phone||"your AgroSeed account";
+ return wrap(`<div class="container page-wrap">${pageTitle("Your account",`Signed in as ${signedInAs}`)}<div class="account-layout"><nav class="account-nav">${tabs.map(([href,t])=>`<a class="${path===href?"active":""}" href="${href}">${t}</a>`).join("")}</nav><section class="account-content">${body}<div class="account-signout"><button type="button" class="btn btn-secondary" data-customer-logout>Sign out</button></div></section></div></div>`);
+}
+async function trackingPage(path){
+ if(path.startsWith("/order/")){const number=decodeURIComponent(path.split("/").pop());const record=orderTokens().find(x=>x.orderNumber===number);if(!record)return wrap(`<div class="container page-wrap"><div class="tracking-form">${pageTitle("Track your order","Enter the private tracking code from the confirmation on this device.")}${trackForm(number)}</div></div>`);try{const order=await api(`/api/v1/orders/${encodeURIComponent(number)}`,{headers:{Authorization:`Bearer ${record.token}`}});return wrap(`<div class="container page-wrap"><section class="confirmation"><div class="confirmation-icon">‚úì</div><p class="eyebrow">PREVIEW ORDER</p><h1>Order preview created</h1><p>This is a sandbox order. Payment was not taken and no real delivery has been arranged.</p><div class="order-number">${esc(order.orderNumber)}</div><p>Status: <span class="status-pill warning">${esc(order.status.replaceAll("_"," "))}</span></p><div class="panel-card" style="text-align:left;margin-top:15px">${order.items.map(x=>`<div class="summary-row"><span>${esc(x.quantity)} √ó ${esc(x.nameEn)} ¬∑ ${esc(x.pack)}</span><b>${money(x.lineTotalPaise)}</b></div>`).join("")}<div class="summary-row total"><span>Preview total</span><b>${money(order.totalPaise)}</b></div></div><p>Your private tracking code is saved in this browser. Keep it private.</p><a class="btn btn-primary" href="/shop">Continue browsing</a></section></div>`);}catch(e){return wrap(`<div class="container page-wrap">${empty("Order unavailable",e.message,'<a class="btn btn-secondary" href="/track-order">Enter a tracking code</a>')}</div>`);}}
+ return wrap(`<div class="container page-wrap"><div class="tracking-form">${pageTitle("Track an order","Use the order number and private tracking code shown after checkout.")}${trackForm("")}</div></div>`);
+}
+function trackForm(number){return `<form id="track-form" class="form-card"><div class="form-stack"><div class="field"><label>Order number</label><input name="orderNumber" required value="${esc(number)}" placeholder="AS-SBX-‚Ä¶"></div><div class="field"><label>Private tracking code</label><input name="token" required autocomplete="off"></div><button class="btn btn-primary">Find order</button></div></form>`;}
+const adminLinks=[
+ ["/admin","Overview","‚åÇ","WORKSPACE"],["/admin/products","Products","‚ñ¶"],["/admin/inventory","Inventory","‚óà"],["/admin/orders","Orders","‚ñ§"],["/admin/support","Support inbox","‚úâ"],
+ ["/admin/catalog","Categories & brands","‚óâ","STORE SETUP"],["/admin/promotions","Promotions","ÔºÖ"],["/admin/shipping","Delivery areas","‚åñ"],["/admin/reports","Reports","‚ñ•"],["/admin/audit","Activity log","‚ó∑"],["/admin/settings","Settings","‚öô"]
+];
+function adminLogin(error="") {return `<main class="admin-login"><form id="admin-login-form" class="login-card"><a class="logo" href="/"><span class="logo-mark"><img src="/agroseed-mark-v2.png" alt="" aria-hidden="true"></span><span>AGRO <b>SEED</b></span></a><h1>Staff sign in</h1><p>This local preview console is protected by a password you configure on this machine. It is not a production staff account.</p>${error?`<div class="callout">${esc(error)}</div>`:""}<div class="field"><label for="admin-password">Owner password</label><input id="admin-password" type="password" name="password" required autocomplete="current-password"></div><button class="btn btn-primary">Sign in</button><p class="hint">Set <code>AGROSEED_ADMIN_PASSWORD</code> before starting the local server.</p><a class="text-link" href="/">‚Üê Back to storefront</a></form></main>`;}
+function adminShell(path,content,role="Owner"){
+ const allowed=role==="Catalog"?new Set(["/admin/products","/admin/inventory","/admin/catalog"]):role==="Orders"?new Set(["/admin/inventory","/admin/orders","/admin/support"]):null,links=allowed?adminLinks.filter(([href])=>allowed.has(href)):adminLinks;
+ const nav=links.map(([href,label,icon,group])=>`${group?`<div class="side-label">${group}</div>`:""}<a class="${path===href||path.startsWith(href+"/")?"active":""}" href="${href}"><span>${icon}</span> &nbsp;${label}</a>`).join("");
+ const bottom=links.slice(0,5).map(([href,label,icon])=>`<a href="${href}"><span>${icon}</span>${label.split(" ")[0]}</a>`).join("");
+ return `<div class="admin-app"><header class="admin-top"><a class="logo" href="/admin"><span class="logo-mark">‚ú≥</span><span>AGRO <b>SEED</b> <small class="muted">/ ADMIN</small></span></a><div class="staff-tag"><span class="staff-avatar">${esc(role[0])}</span><span>${esc(role)} ¬∑ Preview</span><button class="btn btn-secondary btn-small" data-logout>Sign out</button></div></header><div class="preview-strip"><b>LOCAL PREVIEW</b> Demo data ¬∑ Orders do not accept payment or create real shipments.</div><div class="admin-layout"><aside class="admin-sidebar"><nav class="admin-nav">${nav}</nav><a class="admin-nav" href="/" style="margin-top:25px">‚Üó View storefront</a></aside><main class="admin-content">${content}</main></div><nav class="mobile-admin-nav">${bottom}</nav></div>`;
+}
+const adminHead=(title,desc,action="")=>`<div class="admin-page-head"><div><h1>${title}</h1><p>${desc}</p></div>${action}</div>`;
+async function adminPage(path){
+ let session;try{session=await api("/api/v1/admin/session");csrf=session.csrf||"";}catch(e){if(path!=="/admin/login"){location.replace("/admin/login");return "";}return adminLogin(e.message==="Sign in to the staff console."?"":e.message);}
+ if(path==="/admin/login"){location.replace("/admin");return "";}
+ const role=session.user?.role||"Owner";if((path==="/admin"||path==="/admin/")&&role==="Catalog"){location.replace("/admin/products");return "";}if((path==="/admin"||path==="/admin/")&&role==="Orders"){location.replace("/admin/orders");return "";}
+ let content="";
+ if(path==="/admin"||path==="/admin/"){
+  const d=await api("/api/v1/admin/overview");content=adminHead("Overview","Your sandbox store at a glance.",'<a class="btn btn-primary" href="/admin/products/new">Ôºã Add product</a>')+`<div class="callout">This dashboard uses local JSON preview data. Database backups, staff roles, and payment operations are not connected.</div><div class="metric-grid">${[["Products",d.products,"total listings"],["Published",d.published,"visible in preview"],["Open orders",d.openOrders,"sandbox only"],["Low stock",d.lowStock,"packs at 5 or fewer"]].map(x=>`<div class="metric"><small>${x[0]}</small><strong>${x[1]}</strong><em>${x[2]}</em></div>`).join("")}</div><section class="admin-card"><h2>Recent preview orders</h2>${d.recentOrders.length?orderTable(d.recentOrders):`<p class="muted">No orders yet.</p>`}</section><section class="admin-card"><h2>Quick links</h2><div class="hero-actions"><a class="btn btn-secondary" href="/admin/products/import">Import products</a><a class="btn btn-secondary" href="/admin/inventory">Adjust stock</a><a class="btn btn-secondary" href="/admin/shipping">Configure PIN codes</a></div></section>`;
+ } else if(path==="/admin/products"||path==="/admin/products/"){
+  const params=new URLSearchParams(location.search),q=params.get("q")||"",status=params.get("status")||"",page=Math.max(1,Number(params.get("page"))||1);const query=new URLSearchParams({page:String(page),limit:"20"});if(q)query.set("q",q);if(status)query.set("status",status);const d=await api(`/api/v1/admin/products?${query}`);content=adminHead("Products","Create, review, feature and publish the store catalog.",'<a class="btn btn-primary" href="/admin/products/new">Ôºã Add product</a>')+`<div class="admin-card"><form class="search-tools" action="/admin/products"><input class="control" name="q" placeholder="Search name, brand, SKU‚Ä¶" value="${esc(q)}"><select class="control" name="status"><option value="">All statuses</option><option value="published" ${status==="published"?"selected":""}>Published</option><option value="draft" ${status==="draft"?"selected":""}>Draft</option><option value="review" ${status==="review"?"selected":""}>Review</option><option value="archived" ${status==="archived"?"selected":""}>Archived</option></select><button class="btn btn-secondary">Filter</button><a class="btn btn-secondary" href="/admin/products/import">CSV import</a></form><div class="table-wrap"><table class="data-table"><thead><tr><th>Product</th><th>SKU / variants</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead><tbody>${d.items.map(p=>`<tr data-product-row><td><b class="table-primary">${esc(p.nameEn)}</b><span class="table-secondary">${esc(p.brandEn)} ¬∑ ${esc(p.categoryEn)}${p.featured?" ¬∑ Featured":""}</span></td><td>${esc(p.sku)}<span class="table-secondary">${p.variants.length} pack option(s)</span></td><td>${money(p.pricePaise)}</td><td>${p.stock}</td><td><span class="status-pill ${p.status==="published"?"":"warning"}">${p.status}</span></td><td><div class="table-actions"><a class="btn btn-secondary btn-small" href="/admin/products/${p.id}">Edit</a><button class="btn btn-secondary btn-small" data-publish="${p.id}" data-next="${p.status==="published"?"draft":"published"}">${p.status==="published"?"Unpublish":"Publish"}</button><button class="btn btn-secondary btn-small" data-feature="${p.id}" data-next="${!p.featured}">${p.featured?"Unfeature":"Feature"}</button></div></td></tr>`).join("")||"<tr><td colspan='6'>No products match these filters.</td></tr>"}</tbody></table></div>${pagination(d.page,d.pages,d.total)}</div>`;
+ } else if(path==="/admin/products/new"||/^\/admin\/products\/\d+$/.test(path)){
+  const id=Number(path.split("/").pop());let p={name:"",nameEn:"",brand:"",brandEn:"",category:"",categoryEn:"",description:"",descriptionEn:"",labelInfo:"",labelInfoHi:"",directions:"",directionsHi:"",safetyInfo:"",safetyInfoHi:"",status:"draft",images:[],variants:[{sku:"",pack:"",pricePaise:0,mrpPaise:0,stock:0}]};if(id)p=await api(`/api/v1/admin/products/${id}`);
+  const variants=(p.variants||[]).map(v=>`${v.pack} | ${v.sku} | ${(v.pricePaise/100).toFixed(2)} | ${(v.mrpPaise/100).toFixed(2)} | ${v.stock}`).join("\n");
+  content=adminHead(id?"Edit product":"Add a product",`${id?"Update":"Create"} bilingual catalog details and pack variants.`)+`<form id="product-form" class="admin-card admin-product-form" data-id="${id||""}"><div class="field-grid"><div class="field"><label>Product name ¬∑ English *</label><input name="nameEn" required value="${esc(p.nameEn)}"></div><div class="field"><label>Product name ¬∑ Hindi *</label><input name="name" required value="${esc(p.name)}"></div><div class="field"><label>Brand ¬∑ English</label><input name="brandEn" value="${esc(p.brandEn)}"></div><div class="field"><label>Brand ¬∑ Hindi</label><input name="brand" value="${esc(p.brand)}"></div><div class="field"><label>Category ¬∑ English</label><input name="categoryEn" value="${esc(p.categoryEn)}"></div><div class="field"><label>Category ¬∑ Hindi</label><input name="category" value="${esc(p.category)}"></div><div class="field"><label>Status</label><select name="status"><option value="draft" ${p.status==="draft"?"selected":""}>Draft</option><option value="review" ${p.status==="review"?"selected":""}>Review</option><option value="published" ${p.status==="published"?"selected":""}>Published</option><option value="archived" ${p.status==="archived"?"selected":""}>Archived</option></select></div><div class="field"><label>Product photo</label><input type="file" id="product-image" accept="image/png,image/jpeg,image/webp"><input type="hidden" name="images" value="${esc((p.images||[]).join(","))}"><small>PNG, JPG or WebP, up to 4 MB. Stored in this local project.</small><img class="image-preview" id="image-preview" src="${esc(p.images?.[0]||"")}" ${p.images?.[0]?"":"hidden"}></div><div class="field span-2"><label>Description ¬∑ English</label><textarea name="descriptionEn">${esc(p.descriptionEn||"")}</textarea></div><div class="field span-2"><label>Description ¬∑ Hindi</label><textarea name="description">${esc(p.description||"")}</textarea></div><div class="span-2 settings-section"><h3>Product label and use information</h3><p class="hint">Enter information copied from the approved product label. Leave fields blank if the supplier has not provided it yet.</p></div><div class="field span-2"><label>Label information ¬∑ English</label><textarea name="labelInfo" maxlength="20000" placeholder="Product label details, composition, or manufacturer information">${esc(p.labelInfo||"")}</textarea></div><div class="field span-2"><label>Label information ¬∑ Hindi</label><textarea name="labelInfoHi" maxlength="20000" placeholder="‡§â‡§§‡•ç‡§™‡§æ‡§¶ ‡§ï‡•á ‡§≤‡•á‡§¨‡§≤ ‡§ï‡•Ä ‡§ú‡§æ‡§®‡§ï‡§æ‡§∞‡•Ä">${esc(p.labelInfoHi||"")}</textarea></div><div class="field span-2"><label>Directions for use ¬∑ English</label><textarea name="directions" maxlength="20000" placeholder="Use only the directions supplied with this product">${esc(p.directions||"")}</textarea></div><div class="field span-2"><label>Directions for use ¬∑ Hindi</label><textarea name="directionsHi" maxlength="20000" placeholder="‡§â‡§™‡§Ø‡•ã‡§ó ‡§ï‡•á ‡§®‡§ø‡§∞‡•ç‡§¶‡•á‡§∂">${esc(p.directionsHi||"")}</textarea></div><div class="field span-2"><label>Safety and precautions ¬∑ English</label><textarea name="safetyInfo" maxlength="20000" placeholder="Safety and precaution information from the approved label">${esc(p.safetyInfo||"")}</textarea></div><div class="field span-2"><label>Safety and precautions ¬∑ Hindi</label><textarea name="safetyInfoHi" maxlength="20000" placeholder="‡§∏‡•Å‡§∞‡§ï‡•ç‡§∑‡§æ ‡§î‡§∞ ‡§∏‡§æ‡§µ‡§ß‡§æ‡§®‡§ø‡§Ø‡§æ‡§Ç">${esc(p.safetyInfoHi||"")}</textarea></div><div class="field span-2"><label>Pack variants * (one per line)</label><textarea name="variants" required placeholder="250 g | SKU-001 | 199.00 | 249.00 | 20">${esc(variants)}</textarea><small>Format: pack | SKU | price in ‚Çπ | MRP in ‚Çπ | available stock. Use unique SKUs; keep prices and label details client-approved.</small></div></div><div class="hero-actions" style="margin-top:18px"><button class="btn btn-primary">Save product</button><a class="btn btn-secondary" href="/admin/products">Cancel</a>${id?`<button type="button" class="btn btn-danger" data-archive="${id}">Archive product</button>`:""}</div></form>`;
+ } else if(path==="/admin/products/import"){
+  content=adminHead("Catalog import","Preview rows and resolve duplicates before applying changes.")+`<section class="admin-card"><p>Upload a CSV with columns: name,nameEn,brand,brandEn,category,categoryEn,sku,pack,pricePaise,mrpPaise,stock,status. Use integer paise for prices.</p><button class="btn btn-secondary" data-template>Download CSV template</button><div class="field" style="margin-top:17px"><label>Choose CSV</label><input id="csv-file" type="file" accept=".csv,text/csv"></div><div id="csv-preview"></div><div class="field" style="max-width:300px;margin-top:12px"><label>Duplicate SKU behavior</label><select class="control" id="import-mode"><option value="create">Create only ¬∑ report duplicates</option><option value="upsert">Update matching products</option></select></div><button class="btn btn-primary" id="apply-import" data-import disabled style="margin-top:12px">Apply reviewed import</button></section>`;
+ } else if(path==="/admin/inventory"){
+  const d=await api("/api/v1/admin/inventory");const vars=d.products.flatMap(p=>p.variants.map(v=>({p,v})));content=adminHead("Inventory","Adjust stock by SKU and leave a reason for each change.")+`<section class="admin-card"><div class="table-wrap"><table class="data-table"><thead><tr><th>Product</th><th>Pack</th><th>SKU</th><th>Available</th><th>Reserved</th><th>Action</th></tr></thead><tbody>${vars.map(({p,v})=>`<tr><td>${esc(p.nameEn)}</td><td>${esc(v.pack)}</td><td>${esc(v.sku)}</td><td>${v.stock}</td><td>${v.reserved||0}</td><td><button class="btn btn-secondary btn-small" data-adjust="${esc(v.sku)}">Adjust stock</button></td></tr>`).join("")}</tbody></table></div><h2 style="margin-top:22px">Recent adjustments</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>When</th><th>SKU</th><th>Change</th><th>Reason</th><th>Order</th></tr></thead><tbody>${d.transactions.slice(0,40).map(x=>`<tr><td>${new Date(x.createdAt).toLocaleString()}</td><td>${esc(x.sku)}</td><td>${x.delta>0?"+":""}${x.delta}</td><td>${esc(x.reason)}</td><td>${esc(x.orderNumber||"‚Äî")}</td></tr>`).join("")}</tbody></table></div></section>`;
+ } else if(path==="/admin/orders"||path.startsWith("/admin/orders/")){
+  const detail=path.split("/").length>3,id=decodeURIComponent(path.split("/").pop()),params=new URLSearchParams(location.search),q=params.get("q")||"",status=params.get("status")||"",page=Math.max(1,Number(params.get("page"))||1);const listQuery=new URLSearchParams({page:String(page),limit:"20"});if(status)listQuery.set("status",status);if(q)listQuery.set("q",q);const d=detail?await api(`/api/v1/admin/orders/${encodeURIComponent(id)}`):await api(`/api/v1/admin/orders?${listQuery}`);const selected=detail?d:null;
+  const listView=`<section class="admin-card"><form class="search-tools" action="/admin/orders"><input class="control" name="q" value="${esc(q)}" placeholder="Order, customer, phone, PIN"><select class="control" name="status"><option value="">All statuses</option>${["sandbox_pending","confirmed","packing","shipped","delivered","cancelled","returned","refund_recorded","expired"].map(s=>`<option value="${s}" ${status===s?"selected":""}>${s.replaceAll("_"," ")}</option>`).join("")}</select><button class="btn btn-secondary">Filter</button></form>${orderTable(d.items)}${pagination(d.page,d.pages,d.total)}</section>`;
+  content=adminHead(selected?`Order ${esc(selected.orderNumber)}`:"Orders","Review sandbox orders and record fulfillment steps.")+ (selected?`<section class="admin-card"><div class="notice">Sandbox only. No payment or shipment was actually created.</div><p><b>Status:</b> <span class="status-pill warning">${esc(selected.status)}</span></p><p><b>Placed:</b> ${new Date(selected.createdAt).toLocaleString()}</p><p><b>Customer:</b> ${esc(selected.address?.name||"Guest preview")}</p><p><b>Address:</b> ${esc(selected.address?[selected.address.line1,selected.address.city,selected.address.state,selected.address.pincode].join(", "):"Not collected")}</p>${selected.items.map(x=>`<div class="summary-row"><span>${x.quantity} √ó ${esc(x.nameEn)} ¬∑ ${esc(x.pack)} (${esc(x.sku)})</span><b>${money(x.lineTotalPaise)}</b></div>`).join("")}<div class="summary-row total"><span>Total</span><b>${money(selected.totalPaise)}</b></div>${selected.returnRecord?`<div class="notice">Return recorded: ${esc(selected.returnRecord.reason)}</div>`:""}${selected.refundRecord?`<div class="notice">Preview refund record: ${money(selected.refundRecord.amountPaise)} ${esc(selected.refundRecord.reference||"")}</div>`:""}${(selected.statusHistory||[]).length?`<h2 style="margin-top:18px">Order history</h2>${selected.statusHistory.map(h=>`<div class="summary-row"><span>${new Date(h.at).toLocaleString()} ¬∑ ${esc(h.actor)}</span><b>${esc(h.status.replaceAll("_"," "))}</b></div>`).join("")}`:""}<div class="field-grid" style="max-width:620px;margin-top:16px"><div class="field"><label>Preview tracking reference</label><input id="tracking-number" value="${esc(selected.trackingNumber||"")}"></div><div class="field"><label>Return reason (required for return)</label><input id="return-reason" placeholder="Reason for return"></div><div class="field"><label>Refund amount ¬∑ ‚Çπ (preview record)</label><input id="refund-amount" type="number" min="0.01" step="0.01"></div><div class="field"><label>Refund reference</label><input id="refund-reference" placeholder="Optional local reference"></div></div><div class="hero-actions" style="margin-top:12px">${nextStatuses(selected.status).map(s=>`<button class="btn ${s==="cancelled"?"btn-danger":"btn-secondary"}" data-order-status="${esc(selected.orderNumber)}" data-status="${s}">${s.replaceAll("_"," ")}</button>`).join("")}<a class="btn btn-secondary" href="/admin/orders">Back to orders</a></div></section>`:listView);
+ } else if(path==="/admin/catalog"){
+  const d=await api("/api/v1/admin/settings");content=adminHead("Categories & brands","Edit names, reorder or hide browse labels.")+`<section class="admin-card"><h2>Categories</h2><div class="taxonomy-list">${taxonomyEditor(d.categories,"category")}</div><form id="category-form" class="hero-actions" style="margin-top:16px"><input class="control" name="nameEn" required placeholder="Category ¬∑ English" style="max-width:220px"><input class="control" name="name" placeholder="Category ¬∑ Hindi" style="max-width:220px"><button class="btn btn-secondary">Add category</button></form></section><section class="admin-card"><h2>Brands</h2><div class="taxonomy-list">${taxonomyEditor(d.brands,"brand")}</div><form id="brand-form" class="hero-actions" style="margin-top:16px"><input class="control" name="nameEn" required placeholder="Brand ¬∑ English" style="max-width:220px"><input class="control" name="name" placeholder="Brand ¬∑ Hindi" style="max-width:220px"><button class="btn btn-secondary">Add brand</button></form></section>`;
+ } else if(path==="/admin/promotions"){
+  const d=await api("/api/v1/admin/coupons");content=adminHead("Promotions","Set a discount, expiry, minimum order and usage cap.")+`<section class="admin-card"><form id="coupon-form" class="field-grid"><div class="field"><label>Code</label><input class="control" name="code" placeholder="GROW10" required maxlength="20"></div><div class="field"><label>Discount type</label><select class="control" name="type"><option value="percent">Percent off</option><option value="flat">Amount in ‚Çπ</option></select></div><div class="field"><label>Discount value</label><input class="control" name="value" type="number" min="0.01" step="0.01" required></div><div class="field"><label>Minimum order ¬∑ ‚Çπ</label><input class="control" name="minSubtotal" type="number" min="0" step="0.01" value="0"></div><div class="field"><label>Maximum uses (optional)</label><input class="control" name="maxUses" type="number" min="1" step="1" placeholder="Unlimited"></div><div class="field"><label>Expires (optional)</label><input class="control" name="expiresAt" type="date"></div><div class="span-2"><button class="btn btn-primary">Create promotion</button></div></form></section><section class="admin-card"><div class="table-wrap"><table class="data-table"><thead><tr><th>Code</th><th>Discount</th><th>Minimum</th><th>Uses</th><th>Expires</th><th>Status</th><th>Action</th></tr></thead><tbody>${d.items.map(c=>`<tr><td><b>${esc(c.code)}</b></td><td>${c.type==="percent"?`${c.value}%`:`${money(c.value)}`}</td><td>${money(c.minSubtotalPaise||0)}</td><td>${Number(c.usesCount)||0}${c.maxUses?` / ${c.maxUses}`:" / ‚àû"}</td><td>${c.expiresAt?esc(c.expiresAt):"No expiry"}</td><td>${c.active===false?"Paused":"Active"}</td><td><div class="table-actions"><button class="btn btn-secondary btn-small" data-toggle-coupon="${c.id}" data-active="${c.active===false?"true":"false"}">${c.active===false?"Activate":"Pause"}</button><button class="btn btn-danger btn-small" data-delete-coupon="${c.id}">Remove</button></div></td></tr>`).join("")||"<tr><td colspan='7'>No codes yet.</td></tr>"}</tbody></table></div></section>`;
+ } else if(path==="/admin/shipping"){
+  const d=await api("/api/v1/admin/service-areas");content=adminHead("Delivery areas","Add service PIN codes, preview delivery fees and estimates.")+`<div class="callout">These are preview rules only. Add client-approved rates and regions before production.</div><section class="admin-card"><form id="area-form" class="hero-actions"><input class="control" name="pincode" required inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="6-digit PIN" style="max-width:150px"><input class="control" name="city" placeholder="City / area" style="max-width:180px"><input class="control" name="feeRupees" type="number" min="0" step="0.01" placeholder="Delivery fee ‚Çπ" style="max-width:150px"><input class="control" name="estimate" placeholder="Estimate e.g. 3‚Äì5 days" style="max-width:200px"><button class="btn btn-primary">Add PIN</button></form></section><section class="admin-card"><div class="table-wrap"><table class="data-table"><thead><tr><th>PIN</th><th>Area</th><th>Fee</th><th>Estimate</th><th></th></tr></thead><tbody>${d.items.map(x=>`<tr><td>${esc(x.pincode)}</td><td>${esc(x.city)}</td><td>${money(x.feePaise)}</td><td>${esc(x.estimate)}</td><td><button class="btn btn-danger btn-small" data-delete-area="${x.id}">Remove</button></td></tr>`).join("")||"<tr><td colspan='5'>No service areas configured. Preview orders remain marked preview-only.</td></tr>"}</tbody></table></div></section>`;
+ } else if(path==="/admin/reports"){
+  const params=new URLSearchParams(location.search),from=params.get("from")||"",to=params.get("to")||"",query=new URLSearchParams();if(from)query.set("from",from);if(to)query.set("to",to);const d=await api(`/api/v1/admin/reports?${query}`);content=adminHead("Reports","Preview sales summary, date range and low-stock list.")+`<div class="callout">Preview data only. Stock warning threshold is 5 packs; revenue is not an accounting record.</div><section class="admin-card"><form class="search-tools" action="/admin/reports"><label class="field">From <input class="control" type="date" name="from" value="${esc(from)}"></label><label class="field">To <input class="control" type="date" name="to" value="${esc(to)}"></label><button class="btn btn-secondary">Update report</button><a class="btn btn-secondary" href="/admin/reports">All dates</a></form></section><div class="metric-grid"><div class="metric"><small>Preview orders</small><strong>${d.orderCount}</strong><em>${from||to?`${esc(from||"‚Ä¶")} to ${esc(to||"today")}`:"All dates"}</em></div><div class="metric"><small>Preview order value</small><strong>${money(d.revenuePaise)}</strong><em>excluding cancelled orders</em></div><div class="metric"><small>Low-stock variants</small><strong>${d.lowStock.length}</strong><em>5 packs or fewer</em></div><div class="metric"><small>Top sold SKUs</small><strong>${d.topProducts.length}</strong><em>in selected period</em></div></div><section class="admin-card"><h2>Low stock</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>Product</th><th>Pack SKU</th><th>Available</th></tr></thead><tbody>${d.lowStock.map(x=>`<tr><td>${esc(x.product)}</td><td>${esc(x.pack)} ¬∑ ${esc(x.sku)}</td><td>${x.stock}</td></tr>`).join("")||"<tr><td colspan='3'>No low-stock variants.</td></tr>"}</tbody></table></div></section><section class="admin-card"><h2>Product sales</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>Product</th><th>SKU</th><th>Units</th><th>Preview revenue</th></tr></thead><tbody>${d.topProducts.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.sku)}</td><td>${x.quantity}</td><td>${money(x.revenuePaise)}</td></tr>`).join("")||"<tr><td colspan='4'>No orders in this period.</td></tr>"}</tbody></table></div></section>`;
+ } else if(path==="/admin/settings"){
+  const d=await api("/api/v1/admin/settings");content=adminHead("Settings","Store details and local admin access.")+`<section class="admin-card"><h2>Store profile</h2><form id="settings-form" class="field-grid"><div class="field"><label>Store name</label><input name="storeName" value="${esc(d.settings.storeName||"AgroSeed")}"></div><div class="field"><label>Support email</label><input name="supportEmail" type="email" value="${esc(d.settings.supportEmail||"")}" placeholder="Set after client approval"></div><div class="field span-2"><label for="public-domain">Public website domain</label><input id="public-domain" name="publicDomain" type="url" inputmode="url" maxlength="255" value="${esc(d.settings.publicDomain||"")}" placeholder="https://agroseed.in"><small class="hint">Optional until your domain is connected. Enter the full public base URL; used for canonical and social sharing links.</small></div><div class="field"><label>Default language</label><select name="language"><option value="en" ${d.settings.language==="en"?"selected":""}>English</option><option value="hi" ${d.settings.language==="hi"?"selected":""}>Hindi</option></select></div><div class="field"><label>Staff identity</label><input disabled value="Store owner ¬∑ local env password"></div><div class="span-2"><button class="btn btn-primary">Save profile</button></div></form></section><section class="admin-card"><h2>Launch checklist</h2><p class="muted">Before a live release: replace demo catalog and policies; configure PostgreSQL, client-owned payment, OTP, email and image services; approve fulfilment rules; create backup and restore procedures.</p><a class="btn btn-secondary" href="/docs/godaddy-deployment.md">Deployment notes</a></section>`;
+ } else if(path==="/admin/audit"){
+  const d=await api("/api/v1/admin/audit");content=adminHead("Activity log","Recent product, stock, order and store actions.")+`<section class="admin-card"><div class="table-wrap"><table class="data-table"><thead><tr><th>When</th><th>Staff</th><th>Action</th><th>Item</th><th>Details</th></tr></thead><tbody>${d.items.map(x=>`<tr><td>${new Date(x.createdAt).toLocaleString()}</td><td>${esc(x.actor)}</td><td>${esc(x.action)}</td><td>${esc(x.entity)} ¬∑ ${esc(x.entityId)}</td><td>${esc(x.detail)}</td></tr>`).join("")||"<tr><td colspan='5'>No changes logged yet.</td></tr>"}</tbody></table></div></section>`;
+ } else if(path==="/admin/support"){
+  const d=await api("/api/v1/admin/support");content=adminHead("Support inbox","Preview contact requests. Email delivery is not configured.")+`<section class="admin-card"><div class="table-wrap"><table class="data-table"><thead><tr><th>Received</th><th>Customer</th><th>Topic</th><th>Message</th><th>Status</th><th></th></tr></thead><tbody>${d.items.map(x=>`<tr><td>${new Date(x.createdAt).toLocaleString()}</td><td>${esc(x.name)}<span class="table-secondary">${esc(x.email)}</span></td><td>${esc(x.topic)}</td><td>${esc(x.message)}</td><td>${esc(x.status)}</td><td>${x.status==="new"?`<button class="btn btn-secondary btn-small" data-support-id="${x.id}">Mark in progress</button>`:""}</td></tr>`).join("")||"<tr><td colspan='6'>No messages yet.</td></tr>"}</tbody></table></div></section>`;
+ }
+ return adminShell(path,content,role);
+}
+function nextStatuses(s){return ({sandbox_pending:["confirmed","cancelled"],confirmed:["packing","cancelled"],packing:["shipped","cancelled"],shipped:["delivered","returned"],delivered:["returned"],returned:["refund_recorded"]})[s]||[];}
+function orderTable(rows){return `<div class="table-wrap"><table class="data-table"><thead><tr><th>Order</th><th>Placed</th><th>Items</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody>${rows.map(o=>`<tr><td><b>${esc(o.orderNumber)}</b></td><td>${new Date(o.createdAt).toLocaleString()}</td><td>${o.items.reduce((n,x)=>n+x.quantity,0)}</td><td>${money(o.totalPaise)}</td><td><span class="status-pill warning">${esc(o.status.replaceAll("_"," "))}</span></td><td><a class="btn btn-secondary btn-small" href="/admin/orders/${encodeURIComponent(o.orderNumber)}">Open</a></td></tr>`).join("")||"<tr><td colspan='6'>No preview orders yet.</td></tr>"}</tbody></table></div>`;}
+function taxonomyEditor(rows,kind){return rows.map(x=>`<form class="taxonomy-row" data-taxonomy-form data-kind="${kind}" data-id="${esc(x.id||slug(x.nameEn))}"><input class="control" name="nameEn" aria-label="${kind} name in English" value="${esc(x.nameEn)}" required><input class="control" name="name" aria-label="${kind} name in Hindi" value="${esc(x.name||x.nameEn)}"><input class="control taxonomy-order" type="number" name="order" min="0" max="1000" value="${Number(x.order)||0}" aria-label="Display order"><select class="control taxonomy-active" name="active" aria-label="Availability"><option value="true" ${x.active!==false?"selected":""}>Active</option><option value="false" ${x.active===false?"selected":""}>Hidden</option></select><button class="btn btn-secondary btn-small">Save</button></form>`).join("")||`<p class="muted">No ${kind}s yet.</p>`;}
+function readForm(form){return Object.fromEntries(new FormData(form).entries());}
+function parseVariants(text){return text.split(/\r?\n/).map(line=>line.trim()).filter(Boolean).map(line=>{const [pack,sku,price,mrp,stock]=line.split("|").map(x=>x.trim());return {pack,sku,pricePaise:Math.round(Number(price)*100),mrpPaise:Math.round(Number(mrp)*100),stock:Number(stock)};});}
+function parseCsv(text){const rows=[];let row=[],value="",quoted=false;for(let i=0;i<text.length;i++){const c=text[i];if(c==='"'&&quoted&&text[i+1]==='"'){value+='"';i++;}else if(c==='"')quoted=!quoted;else if(c===","&&!quoted){row.push(value.trim());value="";}else if((c==="\n"||c==="\r")&&!quoted){if(c==="\r"&&text[i+1]==="\n")i++;row.push(value.trim());if(row.some(Boolean))rows.push(row);row=[];value="";}else value+=c;}if(quoted)throw new Error("CSV has an unclosed quoted field.");row.push(value.trim());if(row.some(Boolean))rows.push(row);const head=rows.shift()?.map(x=>x.replace(/^\uFEFF/,""))||[];if(!head.length||head.some(x=>!x))throw new Error("CSV needs a header row with column names.");return rows.map(r=>Object.fromEntries(head.map((h,i)=>[h,r[i]||""])));}
+async function validateImport(mode){
+ const errors=[],valid=[];
+ if(rawImportRows.length>1000){importRows=[];importErrors=[{row:0,error:"Import is limited to 1,000 rows per batch."}];renderImportPreview();return;}
+ const products=[];let page=1,pages=1;do{const data=await api(`/api/v1/admin/products?page=${page}&limit=100`);products.push(...data.items);pages=data.pages;page++;}while(page<=pages);
+ const existing=new Set(products.flatMap(p=>p.variants.map(v=>v.sku.toUpperCase()))),seen=new Set();
+ rawImportRows.forEach((row,index)=>{
+  const line=index+2,sku=String(row.sku||"").trim().toUpperCase(),price=Number(row.pricePaise),mrp=Number(row.mrpPaise),stock=Number(row.stock),nameEn=String(row.nameEn||"").trim(),name=String(row.name||"").trim(),pack=String(row.pack||"").trim();let message="";
+  if(!name||!nameEn)message="English and Hindi product names are required.";
+  else if(!pack)message="Pack is required.";
+  else if(!/^[A-Z0-9][A-Z0-9._-]{1,39}$/.test(sku))message="SKU must be 2‚Äì40 letters, digits, dots, underscores or hyphens.";
+  else if(!Number.isSafeInteger(price)||price<0||!Number.isSafeInteger(mrp)||mrp<price)message="Prices must be whole paise and MRP cannot be below selling price.";
+  else if(!Number.isSafeInteger(stock)||stock<0)message="Stock must be a non-negative whole number.";
+  else if(row.status&&!['draft','review','published','archived'].includes(String(row.status).toLowerCase()))message="Status must be draft, review, published or archived.";
+  else if(seen.has(sku))message="This SKU is repeated in the CSV.";
+  else if(existing.has(sku)&&mode!=="upsert")message="SKU already exists. Choose Update only after reviewing the matching row.";
+  seen.add(sku);if(message)errors.push({row:line,error:message});else valid.push({...row,sku,status:String(row.status||"draft").toLowerCase()});
+ });
+ importRows=valid;importErrors=errors;renderImportPreview();
+}
+function renderImportPreview(){const target=$("#csv-preview");if(!target)return;const shown=rawImportRows.slice(0,20);target.innerHTML=`<p class="hint">${rawImportRows.length} CSV rows ¬∑ ${importRows.length} ready ¬∑ ${importErrors.length} need correction${importErrors.some(x=>x.row===0)?`<br>${esc(importErrors[0].error)}`:""}</p><div class="table-wrap"><table class="data-table"><thead><tr><th>Row</th><th>English name</th><th>SKU</th><th>Pack</th><th>Price paise</th><th>Stock</th><th>Validation</th></tr></thead><tbody>${shown.map((x,i)=>{const err=importErrors.find(y=>y.row===i+2);return `<tr><td>${i+2}</td><td>${esc(x.nameEn)}</td><td>${esc(x.sku)}</td><td>${esc(x.pack)}</td><td>${esc(x.pricePaise)}</td><td>${esc(x.stock)}</td><td class="${err?"text-danger":""}">${err?esc(err.error):"Ready"}</td></tr>`;}).join("")}</tbody></table></div>${rawImportRows.length>20?`<p class="hint">Showing first 20 rows.</p>`:""}`;$("[data-import]").disabled=!importRows.length;}
+function showDialog(title,desc,fields,confirmLabel="Save"){$("#dialog-root").innerHTML=`<div class="dialog-scrim"><form id="dialog-form" class="dialog-card"><h2>${esc(title)}</h2><p>${esc(desc)}</p>${fields}<div class="dialog-actions"><button type="button" class="btn btn-secondary" data-dismiss>Cancel</button><button class="btn btn-primary">${esc(confirmLabel)}</button></div></form></div>`;}
+function formDataJson(form){return JSON.stringify(readForm(form));}
+function imageGalleryRows(){const urls=$("[name=images]")?.value.split(",").map(x=>x.trim()).filter(Boolean)||[];let alts=[];try{alts=JSON.parse($("[name=imageAlt]")?.value||"[]");}catch{}return urls.map((url,index)=>({url,alt:String(alts[index]||"")}));}
+function saveImageGallery(rows){const imageInput=$("[name=images]"),altInput=$("[name=imageAlt]");if(!imageInput||!altInput)return;imageInput.value=rows.map(x=>x.url).join(",");altInput.value=JSON.stringify(rows.map(x=>x.alt));const gallery=$("#product-gallery");if(gallery)gallery.innerHTML=rows.map((x,i)=>`<div class="gallery-row"><img src="${esc(x.url)}" alt=""><label class="field">Image ${i+1} alt text<input data-image-alt="${i}" maxlength="180" required value="${esc(x.alt)}" placeholder="Describe this product photo"></label><button type="button" class="btn btn-secondary btn-small" data-image-up="${i}" ${i===0?"disabled":""}>Move up</button><button type="button" class="btn btn-secondary btn-small" data-image-down="${i}" ${i===rows.length-1?"disabled":""}>Move down</button><button type="button" class="btn btn-danger btn-small" data-image-remove="${i}">Remove</button></div>`).join("");}
+async function initImageGallery(path){const form=$("#product-form"),file=$("#product-image");if(!form||!file)return;file.multiple=true;file.setAttribute("aria-label","Upload product images");file.closest(".field").insertAdjacentHTML("beforeend",'<input type="hidden" name="imageAlt" value="[]"><div id="product-gallery" class="product-gallery"></div>');$("#image-preview").hidden=true;let rows=imageGalleryRows();const match=path.match(/^\/admin\/products\/(\d+)$/);if(match){try{const product=await api(`/api/v1/admin/products/${match[1]}`);rows=(product.images||[]).map((url,index)=>({url,alt:product.imageAlt?.[index]||""}));}catch{}}saveImageGallery(rows);}
+async function initPublicGallery(path){try{const product=await api(`/api/v1/products/${encodeURIComponent(path.split("/").pop())}`),images=(product.images||[]).map((url,index)=>({url,alt:product.imageAlt?.[index]||prodName(product)}));if(images.length<2)return;const host=$(".detail-image");if(!host)return;host.outerHTML=`<div class="product-gallery-display"><div class="detail-image"><img id="detail-main-image" src="${esc(images[0].url)}" alt="${esc(images[0].alt)}"></div><div class="gallery-thumbnails">${images.map((image,index)=>`<button type="button" class="gallery-thumbnail ${index===0?"active":""}" data-public-image="${index}" aria-label="View product image ${index+1}"><img src="${esc(image.url)}" alt=""></button>`).join("")}</div></div>`;app.dataset.galleryImages=JSON.stringify(images);}catch{}}
+function initProductDeliveryCheck(){const detail=$(".detail-copy");if(!detail||$("#delivery-check-form"))return;detail.insertAdjacentHTML("beforeend",'<form id="delivery-check-form" class="product-delivery-check"><label for="product-pincode">Check delivery by PIN code</label><div><input id="product-pincode" name="pincode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="6-digit PIN"><button class="btn btn-secondary">Check</button></div><p id="delivery-check-result" class="hint" aria-live="polite">Delivery availability is a preview estimate.</p></form>');}
+async function initAdminSettingsEditor(){const form=$("#settings-form");if(!form)return;try{const d=await api("/api/v1/admin/settings"),settings=d.settings||{},sections=[{"Page and business copy":[["storeAbout","Store introduction"],["businessDetails","Legal business identity and address"],["supportPhone","Support phone"],["supportDetails","Support hours and contact instructions"]]},{"Home page copy":[["homeHeroEyebrow","Home eyebrow"],["homeHeroHeadline","Home headline"],["homeHeroBody","Home introduction"],["homeHeroNote","Supporting note"],["homeHeroPrimaryCta","Primary button label"]]},{"Policies and operating rules":[["deliveryRules","Delivery regions, fees and estimates (text)"],["codPolicy","Cash on delivery policy"],["cancellationReturnsRules","Cancellation and return rules"],["shippingReturnsPolicy","Shipping & returns page"],["privacyPolicy","Privacy page"],["termsPolicy","Terms page"],["productUseNotice","Product-use notice"]]}];const save=form.querySelector(".span-2");const markup=sections.map(([title,fields])=>`<div class="span-2 settings-section"><h3>${esc(title)}</h3><p class="hint">Leave blank until AgroSeed provides approved text. These values appear on the customer site.</p></div>${fields.map(([name,label])=>`<div class="field span-2"><label for="setting-${name}">${esc(label)}</label><textarea id="setting-${name}" name="${name}" maxlength="20000" placeholder="Not configured. Enter approved text here.">${esc(settings[name]||"")}</textarea></div>`).join("")}`).join("");save?.insertAdjacentHTML("beforebegin",markup);}catch{}}
 function applyEditableCustomerCopy(path){const lineBreak=value=>esc(value).replace(/\r?\n/g,"<br>");if(path==="/contact"){const title=$(".page-title")?.outerHTML,form=$("#support-form");if(form){const support=[storefrontSettings.supportDetails,storefrontSettings.supportPhone,storefrontSettings.supportEmail?`Email: ${storefrontSettings.supportEmail}`:"",storefrontSettings.businessDetails].filter(Boolean);form.insertAdjacentHTML("beforebegin",support.length?`<div class="notice support-details">${support.map(lineBreak).join("<br>")}</div>`:`<div class="notice support-details">Support contact details are not configured. Add approved details in Admin &gt; Settings.</div>`);}return title;}
  if(path==="/help"){const callout=$(".category-grid")?.nextElementSibling;if(callout)callout.textContent=storefrontSettings.supportDetails||"Support contact details are not configured. Add approved details in Admin > Settings.";return;}
  const map={"/shipping-returns":["Shipping & returns","shippingReturnsPolicy",[["Delivery rules","deliveryRules"],["Cash on delivery","codPolicy"],["Cancellation and returns","cancellationReturnsRules"]]],"/privacy":["Privacy","privacyPolicy",[]],"/terms":["Terms of service","termsPolicy",[["Business details","businessDetails"]]]},entry=map[path],copy=$(".policy-copy");if(!entry||!copy)return;const [title,key,extra]=entry,sections=[];if(storefrontSettings[key]?.trim())sections.push(`<p>${lineBreak(storefrontSettings[key])}</p>`);for(const [label,field] of extra)if(storefrontSettings[field]?.trim())sections.push(`<h2>${esc(label)}</h2><p>${lineBreak(storefrontSettings[field])}</p>`);copy.innerHTML=`${pageTitle(title)}${sections.length?`<div class="callout">Preview copy. Confirm this content before launch.</div>${sections.join("")}`:`<div class="notice">${esc(title)} text is not configured. Add AgroSeed-approved content in Admin &gt; Settings.</div>`}`;}

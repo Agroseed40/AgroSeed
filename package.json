@@ -2,23 +2,18 @@
   "name": "agroseed-storefront",
   "version": "0.1.0",
   "private": true,
-  "description": "AgroSeed Node.js storefront with GoDaddy and AWS Amplify deployment targets",
-  "main": "server.mjs",
+  "description": "AgroSeed preview storefront on Cloudflare Workers with D1",
+  "main": "cloudflare/worker.mjs",
   "engines": {
     "node": "22.x"
   },
   "scripts": {
-    "build": "node scripts/build-check.mjs && node scripts/godaddy-preflight.mjs && node scripts/package-preview.mjs && node scripts/package-amplify.mjs",
-    "start": "node server.mjs",
-    "dev": "node --watch server.mjs",
-    "migrate:customers": "node scripts/migrate-customer-accounts.mjs"
+    "build": "node scripts/embed-worker-assets.mjs && wrangler deploy --dry-run",
+    "start": "node scripts/embed-worker-assets.mjs && wrangler dev",
+    "dev": "node scripts/embed-worker-assets.mjs && wrangler dev",
+    "deploy": "node scripts/embed-worker-assets.mjs && wrangler deploy"
   },
-  "dependencies": {
-    "@aws-sdk/client-cognito-identity-provider": "^3.1164.0",
-    "@aws-sdk/client-secrets-manager": "^3.1165.0",
-    "@supabase/server": "^1.9.2",
-    "@supabase/supabase-js": "^2.119.0",
-    "aws-jwt-verify": "^5.2.1",
-    "mysql2": "^3.24.6"
+  "devDependencies": {
+    "wrangler": "^4.164.0"
   }
 }

@@ -2,13 +2,13 @@ import { randomBytes, createHash, timingSafeEqual } from "node:crypto";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import seedProducts from "./seed/products.json" with { type: "json" };
 import { allowSandboxOrders, demoMode } from "../config/features.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const storageRoot = path.resolve(process.env.AGROSEED_STORAGE_DIR || path.join(root, "storage"));
 const storeFile = path.join(storageRoot, "sandbox-store.json");
 const seedFile = path.join(root, "backend", "seed", "products.json");
-const demoEnabled = demoMode && process.env.NODE_ENV !== "production";
 const sessions = new Map();
 const loginAttempts = new Map();
 const orderPattern = /^AS-SBX-[A-Z0-9-]{8,40}$/;
@@ -61,7 +61,27 @@ function normalizeProduct(product, index) {
   };
 }
 
-async function readState() {
+function initialState(seed = seedProducts) {
+  return {
+    products: (seed.products || seed).map(normalizeProduct),
+    orders: [], carts: {}, serviceAreas: [], coupons: [], audit: [], inventoryTransactions: [], supportRequests: [],
+    settings: { storeName: "AgroSeed", currency: "INR" }
+  };
+}
+
+async function readState(env) {
+  if (env?.DB) {
+    let row = await env.DB.prepare("SELECT payload FROM agroseed_app_state WHERE state_id = 1").first();
+    if (!row) {
+      const initial = initialState();
+      await env.DB.prepare("INSERT OR IGNORE INTO agroseed_app_state (state_id, revision, payload) VALUES (1, 0, ?)").bind(JSON.stringify(initial)).run();
+      row = await env.DB.prepare("SELECT payload FROM agroseed_app_state WHERE state_id = 1").first();
+    }
+    if (!row?.payload) throw new Error("AgroSeed D1 state is missing.");
+    const state = JSON.parse(row.payload);
+    state.products = (state.products || []).map(normalizeProduct);
+    return Object.assign({ orders: [], carts: {}, serviceAreas: [], coupons: [], audit: [], inventoryTransactions: [], supportRequests: [], settings: {} }, state);
+  }
   await mkdir(path.dirname(storeFile), { recursive: true });
   try {
     const state = JSON.parse(await readFile(storeFile, "utf8"));
@@ -76,8 +96,7 @@ async function readState() {
     return Object.assign({ orders: [], carts: {}, serviceAreas: [], coupons: [], audit: [], inventoryTransactions: [], supportRequests: [], settings: {} }, state);
   } catch (error) {
     if (error.code !== "ENOENT") throw error;
-    const seed = JSON.parse(await readFile(seedFile, "utf8"));
-    const initial = { products: (seed.products || seed).map(normalizeProduct), orders: [], carts: {}, serviceAreas: [], coupons: [], audit: [], inventoryTransactions: [], supportRequests: [], settings: { storeName: "AgroSeed", currency: "INR" } };
+    const initial = initialState(JSON.parse(await readFile(seedFile, "utf8")));
     const temp = `${storeFile}.tmp`;
     await writeFile(temp, `${JSON.stringify(initial, null, 2)}\n`, "utf8");
     await rename(temp, storeFile);
@@ -85,9 +104,26 @@ async function readState() {
   }
 }
 
-function state() { statePromise ??= readState(); return statePromise; }
+function state(env) {
+  if (env?.DB) return readState(env);
+  statePromise ??= readState();
+  return statePromise;
+}
 
-async function change(mutator) {
+async function change(env, mutator) {
+  if (env?.DB) {
+    for (let attempt = 0; attempt < 5; attempt++) {
+      await state(env);
+      const row = await env.DB.prepare("SELECT revision, payload FROM agroseed_app_state WHERE state_id = 1").first();
+      if (!row?.payload) throw new Error("AgroSeed D1 state is missing.");
+      const current = JSON.parse(row.payload);
+      const result = await mutator(current);
+      const write = await env.DB.prepare("UPDATE agroseed_app_state SET payload = ?, revision = revision + 1, updated_at = CURRENT_TIMESTAMP WHERE state_id = 1 AND revision = ?")
+        .bind(JSON.stringify(current), row.revision).run();
+      if (write.meta?.changes === 1) return result;
+    }
+    throw Object.assign(new Error("The store changed during this request. Please try again."), { statusCode: 409 });
+  }
   let result;
   const operation = writes.then(async () => {
     const current = await state();
@@ -102,11 +138,11 @@ async function change(mutator) {
   return result;
 }
 
-async function expireSandboxReservations() {
-  const data = await state();
+async function expireSandboxReservations(env) {
+  const data = await state(env);
   const cutoff = Date.now() - 24 * 60 * 60 * 1000;
   if (!data.orders.some((order) => order.status === "sandbox_pending" && Date.parse(order.createdAt) < cutoff)) return;
-  await change((current) => {
+  await change(env, (current) => {
     for (const order of current.orders) {
       if (order.status !== "sandbox_pending" || Date.parse(order.createdAt) >= cutoff) continue;
       order.status = "expired"; order.updatedAt = now();
@@ -145,15 +181,23 @@ function cookieValue(request, name) {
   return row ? decodeURIComponent(row.slice(name.length + 1)) : "";
 }
 
-function adminSession(request) {
+async function adminSession(request, env) {
   const raw = cookieValue(request, "agroseed_admin");
+  if (env?.DB && raw) {
+    const tokenHash = hash(raw);
+    const session = await env.DB.prepare("SELECT role, csrf_token, expires_at FROM agroseed_admin_sessions WHERE token_hash = ? AND datetime(expires_at) > CURRENT_TIMESTAMP")
+      .bind(tokenHash).first();
+    if (session) return { role: session.role, csrf: session.csrf_token };
+    await env.DB.prepare("DELETE FROM agroseed_admin_sessions WHERE token_hash = ?").bind(tokenHash).run();
+    return null;
+  }
   const session = raw ? sessions.get(hash(raw)) : null;
   if (!session || session.expires < Date.now()) { if (raw) sessions.delete(hash(raw)); return null; }
   return session;
 }
 
-function requireAdmin(request, response, mutating = false) {
-  const session = adminSession(request);
+async function requireAdmin(request, response, mutating = false, env) {
+  const session = await adminSession(request, env);
   if (!session) { send(response, 401, { error: "Sign in to the staff console." }); return null; }
   if (mutating && request.headers["x-agroseed-csrf"] !== session.csrf) { send(response, 403, { error: "Your staff session expired. Sign in again." }); return null; }
   return session;
@@ -303,55 +347,75 @@ function catalogProduct(product) { return { ...product, variants: product.varian
 
 async function readAndSend(request, response, status, data) { send(response, status, data); }
 
-export async function handleSandboxRequest(request, response, pathname) {
+export async function handleSandboxRequest(request, response, pathname, env) {
   if (!pathname.startsWith("/api/")) return false;
+  const demoEnabled = env?.DB ? String(env.AGROSEED_DEMO_MODE || "true") !== "false" : demoMode && process.env.NODE_ENV !== "production";
   try {
     const url = new URL(request.url || "/", "http://localhost");
     const method = request.method;
     if (pathname === "/api/v1/health" && method === "GET") { send(response, 200, { status: "ok", service: "agroseed-preview-api", mode: demoEnabled ? "local-sandbox" : "disabled" }); return true; }
-    if (pathname === "/api/v1/storefront/settings" && method === "GET") { if (!demoEnabled) { send(response, 503, { error: "Store settings are available in local preview only." }); return true; } const data = await state(), allowed = ["storeName", "publicDomain", "storeAbout", "supportEmail", "supportPhone", "supportDetails", "businessDetails", "homeHeroEyebrow", "homeHeroHeadline", "homeHeroBody", "homeHeroNote", "homeHeroPrimaryCta", "deliveryRules", "codPolicy", "cancellationReturnsRules", "shippingReturnsPolicy", "privacyPolicy", "termsPolicy", "productUseNotice"]; send(response, 200, Object.fromEntries(allowed.map((key) => [key, String(data.settings?.[key] || "")]))); return true; }
-    if (pathname === "/api/v1/storefront/offers" && method === "GET") { if (!demoEnabled) { send(response, 503, { error: "Store offers are available in local preview only." }); return true; } const data = await state(), time = Date.now(), items = (data.coupons || []).filter((item) => item.active !== false && (!item.expiresAt || time <= Date.parse(`${item.expiresAt}T23:59:59Z`)) && (!item.maxUses || (Number(item.usesCount) || 0) < item.maxUses)).map(({ code, type, value, minSubtotalPaise, expiresAt }) => ({ code, type, value, minSubtotalPaise: Number(minSubtotalPaise) || 0, expiresAt: expiresAt || null })); send(response, 200, { items }); return true; }
+    if (pathname === "/api/v1/storefront/settings" && method === "GET") { if (!demoEnabled) { send(response, 503, { error: "Store settings are available in local preview only." }); return true; } const data = await state(env), allowed = ["storeName", "publicDomain", "storeAbout", "supportEmail", "supportPhone", "supportDetails", "businessDetails", "homeHeroEyebrow", "homeHeroHeadline", "homeHeroBody", "homeHeroNote", "homeHeroPrimaryCta", "deliveryRules", "codPolicy", "cancellationReturnsRules", "shippingReturnsPolicy", "privacyPolicy", "termsPolicy", "productUseNotice"]; send(response, 200, Object.fromEntries(allowed.map((key) => [key, String(data.settings?.[key] || "")]))); return true; }
+    if (pathname === "/api/v1/storefront/offers" && method === "GET") { if (!demoEnabled) { send(response, 503, { error: "Store offers are available in local preview only." }); return true; } const data = await state(env), time = Date.now(), items = (data.coupons || []).filter((item) => item.active !== false && (!item.expiresAt || time <= Date.parse(`${item.expiresAt}T23:59:59Z`)) && (!item.maxUses || (Number(item.usesCount) || 0) < item.maxUses)).map(({ code, type, value, minSubtotalPaise, expiresAt }) => ({ code, type, value, minSubtotalPaise: Number(minSubtotalPaise) || 0, expiresAt: expiresAt || null })); send(response, 200, { items }); return true; }
     if (pathname === "/api/v1/cart" && (method === "GET" || method === "PUT")) {
       if (!demoEnabled) { send(response, 503, { error: "Guest carts are available in local preview only." }); return true; }
       const id = String(request.headers["x-agroseed-cart-id"] || "").trim();
       if (!/^[a-f0-9]{32}$/i.test(id)) { send(response, 400, { error: "A valid guest cart ID is required." }); return true; }
       const key = hash(id);
-      if (method === "GET") { const data = await state(); send(response, 200, data.carts?.[key] || { items: [], updatedAt: null }); return true; }
+      if (method === "GET") { const data = await state(env); send(response, 200, data.carts?.[key] || { items: [], updatedAt: null }); return true; }
       const input = await body(request, 12_000);
       if (!Array.isArray(input.items) || input.items.length > 50) { send(response, 400, { error: "A guest cart can contain at most 50 lines." }); return true; }
       const quantities = new Map();
-      for (const item of input.items) { const sku = String(item?.sku || "").trim().toUpperCase(), quantity = Number(item?.quantity), found = findVariant(await state(), sku); if (!found || found.product.status !== "published" || !found.variant.active) { send(response, 409, { error: `Product ${sku || "item"} is no longer available.` }); return true; } if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) { send(response, 400, { error: "Cart quantities must be whole numbers from 1 to 99." }); return true; } const total = (quantities.get(sku) || 0) + quantity; if (total > 99) { send(response, 400, { error: "A SKU can have at most 99 items in the cart." }); return true; } quantities.set(sku, total); }
-      const result = await change((data) => { data.carts ||= {}; const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000; for (const [cartKey, cartValue] of Object.entries(data.carts)) if (Date.parse(cartValue.updatedAt || "") < cutoff) delete data.carts[cartKey]; const cart = { items: [...quantities].map(([sku, quantity]) => ({ sku, quantity })), updatedAt: now() }; data.carts[key] = cart; return cart; }); send(response, 200, result); return true;
+      for (const item of input.items) { const sku = String(item?.sku || "").trim().toUpperCase(), quantity = Number(item?.quantity), found = findVariant(await state(env), sku); if (!found || found.product.status !== "published" || !found.variant.active) { send(response, 409, { error: `Product ${sku || "item"} is no longer available.` }); return true; } if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) { send(response, 400, { error: "Cart quantities must be whole numbers from 1 to 99." }); return true; } const total = (quantities.get(sku) || 0) + quantity; if (total > 99) { send(response, 400, { error: "A SKU can have at most 99 items in the cart." }); return true; } quantities.set(sku, total); }
+      const result = await change(env, (data) => { data.carts ||= {}; const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000; for (const [cartKey, cartValue] of Object.entries(data.carts)) if (Date.parse(cartValue.updatedAt || "") < cutoff) delete data.carts[cartKey]; const cart = { items: [...quantities].map(([sku, quantity]) => ({ sku, quantity })), updatedAt: now() }; data.carts[key] = cart; return cart; }); send(response, 200, result); return true;
     }
     if (pathname === "/api/v1/admin/session" && method === "POST") {
       if (!demoEnabled) { send(response, 503, { error: "The staff demo is available in local development only." }); return true; }
       const ip = request.socket.remoteAddress || "unknown";
-      const attempt = loginAttempts.get(ip) || { count: 0, since: Date.now() };
+      const attemptKey = hash(ip);
+      const savedAttempt = env?.DB ? await env.DB.prepare("SELECT count, window_started FROM agroseed_admin_login_attempts WHERE ip_hash = ?").bind(attemptKey).first() : null;
+      const attempt = savedAttempt ? { count: Number(savedAttempt.count) || 0, since: Number(savedAttempt.window_started) || Date.now() } : (loginAttempts.get(ip) || { count: 0, since: Date.now() });
       if (Date.now() - attempt.since > 15 * 60_000) { attempt.count = 0; attempt.since = Date.now(); }
       if (attempt.count >= 8) { send(response, 429, { error: "Too many sign-in attempts. Try again in 15 minutes." }); return true; }
       const input = await body(request, 2048);
-      const configured = process.env.AGROSEED_ADMIN_PASSWORD || "";
-      if (!configured) { send(response, 503, { error: "Set AGROSEED_ADMIN_PASSWORD in your local environment to enable the staff demo." }); return true; }
+      const configured = String(env?.AGROSEED_ADMIN_PASSWORD || process.env.AGROSEED_ADMIN_PASSWORD || "");
+      if (!configured) { send(response, 503, { error: env?.DB ? "The staff sign-in password is not configured on this Worker." : "Set AGROSEED_ADMIN_PASSWORD in your local environment to enable the staff demo." }); return true; }
       const supplied = Buffer.from(String(input.password || "")); const expected = Buffer.from(configured);
       const match = supplied.length === expected.length && timingSafeEqual(supplied, expected);
-      if (!match) { attempt.count++; loginAttempts.set(ip, attempt); send(response, 401, { error: "That password did not match." }); return true; }
-      loginAttempts.delete(ip);
+      if (!match) {
+        attempt.count++;
+        if (env?.DB) await env.DB.prepare(`INSERT INTO agroseed_admin_login_attempts (ip_hash, count, window_started) VALUES (?, ?, ?)
+          ON CONFLICT(ip_hash) DO UPDATE SET count = excluded.count, window_started = excluded.window_started, updated_at = CURRENT_TIMESTAMP`)
+          .bind(attemptKey, attempt.count, attempt.since).run();
+        else loginAttempts.set(ip, attempt);
+        send(response, 401, { error: "That password did not match." }); return true;
+      }
+      if (env?.DB) await env.DB.prepare("DELETE FROM agroseed_admin_login_attempts WHERE ip_hash = ?").bind(attemptKey).run();
+      else loginAttempts.delete(ip);
       const raw = randomBytes(32).toString("base64url");
       const csrf = randomBytes(24).toString("base64url");
-      sessions.set(hash(raw), { role: "Owner", csrf, expires: Date.now() + 8 * 60 * 60_000 });
-      send(response, 200, { user: { name: "Store owner", role: "Owner" }, csrf }, { "Set-Cookie": `agroseed_admin=${encodeURIComponent(raw)}; HttpOnly; SameSite=Strict; Path=/api/v1/admin; Max-Age=28800` }); return true;
+      const expires = Date.now() + 8 * 60 * 60_000;
+      if (env?.DB) await env.DB.prepare("INSERT INTO agroseed_admin_sessions (token_hash, role, csrf_token, expires_at) VALUES (?, ?, ?, ?)")
+        .bind(hash(raw), "Owner", csrf, new Date(expires).toISOString()).run();
+      else sessions.set(hash(raw), { role: "Owner", csrf, expires });
+      const secure = env?.DB ? "; Secure" : "";
+      send(response, 200, { user: { name: "Store owner", role: "Owner" }, csrf }, { "Set-Cookie": `agroseed_admin=${encodeURIComponent(raw)}; HttpOnly; SameSite=Strict; Path=/api/v1/admin; Max-Age=28800${secure}` }); return true;
     }
     if (pathname === "/api/v1/admin/session" && (method === "GET" || method === "DELETE")) {
       if (!demoEnabled) { send(response, 503, { error: "Staff demo is disabled." }); return true; }
-      const session = requireAdmin(request, response, method === "DELETE"); if (!session) return true;
-      if (method === "DELETE") { sessions.delete(hash(cookieValue(request, "agroseed_admin"))); send(response, 200, { ok: true }, { "Set-Cookie": "agroseed_admin=; HttpOnly; SameSite=Strict; Path=/api/v1/admin; Max-Age=0" }); }
+      const session = await requireAdmin(request, response, method === "DELETE", env); if (!session) return true;
+      if (method === "DELETE") {
+        const tokenHash = hash(cookieValue(request, "agroseed_admin"));
+        if (env?.DB) await env.DB.prepare("DELETE FROM agroseed_admin_sessions WHERE token_hash = ?").bind(tokenHash).run();
+        else sessions.delete(tokenHash);
+        send(response, 200, { ok: true }, { "Set-Cookie": "agroseed_admin=; HttpOnly; SameSite=Strict; Path=/api/v1/admin; Max-Age=0" });
+      }
       else send(response, 200, { user: { name: "Store owner", role: session.role || "Owner" }, csrf: session.csrf }); return true;
     }
     if (!demoEnabled) { send(response, 503, { error: "Preview workflows are disabled. Connect the approved production services before launch." }); return true; }
-    await expireSandboxReservations();
+    await expireSandboxReservations(env);
 
     if (pathname === "/api/v1/products" && method === "GET") {
-      const data = await state();
+      const data = await state(env);
       const hiddenCategories = new Set((data.categories || []).filter((item) => item.active === false).map((item) => item.nameEn));
       const hiddenBrands = new Set((data.brands || []).filter((item) => item.active === false).map((item) => item.nameEn));
       let products = data.products.filter((item) => item.status === "published" && !hiddenCategories.has(item.categoryEn) && !hiddenBrands.has(item.brandEn));
@@ -370,32 +434,32 @@ export async function handleSandboxRequest(request, response, pathname) {
     }
     const publicProduct = pathname.match(/^\/api\/v1\/products\/(\d+|[a-z0-9-]+)$/);
     if (publicProduct && method === "GET") {
-      const data = await state(); const needle = publicProduct[1]; const hiddenCategories = new Set((data.categories || []).filter((item) => item.active === false).map((item) => item.nameEn)); const hiddenBrands = new Set((data.brands || []).filter((item) => item.active === false).map((item) => item.nameEn)); const product = data.products.find((item) => item.status === "published" && !hiddenCategories.has(item.categoryEn) && !hiddenBrands.has(item.brandEn) && (String(item.id) === needle || item.slug === needle));
+      const data = await state(env); const needle = publicProduct[1]; const hiddenCategories = new Set((data.categories || []).filter((item) => item.active === false).map((item) => item.nameEn)); const hiddenBrands = new Set((data.brands || []).filter((item) => item.active === false).map((item) => item.nameEn)); const product = data.products.find((item) => item.status === "published" && !hiddenCategories.has(item.categoryEn) && !hiddenBrands.has(item.brandEn) && (String(item.id) === needle || item.slug === needle));
       if (!product) send(response, 404, { error: "Product not found." }); else send(response, 200, catalogProduct(product)); return true;
     }
     const service = pathname.match(/^\/api\/v1\/serviceability\/(\d{6})$/);
     if (service && method === "GET") {
-      const data = await state(); const area = data.serviceAreas.find((item) => item.pincode === service[1] && item.active !== false);
+      const data = await state(env); const area = data.serviceAreas.find((item) => item.pincode === service[1] && item.active !== false);
       send(response, 200, { available: data.serviceAreas.length ? Boolean(area) : false, configured: data.serviceAreas.length > 0, previewOnly: !data.serviceAreas.length, area: area || null }); return true;
     }
     if (pathname === "/api/v1/support/requests" && method === "POST") {
       const input = await body(request, 12_000);
       if (!String(input.name || "").trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(input.email || "")) || String(input.message || "").trim().length < 10) { send(response, 400, { error: "Add your name, a valid email, and a message of at least 10 characters." }); return true; }
-      const ticket = await change((data) => { const item = { id: randomBytes(6).toString("hex").toUpperCase(), name: String(input.name).trim(), email: String(input.email).trim(), topic: String(input.topic || "General"), message: String(input.message).trim().slice(0, 4000), status: "new", createdAt: now() }; data.supportRequests.unshift(item); return item.id; });
+      const ticket = await change(env, (data) => { const item = { id: randomBytes(6).toString("hex").toUpperCase(), name: String(input.name).trim(), email: String(input.email).trim(), topic: String(input.topic || "General"), message: String(input.message).trim().slice(0, 4000), status: "new", createdAt: now() }; data.supportRequests.unshift(item); return item.id; });
       send(response, 201, { received: true, ticket }); return true;
     }
     if (pathname === "/api/v1/checkout/quote" && method === "POST") {
-      const input = await body(request, 16_000); const data = await state();
+      const input = await body(request, 16_000); const data = await state(env);
       const quote = calculate(data, input);
       if (input.address && !/^\d{6}$/.test(String(input.address.pincode || ""))) { send(response, 400, { error: "Enter a valid 6-digit PIN code." }); return true; }
       send(response, 200, { ...quote, expiresAt: new Date(Date.now() + 5 * 60_000).toISOString(), currency: "INR", previewOnly: true }); return true;
     }
     if (pathname === "/api/v1/orders" && method === "POST") {
       const input = await body(request, 24_000);
-      if (!allowSandboxOrders) { send(response, 503, { error: "Sandbox order creation is turned off." }); return true; }
+      if (!(env?.DB ? String(env.AGROSEED_ALLOW_SANDBOX_ORDERS || "true") !== "false" : allowSandboxOrders)) { send(response, 503, { error: "Sandbox order creation is turned off." }); return true; }
       if (!input.items && input.productId) input.items = [{ sku: String(input.productId), quantity: input.quantity || 1 }];
       if (Array.isArray(input.items)) {
-        const current = await state();
+        const current = await state(env);
         input.items = input.items.map((item) => {
           if (item.sku || !item.productId) return item;
           const product = current.products.find((p) => p.id === Number(item.productId));
@@ -407,7 +471,7 @@ export async function handleSandboxRequest(request, response, pathname) {
         if (!/^[6-9]\d{9}$/.test(String(input.address.phone).replace(/\D/g, ""))) { send(response, 400, { error: "Enter a valid Indian mobile number." }); return true; }
         if (!/^\d{6}$/.test(String(input.address.pincode))) { send(response, 400, { error: "Enter a valid 6-digit PIN code." }); return true; }
       }
-      const order = await change((data) => {
+      const order = await change(env, (data) => {
         const quote = calculate(data, input);
         for (const line of quote.items) {
           const found = findVariant(data, line.sku); found.variant.stock -= line.quantity; found.variant.reserved += line.quantity;
@@ -431,7 +495,7 @@ export async function handleSandboxRequest(request, response, pathname) {
       const number = decodeURIComponent(customerOrder[1]);
       if (!orderPattern.test(number)) { send(response, 404, { error: "Order not found." }); return true; }
       const credential = String(request.headers.authorization || "").replace(/^Bearer\s+/i, "");
-      const data = await state(); const order = data.orders.find((item) => item.orderNumber === number);
+      const data = await state(env); const order = data.orders.find((item) => item.orderNumber === number);
       const credentialHash = Buffer.from(hash(credential)); const storedHash = Buffer.from(order?.lookupTokenHash || "");
       if (!order || !credential || credentialHash.length !== storedHash.length || !timingSafeEqual(credentialHash, storedHash)) { send(response, 404, { error: "Order not found. Check the number and private tracking code." }); return true; }
       send(response, 200, publicOrder(order)); return true;
@@ -440,10 +504,11 @@ export async function handleSandboxRequest(request, response, pathname) {
     if (pathname.startsWith("/api/v1/admin/")) {
       if (!demoEnabled) { send(response, 503, { error: "The staff preview is disabled." }); return true; }
       const mutating = method !== "GET";
-      const session = requireAdmin(request, response, mutating); if (!session) return true;
+      const session = await requireAdmin(request, response, mutating, env); if (!session) return true;
       const adminPath = pathname.slice("/api/v1/admin".length);
       if (!canAccessAdminPath(session.role || "Owner", adminPath)) { send(response, 403, { error: "Your staff role cannot access this area." }); return true; }
       if (adminPath === "/media" && method === "POST") {
+        if (env?.DB) { send(response, 503, { error: "Image uploads are disabled until an R2 storage binding is configured." }); return true; }
         const input = await body(request, 6 * 1024 * 1024);
         const match = String(input.data || "").match(/^data:(image\/(?:png|jpeg|webp));base64,([A-Za-z0-9+/=]+)$/);
         if (!match) { send(response, 400, { error: "Choose a PNG, JPG, or WebP image." }); return true; }
@@ -458,15 +523,15 @@ export async function handleSandboxRequest(request, response, pathname) {
         const directory = path.join(storageRoot, "uploads");
         await mkdir(directory, { recursive: true });
         await writeFile(path.join(directory, name), buffer, { flag: "wx" });
-        await change((data) => audit(data, "image_uploaded", "image", name, "Product image uploaded to the local sandbox"));
+        await change(env, (data) => audit(data, "image_uploaded", "image", name, "Product image uploaded to the local sandbox"));
         send(response, 201, { url: `/uploads/${name}`, filename: name }); return true;
       }
       if (adminPath === "/overview" && method === "GET") {
-        const data = await state(); const published = data.products.filter((p) => p.status === "published").length;
+        const data = await state(env); const published = data.products.filter((p) => p.status === "published").length;
         send(response, 200, { products: data.products.length, published, drafts: data.products.filter((p) => p.status === "draft" || p.status === "review").length, lowStock: data.products.flatMap((p) => p.variants.map((v) => ({ ...v, product: p.nameEn }))).filter((v) => v.stock <= 5).length, orders: data.orders.length, openOrders: data.orders.filter((o) => !["cancelled", "expired", "delivered", "refund_recorded"].includes(o.status)).length, revenuePaise: data.orders.filter((o) => o.status !== "cancelled").reduce((sum, o) => sum + o.totalPaise, 0), support: data.supportRequests.filter((item) => item.status === "new").length, recentOrders: data.orders.slice(0, 6).map(publicOrder) }); return true;
       }
       if (adminPath === "/products" && method === "GET") {
-        const data = await state(); let products = data.products;
+        const data = await state(env); let products = data.products;
         const q = (url.searchParams.get("q") || "").trim().toLocaleLowerCase();
         const status = url.searchParams.get("status") || "";
         if (q) products = products.filter((p) => [p.name, p.nameEn, p.brand, p.brandEn, p.sku, ...p.variants.map((v) => v.sku)].join(" ").toLocaleLowerCase().includes(q));
@@ -475,23 +540,23 @@ export async function handleSandboxRequest(request, response, pathname) {
         send(response, 200, { items: products.slice((page - 1) * limit, page * limit), total, page, limit, pages: Math.max(1, Math.ceil(total / limit)), ...deriveCollections(data.products, data.categories, data.brands) }); return true;
       }
       if (adminPath === "/products" && method === "POST") {
-        const input = await body(request); const result = await change((data) => { const product = cleanProduct(input, null, data); data.products.push(product); audit(data, "product_created", "product", product.id, product.nameEn); return product; }); send(response, 201, result); return true;
+        const input = await body(request); const result = await change(env, (data) => { const product = cleanProduct(input, null, data); data.products.push(product); audit(data, "product_created", "product", product.id, product.nameEn); return product; }); send(response, 201, result); return true;
       }
       const productRoute = adminPath.match(/^\/products\/(\d+)$/);
       if (productRoute && (method === "GET" || method === "PATCH" || method === "DELETE")) {
-        if (method === "GET") { const data = await state(); const product = data.products.find((p) => p.id === Number(productRoute[1])); if (!product) send(response, 404, { error: "Product not found." }); else send(response, 200, product); return true; }
+        if (method === "GET") { const data = await state(env); const product = data.products.find((p) => p.id === Number(productRoute[1])); if (!product) send(response, 404, { error: "Product not found." }); else send(response, 200, product); return true; }
         const product = await change(async (data) => { const current = data.products.find((p) => p.id === Number(productRoute[1])); if (!current) throw Object.assign(new Error("Product not found."), { statusCode: 404 }); if (method === "DELETE") { current.status = "archived"; current.active = false; current.updatedAt = now(); audit(data, "product_archived", "product", current.id, current.nameEn); return current; } const updated = cleanProduct(await body(request), current, data); Object.assign(current, updated); audit(data, "product_updated", "product", current.id, current.nameEn); return current; }); send(response, 200, product); return true;
       }
-      if (adminPath === "/inventory" && method === "GET") { const data = await state(); send(response, 200, { products: data.products, transactions: data.inventoryTransactions.slice(0, 300) }); return true; }
+      if (adminPath === "/inventory" && method === "GET") { const data = await state(env); send(response, 200, { products: data.products, transactions: data.inventoryTransactions.slice(0, 300) }); return true; }
       if (adminPath === "/inventory" && method === "POST") {
-        const input = await body(request); const result = await change((data) => { const found = findVariant(data, input.sku); const delta = Number(input.delta); const reason = String(input.reason || "").trim(); if (!found) throw Object.assign(new Error("SKU not found."), { statusCode: 404 }); if (!Number.isInteger(delta) || delta === 0 || Math.abs(delta) > 10000) throw Object.assign(new Error("Stock change must be a non-zero whole number."), { statusCode: 400 }); if (found.variant.stock + delta < 0) throw Object.assign(new Error("Stock cannot go below zero."), { statusCode: 400 }); if (reason.length < 5) throw Object.assign(new Error("Add a reason (at least 5 characters)."), { statusCode: 400 }); found.variant.stock += delta; found.product.stock = found.product.variants.reduce((sum, item) => sum + item.stock, 0); const row = { id: randomBytes(8).toString("hex"), sku: found.variant.sku, delta, reason, actor: "Store owner", createdAt: now() }; data.inventoryTransactions.unshift(row); audit(data, "inventory_adjusted", "variant", found.variant.sku, `${delta > 0 ? "+" : ""}${delta}: ${reason}`); return row; }); send(response, 201, result); return true;
+        const input = await body(request); const result = await change(env, (data) => { const found = findVariant(data, input.sku); const delta = Number(input.delta); const reason = String(input.reason || "").trim(); if (!found) throw Object.assign(new Error("SKU not found."), { statusCode: 404 }); if (!Number.isInteger(delta) || delta === 0 || Math.abs(delta) > 10000) throw Object.assign(new Error("Stock change must be a non-zero whole number."), { statusCode: 400 }); if (found.variant.stock + delta < 0) throw Object.assign(new Error("Stock cannot go below zero."), { statusCode: 400 }); if (reason.length < 5) throw Object.assign(new Error("Add a reason (at least 5 characters)."), { statusCode: 400 }); found.variant.stock += delta; found.product.stock = found.product.variants.reduce((sum, item) => sum + item.stock, 0); const row = { id: randomBytes(8).toString("hex"), sku: found.variant.sku, delta, reason, actor: "Store owner", createdAt: now() }; data.inventoryTransactions.unshift(row); audit(data, "inventory_adjusted", "variant", found.variant.sku, `${delta > 0 ? "+" : ""}${delta}: ${reason}`); return row; }); send(response, 201, result); return true;
       }
       if (adminPath === "/import" && method === "POST") {
         const input = await body(request); if (!Array.isArray(input.rows) || !["create", "upsert"].includes(input.mode)) { send(response, 400, { error: "Choose create or update, and include CSV rows." }); return true; }
-        const result = await change((data) => { const created = []; const updated = []; const errors = []; input.rows.slice(0, 1000).forEach((row, index) => { try { const incoming = { ...row, status: row.status || "draft", variants: Array.isArray(row.variants) ? row.variants : [{ sku: row.sku, pack: row.pack || "1 pack", pricePaise: Number(row.pricePaise), mrpPaise: Number(row.mrpPaise), stock: Number(row.stock) }] }; const existing = data.products.find((p) => p.variants.some((v) => v.sku === String(incoming.variants[0]?.sku || "").toUpperCase())); if (existing) { if (input.mode !== "upsert") throw new Error("SKU already exists; select update after reviewing."); Object.assign(existing, cleanProduct(incoming, existing, data)); updated.push(existing.sku); audit(data, "product_import_updated", "product", existing.id, existing.sku); } else { const product = cleanProduct(incoming, null, data); data.products.push(product); created.push(product.sku); audit(data, "product_import_created", "product", product.id, product.sku); } } catch (error) { errors.push({ row: index + 2, error: error.message }); } }); return { created, updated, errors }; }); send(response, 200, result); return true;
+        const result = await change(env, (data) => { const created = []; const updated = []; const errors = []; input.rows.slice(0, 1000).forEach((row, index) => { try { const incoming = { ...row, status: row.status || "draft", variants: Array.isArray(row.variants) ? row.variants : [{ sku: row.sku, pack: row.pack || "1 pack", pricePaise: Number(row.pricePaise), mrpPaise: Number(row.mrpPaise), stock: Number(row.stock) }] }; const existing = data.products.find((p) => p.variants.some((v) => v.sku === String(incoming.variants[0]?.sku || "").toUpperCase())); if (existing) { if (input.mode !== "upsert") throw new Error("SKU already exists; select update after reviewing."); Object.assign(existing, cleanProduct(incoming, existing, data)); updated.push(existing.sku); audit(data, "product_import_updated", "product", existing.id, existing.sku); } else { const product = cleanProduct(incoming, null, data); data.products.push(product); created.push(product.sku); audit(data, "product_import_created", "product", product.id, product.sku); } } catch (error) { errors.push({ row: index + 2, error: error.message }); } }); return { created, updated, errors }; }); send(response, 200, result); return true;
       }
       if (adminPath === "/orders" && method === "GET") {
-        const data = await state(); let orders = data.orders;
+        const data = await state(env); let orders = data.orders;
         const status = url.searchParams.get("status") || "";
         const q = (url.searchParams.get("q") || "").trim().toLowerCase();
         if (status) orders = orders.filter((order) => order.status === status);
@@ -500,10 +565,10 @@ export async function handleSandboxRequest(request, response, pathname) {
         send(response, 200, { items: orders.slice((page - 1) * limit, page * limit).map(publicOrder), total, page, limit, pages: Math.max(1, Math.ceil(total / limit)) }); return true;
       }
       const orderRoute = adminPath.match(/^\/orders\/([^/]+)$/);
-      if (orderRoute && method === "GET") { const data = await state(); const order = data.orders.find((item) => item.orderNumber === decodeURIComponent(orderRoute[1])); if (!order) send(response, 404, { error: "Order not found." }); else send(response, 200, publicOrder(order)); return true; }
+      if (orderRoute && method === "GET") { const data = await state(env); const order = data.orders.find((item) => item.orderNumber === decodeURIComponent(orderRoute[1])); if (!order) send(response, 404, { error: "Order not found." }); else send(response, 200, publicOrder(order)); return true; }
       if (orderRoute && method === "PATCH") {
         const input = await body(request);
-        const result = await change((data) => {
+        const result = await change(env, (data) => {
           const order = data.orders.find((item) => item.orderNumber === decodeURIComponent(orderRoute[1]));
           if (!order) throw Object.assign(new Error("Order not found."), { statusCode: 404 });
           const allowed = { sandbox_pending: ["confirmed", "cancelled"], confirmed: ["packing", "cancelled"], packing: ["shipped", "cancelled"], shipped: ["delivered", "returned"], delivered: ["returned"], returned: ["refund_recorded"], expired: [], cancelled: [], refund_recorded: [] };
@@ -539,13 +604,13 @@ export async function handleSandboxRequest(request, response, pathname) {
         send(response, 200, result); return true;
       }
       if (adminPath === "/settings" && (method === "GET" || method === "PATCH")) {
-        if (method === "GET") { const data = await state(); const collections = deriveCollections(data.products, data.categories, data.brands, true); send(response, 200, { settings: data.settings, categories: collections.categories, brands: collections.brands, serviceAreas: data.serviceAreas, coupons: data.coupons }); return true; }
-        const input = await body(request); const rawDomain = Object.hasOwn(input, "publicDomain") ? String(input.publicDomain || "").trim() : String((await state()).settings?.publicDomain || ""); let publicDomain = ""; if (rawDomain) { let parsed; try { parsed = new URL(rawDomain); } catch { send(response, 400, { error: "Public website domain must be a full URL such as https://agroseed.in." }); return true; } if (!["http:", "https:"].includes(parsed.protocol) || parsed.username || parsed.password || parsed.pathname !== "/" || parsed.search || parsed.hash) { send(response, 400, { error: "Enter only the public site base URL, such as https://agroseed.in, without a path." }); return true; } publicDomain = parsed.origin; } const result = await change((data) => { data.settings ||= {}; data.settings = { ...data.settings, storeName: String(input.storeName || data.settings.storeName || "AgroSeed").slice(0, 80), publicDomain, supportEmail: Object.hasOwn(input, "supportEmail") ? String(input.supportEmail || "").trim().slice(0, 160) : String(data.settings.supportEmail || ""), supportPhone: Object.hasOwn(input, "supportPhone") ? String(input.supportPhone || "").trim().slice(0, 40) : String(data.settings.supportPhone || ""), language: ["en", "hi"].includes(input.language) ? input.language : (data.settings.language || "en") }; for (const field of ["storeAbout", "supportDetails", "businessDetails", "homeHeroEyebrow", "homeHeroHeadline", "homeHeroBody", "homeHeroNote", "homeHeroPrimaryCta", "deliveryRules", "codPolicy", "cancellationReturnsRules", "shippingReturnsPolicy", "privacyPolicy", "termsPolicy", "productUseNotice"]) if (Object.hasOwn(input, field)) data.settings[field] = String(input[field] || "").trim().slice(0, 20000); if (Array.isArray(input.categories)) data.categories = normalizeTaxonomy(input.categories, "Categories"); if (Array.isArray(input.brands)) data.brands = normalizeTaxonomy(input.brands, "Brands"); audit(data, "store_settings_updated", "settings", "store", "Store details and editable copy updated"); return data.settings; }); send(response, 200, result); return true;
+        if (method === "GET") { const data = await state(env); const collections = deriveCollections(data.products, data.categories, data.brands, true); send(response, 200, { settings: data.settings, categories: collections.categories, brands: collections.brands, serviceAreas: data.serviceAreas, coupons: data.coupons }); return true; }
+        const input = await body(request); const rawDomain = Object.hasOwn(input, "publicDomain") ? String(input.publicDomain || "").trim() : String((await state(env)).settings?.publicDomain || ""); let publicDomain = ""; if (rawDomain) { let parsed; try { parsed = new URL(rawDomain); } catch { send(response, 400, { error: "Public website domain must be a full URL such as https://agroseed.in." }); return true; } if (!["http:", "https:"].includes(parsed.protocol) || parsed.username || parsed.password || parsed.pathname !== "/" || parsed.search || parsed.hash) { send(response, 400, { error: "Enter only the public site base URL, such as https://agroseed.in, without a path." }); return true; } publicDomain = parsed.origin; } const result = await change(env, (data) => { data.settings ||= {}; data.settings = { ...data.settings, storeName: String(input.storeName || data.settings.storeName || "AgroSeed").slice(0, 80), publicDomain, supportEmail: Object.hasOwn(input, "supportEmail") ? String(input.supportEmail || "").trim().slice(0, 160) : String(data.settings.supportEmail || ""), supportPhone: Object.hasOwn(input, "supportPhone") ? String(input.supportPhone || "").trim().slice(0, 40) : String(data.settings.supportPhone || ""), language: ["en", "hi"].includes(input.language) ? input.language : (data.settings.language || "en") }; for (const field of ["storeAbout", "supportDetails", "businessDetails", "homeHeroEyebrow", "homeHeroHeadline", "homeHeroBody", "homeHeroNote", "homeHeroPrimaryCta", "deliveryRules", "codPolicy", "cancellationReturnsRules", "shippingReturnsPolicy", "privacyPolicy", "termsPolicy", "productUseNotice"]) if (Object.hasOwn(input, field)) data.settings[field] = String(input[field] || "").trim().slice(0, 20000); if (Array.isArray(input.categories)) data.categories = normalizeTaxonomy(input.categories, "Categories"); if (Array.isArray(input.brands)) data.brands = normalizeTaxonomy(input.brands, "Brands"); audit(data, "store_settings_updated", "settings", "store", "Store details and editable copy updated"); return data.settings; }); send(response, 200, result); return true;
       }
       const taxonomyRoute = adminPath.match(/^\/catalog\/(category|brand)\/([^/]+)$/);
       if (taxonomyRoute && method === "PATCH") {
         const input = await body(request);
-        const result = await change((data) => {
+        const result = await change(env, (data) => {
           const key = taxonomyRoute[1] === "category" ? "categories" : "brands";
           const derived = deriveCollections(data.products, data.categories, data.brands, true)[key];
           const rows = (data[key]?.length ? data[key] : derived).map((item) => ({ ...item }));
@@ -565,30 +630,30 @@ export async function handleSandboxRequest(request, response, pathname) {
         });
         send(response, 200, result); return true;
       }
-      if (adminPath === "/coupons" && method === "GET") { const data = await state(); send(response, 200, { items: data.coupons }); return true; }
-      if (adminPath === "/coupons" && method === "POST") { const input = await body(request); const result = await change((data) => { const code = String(input.code || "").trim().toUpperCase(); const value = Number(input.value); const maxUses = input.maxUses === "" || input.maxUses === undefined ? null : Number(input.maxUses); const minimum = input.minSubtotal === "" || input.minSubtotal === undefined ? 0 : Number(input.minSubtotal); if (!/^[A-Z0-9_-]{3,20}$/.test(code) || !["percent", "flat"].includes(input.type) || !Number.isFinite(value) || value <= 0 || (input.type === "percent" && value > 100)) throw Object.assign(new Error("Check promotion code and discount value."), { statusCode: 400 }); if (maxUses !== null && (!Number.isInteger(maxUses) || maxUses < 1 || maxUses > 1000000)) throw Object.assign(new Error("Maximum uses must be a positive whole number."), { statusCode: 400 }); if (!Number.isFinite(minimum) || minimum < 0) throw Object.assign(new Error("Minimum order amount cannot be negative."), { statusCode: 400 }); if (input.expiresAt && !/^\d{4}-\d{2}-\d{2}$/.test(input.expiresAt)) throw Object.assign(new Error("Enter a valid expiration date."), { statusCode: 400 }); if (data.coupons.some((c) => c.code === code)) throw Object.assign(new Error("That code already exists."), { statusCode: 409 }); const item = { id: randomBytes(6).toString("hex"), code, type: input.type, value: input.type === "flat" ? Math.round(value * 100) : Math.round(value), minSubtotalPaise: Math.round(minimum * 100), maxUses, usesCount: 0, active: true, expiresAt: input.expiresAt || null, createdAt: now() }; data.coupons.push(item); audit(data, "coupon_created", "coupon", item.id, code); return item; }); send(response, 201, result); return true; }
+      if (adminPath === "/coupons" && method === "GET") { const data = await state(env); send(response, 200, { items: data.coupons }); return true; }
+      if (adminPath === "/coupons" && method === "POST") { const input = await body(request); const result = await change(env, (data) => { const code = String(input.code || "").trim().toUpperCase(); const value = Number(input.value); const maxUses = input.maxUses === "" || input.maxUses === undefined ? null : Number(input.maxUses); const minimum = input.minSubtotal === "" || input.minSubtotal === undefined ? 0 : Number(input.minSubtotal); if (!/^[A-Z0-9_-]{3,20}$/.test(code) || !["percent", "flat"].includes(input.type) || !Number.isFinite(value) || value <= 0 || (input.type === "percent" && value > 100)) throw Object.assign(new Error("Check promotion code and discount value."), { statusCode: 400 }); if (maxUses !== null && (!Number.isInteger(maxUses) || maxUses < 1 || maxUses > 1000000)) throw Object.assign(new Error("Maximum uses must be a positive whole number."), { statusCode: 400 }); if (!Number.isFinite(minimum) || minimum < 0) throw Object.assign(new Error("Minimum order amount cannot be negative."), { statusCode: 400 }); if (input.expiresAt && !/^\d{4}-\d{2}-\d{2}$/.test(input.expiresAt)) throw Object.assign(new Error("Enter a valid expiration date."), { statusCode: 400 }); if (data.coupons.some((c) => c.code === code)) throw Object.assign(new Error("That code already exists."), { statusCode: 409 }); const item = { id: randomBytes(6).toString("hex"), code, type: input.type, value: input.type === "flat" ? Math.round(value * 100) : Math.round(value), minSubtotalPaise: Math.round(minimum * 100), maxUses, usesCount: 0, active: true, expiresAt: input.expiresAt || null, createdAt: now() }; data.coupons.push(item); audit(data, "coupon_created", "coupon", item.id, code); return item; }); send(response, 201, result); return true; }
       const couponRoute = adminPath.match(/^\/coupons\/([^/]+)$/);
-      if (couponRoute && method === "PATCH") { const input = await body(request); const result = await change((data) => { const item = data.coupons.find((row) => row.id === couponRoute[1]); if (!item) throw Object.assign(new Error("Promotion not found."), { statusCode: 404 }); item.active = input.active === true || input.active === "true"; audit(data, "coupon_status_changed", "coupon", item.id, item.active ? "activated" : "paused"); return item; }); send(response, 200, result); return true; }
-      if (couponRoute && method === "DELETE") { await change((data) => { data.coupons = data.coupons.filter((item) => item.id !== couponRoute[1]); audit(data, "coupon_deleted", "coupon", couponRoute[1], "Promotion removed"); }); send(response, 200, { ok: true }); return true; }
-      if (adminPath === "/service-areas" && method === "GET") { const data = await state(); send(response, 200, { items: data.serviceAreas }); return true; }
-      if (adminPath === "/service-areas" && method === "POST") { const input = await body(request); const result = await change((data) => { const pincode = String(input.pincode || "").trim(); if (!/^\d{6}$/.test(pincode)) throw Object.assign(new Error("PIN code must have 6 digits."), { statusCode: 400 }); if (data.serviceAreas.some((area) => area.pincode === pincode)) throw Object.assign(new Error("That PIN code is already configured."), { statusCode: 409 }); const area = { id: randomBytes(6).toString("hex"), pincode, city: String(input.city || "").slice(0, 80), feePaise: Math.max(0, Math.round(Number(input.feeRupees || 0) * 100)), estimate: String(input.estimate || "").slice(0, 80), active: true }; data.serviceAreas.push(area); audit(data, "service_area_added", "service-area", area.id, pincode); return area; }); send(response, 201, result); return true; }
+      if (couponRoute && method === "PATCH") { const input = await body(request); const result = await change(env, (data) => { const item = data.coupons.find((row) => row.id === couponRoute[1]); if (!item) throw Object.assign(new Error("Promotion not found."), { statusCode: 404 }); item.active = input.active === true || input.active === "true"; audit(data, "coupon_status_changed", "coupon", item.id, item.active ? "activated" : "paused"); return item; }); send(response, 200, result); return true; }
+      if (couponRoute && method === "DELETE") { await change(env, (data) => { data.coupons = data.coupons.filter((item) => item.id !== couponRoute[1]); audit(data, "coupon_deleted", "coupon", couponRoute[1], "Promotion removed"); }); send(response, 200, { ok: true }); return true; }
+      if (adminPath === "/service-areas" && method === "GET") { const data = await state(env); send(response, 200, { items: data.serviceAreas }); return true; }
+      if (adminPath === "/service-areas" && method === "POST") { const input = await body(request); const result = await change(env, (data) => { const pincode = String(input.pincode || "").trim(); if (!/^\d{6}$/.test(pincode)) throw Object.assign(new Error("PIN code must have 6 digits."), { statusCode: 400 }); if (data.serviceAreas.some((area) => area.pincode === pincode)) throw Object.assign(new Error("That PIN code is already configured."), { statusCode: 409 }); const area = { id: randomBytes(6).toString("hex"), pincode, city: String(input.city || "").slice(0, 80), feePaise: Math.max(0, Math.round(Number(input.feeRupees || 0) * 100)), estimate: String(input.estimate || "").slice(0, 80), active: true }; data.serviceAreas.push(area); audit(data, "service_area_added", "service-area", area.id, pincode); return area; }); send(response, 201, result); return true; }
       const areaRoute = adminPath.match(/^\/service-areas\/([^/]+)$/);
-      if (areaRoute && method === "DELETE") { await change((data) => { data.serviceAreas = data.serviceAreas.filter((item) => item.id !== areaRoute[1]); audit(data, "service_area_removed", "service-area", areaRoute[1], "PIN code removed"); }); send(response, 200, { ok: true }); return true; }
-      if (adminPath === "/support" && method === "GET") { const data = await state(); send(response, 200, { items: data.supportRequests }); return true; }
+      if (areaRoute && method === "DELETE") { await change(env, (data) => { data.serviceAreas = data.serviceAreas.filter((item) => item.id !== areaRoute[1]); audit(data, "service_area_removed", "service-area", areaRoute[1], "PIN code removed"); }); send(response, 200, { ok: true }); return true; }
+      if (adminPath === "/support" && method === "GET") { const data = await state(env); send(response, 200, { items: data.supportRequests }); return true; }
       const supportRoute = adminPath.match(/^\/support\/([^/]+)$/);
-      if (supportRoute && method === "PATCH") { const input = await body(request); const result = await change((data) => { const item = data.supportRequests.find((row) => row.id === supportRoute[1]); if (!item) throw Object.assign(new Error("Request not found."), { statusCode: 404 }); item.status = input.status === "resolved" ? "resolved" : "in_progress"; audit(data, "support_request_updated", "support", item.id, item.status); return item; }); send(response, 200, result); return true; }
+      if (supportRoute && method === "PATCH") { const input = await body(request); const result = await change(env, (data) => { const item = data.supportRequests.find((row) => row.id === supportRoute[1]); if (!item) throw Object.assign(new Error("Request not found."), { statusCode: 404 }); item.status = input.status === "resolved" ? "resolved" : "in_progress"; audit(data, "support_request_updated", "support", item.id, item.status); return item; }); send(response, 200, result); return true; }
       if (adminPath === "/reports" && method === "GET") {
         const from = url.searchParams.get("from") || "", to = url.searchParams.get("to") || "";
         if ((from && !/^\d{4}-\d{2}-\d{2}$/.test(from)) || (to && !/^\d{4}-\d{2}-\d{2}$/.test(to))) { send(response, 400, { error: "Report dates must use YYYY-MM-DD." }); return true; }
         const start = from ? Date.parse(`${from}T00:00:00Z`) : 0; const end = to ? Date.parse(`${to}T23:59:59.999Z`) : Date.now();
         if (start > end) { send(response, 400, { error: "Start date must be before end date." }); return true; }
-        const data = await state(); const orders = data.orders.filter((order) => { const time = Date.parse(order.createdAt); return time >= start && time <= end && order.status !== "cancelled"; });
+        const data = await state(env); const orders = data.orders.filter((order) => { const time = Date.parse(order.createdAt); return time >= start && time <= end && order.status !== "cancelled"; });
         const products = new Map();
         for (const order of orders) for (const line of order.items || []) { const row = products.get(line.sku) || { sku: line.sku, name: line.nameEn || line.name, quantity: 0, revenuePaise: 0 }; row.quantity += line.quantity; row.revenuePaise += line.lineTotalPaise || line.unitPricePaise * line.quantity; products.set(line.sku, row); }
         const lowStock = data.products.flatMap((product) => product.variants.map((variant) => ({ sku: variant.sku, product: product.nameEn, pack: variant.pack, stock: variant.stock }))).filter((variant) => variant.stock <= 5).sort((a, b) => a.stock - b.stock);
         send(response, 200, { from: from || null, to: to || null, orderCount: orders.length, revenuePaise: orders.reduce((sum, order) => sum + order.totalPaise, 0), lowStock, topProducts: [...products.values()].sort((a, b) => b.revenuePaise - a.revenuePaise).slice(0, 20) }); return true;
       }
-      if (adminPath === "/audit" && method === "GET") { const data = await state(); send(response, 200, { items: data.audit.slice(0, 500), inventory: data.inventoryTransactions.slice(0, 500) }); return true; }
+      if (adminPath === "/audit" && method === "GET") { const data = await state(env); send(response, 200, { items: data.audit.slice(0, 500), inventory: data.inventoryTransactions.slice(0, 500) }); return true; }
       send(response, 404, { error: "Staff API route not found." }); return true;
     }
     if (pathname.startsWith("/api/")) { send(response, 404, { error: "API route not found." }); return true; }

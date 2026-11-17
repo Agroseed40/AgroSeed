@@ -10,6 +10,8 @@ pnpm-debug.log*
 Thumbs.db
 dist/
 .amplify-hosting/
+.wrangler/
+cloudflare/static-assets.generated.mjs
 storage/sandbox-store.json
 storage/sandbox-store.json.tmp
 storage/uploads/

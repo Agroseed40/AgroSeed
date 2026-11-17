@@ -1,14 +1,23 @@
 name = "agroseed-preview"
 main = "cloudflare/worker.mjs"
 compatibility_date = "2026-11-17"
+compatibility_flags = ["nodejs_compat"]
 workers_dev = true
-
-[assets]
-directory = "./public"
-binding = "ASSETS"
-run_worker_first = true
 
 [[d1_databases]]
 binding = "DB"
 database_name = "agroseed-db"
 database_id = "ab36e4bc-a937-4494-934f-61796460280d"
+migrations_dir = "migrations"
+
+[vars]
+AGROSEED_DEMO_MODE = "true"
+AGROSEED_ALLOW_SANDBOX_ORDERS = "true"
+ACCESS_AUTH_DOMAIN = "bold-sunset-9e00.cloudflareaccess.com"
+ACCESS_CUSTOMER_AUD = "b87f6d829f3dfbae45012515228a68e58b8d08323655ffa25af173488f70f129"
+
+[observability]
+enabled = true
+
+[observability.traces]
+enabled = true

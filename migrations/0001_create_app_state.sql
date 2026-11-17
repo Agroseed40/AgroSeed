@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS agroseed_app_state (
+  state_id INTEGER PRIMARY KEY CHECK (state_id = 1),
+  revision INTEGER NOT NULL DEFAULT 0,
+  payload TEXT NOT NULL,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

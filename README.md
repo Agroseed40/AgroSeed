@@ -1,47 +1,49 @@
 # AgroSeed
 
-AgroSeed is a Node.js storefront and API for an Indian farm-supplies store. The storefront and backend run in one process. The build creates a GoDaddy preview ZIP and an AWS Amplify server deployment bundle.
+AgroSeed is a farm-supplies storefront and API running on Cloudflare Workers with Cloudflare D1. This branch deploys a public preview on `workers.dev` and preserves the existing storefront design.
 
-## Run the preview
+## Live preview
+
+- Storefront: <https://agroseed-preview.durgesh5757g.workers.dev>
+- Staff console: <https://agroseed-preview.durgesh5757g.workers.dev/admin>
+- D1 database: `agroseed-db`
+
+This is a preview environment. It uses a sample catalog and demo prices. Checkout creates only a sandbox order; no payment provider or real checkout is enabled.
+
+## Local development
 
 Requires Node.js 22 or newer.
 
-```powershell
+```sh
 npm ci
-$env:NODE_ENV = "development"
-$env:AGROSEED_DEMO_MODE = "true"
-$env:AGROSEED_ADMIN_PASSWORD = "set-a-local-password"
 npm run dev
 ```
 
-Open `http://localhost:3000`. The storefront is `/`, the staff preview is `/admin`, and the server health endpoint is `/health`. Preview data is written to `storage/sandbox-store.json`.
+Wrangler serves the Worker locally, normally at `http://localhost:8787`. Local development uses a local D1 database. To apply the checked-in migrations locally:
 
-## Project layout
-
-```text
-public/             Browser pages, styles, scripts, and static images
-backend/            API handlers, seed catalog, and database migrations
-config/             Runtime feature configuration
-storage/            Local preview data and uploaded files (ignored by Git)
-scripts/            Build checks, GoDaddy packaging, and database migration
-docs/project/       E-commerce plan, development roadmap, task backlog
-docs/development/   Local sandbox instructions
-docs/               Deployment and delivery documentation
-server.mjs          HTTP server entry point
-package.json        Runtime commands and dependencies
+```sh
+npx wrangler d1 migrations apply agroseed-db --local
 ```
 
-## Useful commands
+For local staff-console testing, create a `.dev.vars` file with a non-production `AGROSEED_ADMIN_PASSWORD`. Do not commit that file. `.env.example` lists the preview flags.
 
-```powershell
-npm run build                 # Check files and create GoDaddy and Amplify deployment packages
-npm run migrate:customers     # Apply customer-account tables to configured MySQL
+## Deploy
+
+Authenticate the Wrangler CLI to Cloudflare, then run:
+
+```sh
+npm run build
+npm run deploy
 ```
 
-AWS Amplify uses the `amplify.yml` build settings and deploys `.amplify-hosting/`. Its current entrypoint runs the site as a public preview with temporary data. The app needs a production database and approved service credentials before live customer workflows can be enabled. See [AWS Amplify deployment notes](docs/aws-amplify-deployment.md).
+The Worker uses the `DB` D1 binding in `wrangler.toml`. The production staff password is a Worker secret, set with `npx wrangler secret put AGROSEED_ADMIN_PASSWORD`.
 
-Customer sign-in, sign-up, and account recovery use Amazon Cognito Managed Login. The `/account/login` route redirects to Cognito, and successful sign-in returns to the storefront home page. Configure the user-pool domain, public app client, and callback URL using [AWS Amplify deployment notes](docs/aws-amplify-deployment.md). Saved carts and addresses use MySQL when configured; Cognito manages customer identity and credentials.
+## Authentication and storage
 
-The obsolete one-page mock storefront, mock catalog page, fake sponsored cards, brand demo graphics, and debug menu have been retired from the app and GoDaddy package. Their source is retained under `docs/archive/retired-prototype/`. The sample seed catalog and sandbox API remain because the current app still uses them when `AGROSEED_DEMO_MODE=true`; replace those services with the live catalog and order database before removing them.
+Customer account API routes use Cloudflare Access with email one-time PIN authentication. The Access application protects `/api/v1/customer/*`; the storefront remains public. Customer profiles, saved carts, addresses, staff sessions, login limits, and app state are stored in D1.
 
+R2 is not configured. Product image uploads are not part of this preview; the existing storefront assets are bundled into the Worker.
 
+## Before a real launch
+
+Replace the sample catalog and prices, verify customer email-code sign-in and account flows, set business and fulfilment policies, configure durable image storage if needed, and run a complete checkout verification with a payment provider. Keep real checkout disabled until those checks are complete.

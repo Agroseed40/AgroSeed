@@ -1,21 +1,4 @@
 import { randomBytes, createHash, timingSafeEqual } from "node:crypto";
-import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import seedProducts from "./seed/products.json" with { type: "json" };
-import { allowSandboxOrders, demoMode } from "../config/features.mjs";
-
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const storageRoot = path.resolve(process.env.AGROSEED_STORAGE_DIR || path.join(root, "storage"));
-const storeFile = path.join(storageRoot, "sandbox-store.json");
-const seedFile = path.join(root, "backend", "seed", "products.json");
-const sessions = new Map();
-const loginAttempts = new Map();
-const orderPattern = /^AS-SBX-[A-Z0-9-]{8,40}$/;
-let statePromise;
-let writes = Promise.resolve();
-
-const clone = (value) => JSON.parse(JSON.stringify(value));
 const slug = (value) => String(value || "product").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "product";
 const now = () => new Date().toISOString();
 const hash = (value) => createHash("sha256").update(value).digest("hex");
@@ -31,8 +14,8 @@ function normalizeProduct(product, index) {
   const cleanVariants = variants.map((v, i) => ({
     sku: String(v.sku || `${product.sku || `SB-${index + 1}`}-${i + 1}`).trim().toUpperCase(),
     pack: String(v.pack || v.label || "1 pack").trim(),
-    pricePaise: Math.max(0, Math.round(Number(v.pricePaise ?? v.price * 100 ?? 0))),
-    mrpPaise: Math.max(0, Math.round(Number(v.mrpPaise ?? v.mrp * 100 ?? v.pricePaise ?? 0))),
+    pricePaise: Math.max(0, Math.round(Number(v.pricePaise ?? (v.price == null ? 0 : v.price * 100)))),
+    mrpPaise: Math.max(0, Math.round(Number(v.mrpPaise ?? (v.mrp == null ? v.pricePaise ?? 0 : v.mrp * 100)))),
     stock: Math.max(0, Math.floor(Number(v.stock ?? product.stock ?? 0))),
     reserved: Math.max(0, Math.floor(Number(v.reserved ?? 0))),
     active: v.active !== false
@@ -61,103 +44,34 @@ function normalizeProduct(product, index) {
   };
 }
 
-function initialState(seed = seedProducts) {
-  return {
-    products: (seed.products || seed).map(normalizeProduct),
-    orders: [], carts: {}, serviceAreas: [], coupons: [], audit: [], inventoryTransactions: [], supportRequests: [],
-    settings: { storeName: "AgroSeed", currency: "INR" }
-  };
-}
+const emptyState = () => ({
+  products: [], serviceAreas: [], coupons: [], audit: [], inventoryTransactions: [],
+  supportRequests: [], settings: { storeName: "AgroSeed", currency: "INR" }
+});
 
 async function readState(env) {
-  if (env?.DB) {
-    let row = await env.DB.prepare("SELECT payload FROM agroseed_app_state WHERE state_id = 1").first();
-    if (!row) {
-      const initial = initialState();
-      await env.DB.prepare("INSERT OR IGNORE INTO agroseed_app_state (state_id, revision, payload) VALUES (1, 0, ?)").bind(JSON.stringify(initial)).run();
-      row = await env.DB.prepare("SELECT payload FROM agroseed_app_state WHERE state_id = 1").first();
-    }
-    if (!row?.payload) throw new Error("AgroSeed D1 state is missing.");
-    const state = JSON.parse(row.payload);
-    state.products = (state.products || []).map(normalizeProduct);
-    return Object.assign({ orders: [], carts: {}, serviceAreas: [], coupons: [], audit: [], inventoryTransactions: [], supportRequests: [], settings: {} }, state);
-  }
-  await mkdir(path.dirname(storeFile), { recursive: true });
-  try {
-    const state = JSON.parse(await readFile(storeFile, "utf8"));
-    const legacyReservationSkus = new Set((state.products || []).flatMap((product) => (product.variants || []).filter((variant) => !Object.hasOwn(variant, "reserved")).map((variant) => String(variant.sku || "").toUpperCase())));
-    state.products = (state.products || []).map(normalizeProduct);
-    if (legacyReservationSkus.size) {
-      const held = new Map();
-      for (const order of state.orders || []) if (["sandbox_pending", "confirmed", "packing"].includes(order.status)) for (const line of order.items || []) held.set(String(line.sku).toUpperCase(), (held.get(String(line.sku).toUpperCase()) || 0) + Number(line.quantity || 0));
-      for (const product of state.products) for (const variant of product.variants) if (legacyReservationSkus.has(variant.sku)) { const quantity = held.get(variant.sku) || 0; variant.stock += quantity; variant.reserved = quantity; }
-      for (const product of state.products) product.stock = product.variants.reduce((sum, variant) => sum + variant.stock, 0);
-    }
-    return Object.assign({ orders: [], carts: {}, serviceAreas: [], coupons: [], audit: [], inventoryTransactions: [], supportRequests: [], settings: {} }, state);
-  } catch (error) {
-    if (error.code !== "ENOENT") throw error;
-    const initial = initialState(JSON.parse(await readFile(seedFile, "utf8")));
-    const temp = `${storeFile}.tmp`;
-    await writeFile(temp, `${JSON.stringify(initial, null, 2)}\n`, "utf8");
-    await rename(temp, storeFile);
-    return initial;
-  }
+  const row = await env.DB.prepare("SELECT revision, payload FROM agroseed_app_state WHERE state_id = 1").first();
+  if (!row) throw new Error("Apply the AgroSeed D1 migrations before starting the Worker.");
+  const data = Object.assign(emptyState(), JSON.parse(row.payload));
+  data.products = data.products.map(normalizeProduct);
+  return { data, revision: row.revision };
 }
 
-function state(env) {
-  if (env?.DB) return readState(env);
-  statePromise ??= readState();
-  return statePromise;
+async function state(env) {
+  return (await readState(env)).data;
 }
 
 async function change(env, mutator) {
-  if (env?.DB) {
-    for (let attempt = 0; attempt < 5; attempt++) {
-      await state(env);
-      const row = await env.DB.prepare("SELECT revision, payload FROM agroseed_app_state WHERE state_id = 1").first();
-      if (!row?.payload) throw new Error("AgroSeed D1 state is missing.");
-      const current = JSON.parse(row.payload);
-      const result = await mutator(current);
-      const write = await env.DB.prepare("UPDATE agroseed_app_state SET payload = ?, revision = revision + 1, updated_at = CURRENT_TIMESTAMP WHERE state_id = 1 AND revision = ?")
-        .bind(JSON.stringify(current), row.revision).run();
-      if (write.meta?.changes === 1) return result;
-    }
-    throw Object.assign(new Error("The store changed during this request. Please try again."), { statusCode: 409 });
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const { data, revision } = await readState(env);
+    const result = mutator(data);
+    const write = await env.DB.prepare(
+      "UPDATE agroseed_app_state SET payload = ?, revision = revision + 1, updated_at = CURRENT_TIMESTAMP WHERE state_id = 1 AND revision = ?"
+    ).bind(JSON.stringify(data), revision).run();
+    if (write.meta.changes === 1) return result;
+    await new Promise(resolve => setTimeout(resolve, 8 * (attempt + 1) + Math.random() * 12));
   }
-  let result;
-  const operation = writes.then(async () => {
-    const current = await state();
-    result = await mutator(current);
-    await mkdir(path.dirname(storeFile), { recursive: true });
-    const temp = `${storeFile}.tmp`;
-    await writeFile(temp, `${JSON.stringify(current, null, 2)}\n`, "utf8");
-    await rename(temp, storeFile);
-  });
-  writes = operation.catch(() => {});
-  await operation;
-  return result;
-}
-
-async function expireSandboxReservations(env) {
-  const data = await state(env);
-  const cutoff = Date.now() - 24 * 60 * 60 * 1000;
-  if (!data.orders.some((order) => order.status === "sandbox_pending" && Date.parse(order.createdAt) < cutoff)) return;
-  await change(env, (current) => {
-    for (const order of current.orders) {
-      if (order.status !== "sandbox_pending" || Date.parse(order.createdAt) >= cutoff) continue;
-      order.status = "expired"; order.updatedAt = now();
-      order.statusHistory ||= [{ status: "sandbox_pending", actor: "Preview customer", at: order.createdAt }];
-      order.statusHistory.push({ status: "expired", actor: "Preview system", at: now() });
-      for (const line of order.items || []) {
-        const found = findVariant(current, line.sku);
-        if (!found) continue;
-        found.variant.stock += line.quantity; found.variant.reserved = Math.max(0, found.variant.reserved - line.quantity);
-        found.product.stock = found.product.variants.reduce((sum, variant) => sum + variant.stock, 0);
-        current.inventoryTransactions.unshift({ id: randomBytes(8).toString("hex"), sku: line.sku, delta: line.quantity, reason: "Expired preview reservation", orderNumber: order.orderNumber, actor: "Preview system", createdAt: now() });
-      }
-      audit(current, "sandbox_reservation_expired", "order", order.orderNumber, "Preview reservation released after 24 hours");
-    }
-  });
+  throw Object.assign(new Error("The store changed during this request. Please try again."), { statusCode: 409 });
 }
 
 function send(response, status, value, extra = {}) {
@@ -183,17 +97,11 @@ function cookieValue(request, name) {
 
 async function adminSession(request, env) {
   const raw = cookieValue(request, "agroseed_admin");
-  if (env?.DB && raw) {
-    const tokenHash = hash(raw);
-    const session = await env.DB.prepare("SELECT role, csrf_token, expires_at FROM agroseed_admin_sessions WHERE token_hash = ? AND datetime(expires_at) > CURRENT_TIMESTAMP")
-      .bind(tokenHash).first();
-    if (session) return { role: session.role, csrf: session.csrf_token };
-    await env.DB.prepare("DELETE FROM agroseed_admin_sessions WHERE token_hash = ?").bind(tokenHash).run();
-    return null;
-  }
-  const session = raw ? sessions.get(hash(raw)) : null;
-  if (!session || session.expires < Date.now()) { if (raw) sessions.delete(hash(raw)); return null; }
-  return session;
+  if (!raw) return null;
+  const session = await env.DB.prepare(
+    "SELECT role, csrf_token FROM agroseed_admin_sessions WHERE token_hash = ? AND datetime(expires_at) > CURRENT_TIMESTAMP"
+  ).bind(hash(raw)).first();
+  return session ? { role: session.role, csrf: session.csrf_token } : null;
 }
 
 async function requireAdmin(request, response, mutating = false, env) {
@@ -278,6 +186,7 @@ function cleanProduct(input, previous, data) {
     const reserved = Math.max(0, Math.floor(Number(previous?.variants?.find((item) => item.sku === sku)?.reserved ?? variant.reserved ?? 0)));
     return { sku, pack, pricePaise, mrpPaise, stock, reserved, active: variant.active !== false };
   });
+  if (new Set(variants.map(v => v.sku)).size !== variants.length) throw Object.assign(new Error("Variant SKUs must be unique."), { statusCode: 400 });
   if (previous?.variants?.some((variant) => variant.reserved > 0 && !variants.some((next) => next.sku === variant.sku))) throw Object.assign(new Error("A pack with active orders cannot be removed or renamed until its reservations are released."), { statusCode: 409 });
   const status = ["draft", "review", "published", "archived"].includes(input.status) ? input.status : "draft";
   let productSlug = slug(input.slug || nameEn);
@@ -339,80 +248,94 @@ function calculate(data, input) {
   return { items: lines, subtotalPaise, discountPaise, shippingPaise, totalPaise: subtotalPaise - discountPaise + shippingPaise, taxStatus: "not_configured", couponCode: coupon?.code || null, serviceArea: area || null, serviceability: data.serviceAreas.length ? (area ? "configured" : "not_checked") : "preview_only" };
 }
 
-function publicOrder(order) {
-  const { lookupTokenHash, ...visible } = order;
-  return visible;
-}
 function catalogProduct(product) { return { ...product, variants: product.variants.map(({ reserved, ...variant }) => variant) }; }
 
-async function readAndSend(request, response, status, data) { send(response, status, data); }
 
-export async function handleSandboxRequest(request, response, pathname, env) {
+export async function handleStoreRequest(request, response, pathname, env) {
   if (!pathname.startsWith("/api/")) return false;
-  const demoEnabled = env?.DB ? String(env.AGROSEED_DEMO_MODE || "true") !== "false" : demoMode && process.env.NODE_ENV !== "production";
   try {
     const url = new URL(request.url || "/", "http://localhost");
     const method = request.method;
-    if (pathname === "/api/v1/health" && method === "GET") { send(response, 200, { status: "ok", service: "agroseed-preview-api", mode: demoEnabled ? "local-sandbox" : "disabled" }); return true; }
-    if (pathname === "/api/v1/storefront/settings" && method === "GET") { if (!demoEnabled) { send(response, 503, { error: "Store settings are available in local preview only." }); return true; } const data = await state(env), allowed = ["storeName", "publicDomain", "storeAbout", "supportEmail", "supportPhone", "supportDetails", "businessDetails", "homeHeroEyebrow", "homeHeroHeadline", "homeHeroBody", "homeHeroNote", "homeHeroPrimaryCta", "deliveryRules", "codPolicy", "cancellationReturnsRules", "shippingReturnsPolicy", "privacyPolicy", "termsPolicy", "productUseNotice"]; send(response, 200, Object.fromEntries(allowed.map((key) => [key, String(data.settings?.[key] || "")]))); return true; }
-    if (pathname === "/api/v1/storefront/offers" && method === "GET") { if (!demoEnabled) { send(response, 503, { error: "Store offers are available in local preview only." }); return true; } const data = await state(env), time = Date.now(), items = (data.coupons || []).filter((item) => item.active !== false && (!item.expiresAt || time <= Date.parse(`${item.expiresAt}T23:59:59Z`)) && (!item.maxUses || (Number(item.usesCount) || 0) < item.maxUses)).map(({ code, type, value, minSubtotalPaise, expiresAt }) => ({ code, type, value, minSubtotalPaise: Number(minSubtotalPaise) || 0, expiresAt: expiresAt || null })); send(response, 200, { items }); return true; }
+    if (pathname === "/api/v1/storefront/settings" && method === "GET") { const data = await state(env), allowed = ["storeName", "publicDomain", "storeAbout", "supportEmail", "supportPhone", "supportDetails", "businessDetails", "homeHeroEyebrow", "homeHeroHeadline", "homeHeroBody", "homeHeroNote", "homeHeroPrimaryCta", "deliveryRules", "codPolicy", "cancellationReturnsRules", "shippingReturnsPolicy", "privacyPolicy", "termsPolicy", "productUseNotice"]; send(response, 200, Object.fromEntries(allowed.map((key) => [key, String(data.settings?.[key] || "")]))); return true; }
+    if (pathname === "/api/v1/storefront/offers" && method === "GET") { const data = await state(env), time = Date.now(), items = (data.coupons || []).filter((item) => item.active !== false && (!item.expiresAt || time <= Date.parse(`${item.expiresAt}T23:59:59Z`)) && (!item.maxUses || (Number(item.usesCount) || 0) < item.maxUses)).map(({ code, type, value, minSubtotalPaise, expiresAt }) => ({ code, type, value, minSubtotalPaise: Number(minSubtotalPaise) || 0, expiresAt: expiresAt || null })); send(response, 200, { items }); return true; }
     if (pathname === "/api/v1/cart" && (method === "GET" || method === "PUT")) {
-      if (!demoEnabled) { send(response, 503, { error: "Guest carts are available in local preview only." }); return true; }
       const id = String(request.headers["x-agroseed-cart-id"] || "").trim();
       if (!/^[a-f0-9]{32}$/i.test(id)) { send(response, 400, { error: "A valid guest cart ID is required." }); return true; }
       const key = hash(id);
-      if (method === "GET") { const data = await state(env); send(response, 200, data.carts?.[key] || { items: [], updatedAt: null }); return true; }
-      const input = await body(request, 12_000);
-      if (!Array.isArray(input.items) || input.items.length > 50) { send(response, 400, { error: "A guest cart can contain at most 50 lines." }); return true; }
+      if (method === "GET") {
+        const row = await env.DB.prepare("SELECT items, updated_at FROM agroseed_guest_carts WHERE id = ? AND updated_at > datetime('now', '-30 days')").bind(key).first();
+        send(response, 200, row ? { items: JSON.parse(row.items), updatedAt: row.updated_at.replace(" ", "T") + "Z" } : { items: [], updatedAt: null });
+        return true;
+      }
+      const input = await body(request, 12000);
+      if (!Array.isArray(input?.items) || input.items.length > 50) {
+        send(response, 400, { error: "A guest cart can contain at most 50 lines." }); return true;
+      }
+      const data = await state(env);
       const quantities = new Map();
-      for (const item of input.items) { const sku = String(item?.sku || "").trim().toUpperCase(), quantity = Number(item?.quantity), found = findVariant(await state(env), sku); if (!found || found.product.status !== "published" || !found.variant.active) { send(response, 409, { error: `Product ${sku || "item"} is no longer available.` }); return true; } if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) { send(response, 400, { error: "Cart quantities must be whole numbers from 1 to 99." }); return true; } const total = (quantities.get(sku) || 0) + quantity; if (total > 99) { send(response, 400, { error: "A SKU can have at most 99 items in the cart." }); return true; } quantities.set(sku, total); }
-      const result = await change(env, (data) => { data.carts ||= {}; const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000; for (const [cartKey, cartValue] of Object.entries(data.carts)) if (Date.parse(cartValue.updatedAt || "") < cutoff) delete data.carts[cartKey]; const cart = { items: [...quantities].map(([sku, quantity]) => ({ sku, quantity })), updatedAt: now() }; data.carts[key] = cart; return cart; }); send(response, 200, result); return true;
+      for (const item of input.items) {
+        const sku = String(item?.sku || "").trim().toUpperCase();
+        const quantity = Number(item?.quantity);
+        const found = findVariant(data, sku);
+        if (!found || found.product.status !== "published" || !found.variant.active) {
+          send(response, 409, { error: "A product in this cart is no longer available." }); return true;
+        }
+        const total = (quantities.get(sku) || 0) + quantity;
+        if (!Number.isInteger(quantity) || quantity < 1 || total > 99) {
+          send(response, 400, { error: "Cart quantities must be whole numbers from 1 to 99." }); return true;
+        }
+        quantities.set(sku, total);
+      }
+      const items = [...quantities].map(([sku, quantity]) => ({ sku, quantity }));
+      const updatedAt = now();
+      const storedAt = updatedAt.slice(0, -1).replace("T", " ");
+      await env.DB.prepare(`INSERT INTO agroseed_guest_carts (id, items, updated_at) VALUES (?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET items = excluded.items, updated_at = excluded.updated_at`)
+        .bind(key, JSON.stringify(items), storedAt).run();
+      await env.DB.prepare("DELETE FROM agroseed_guest_carts WHERE id IN (SELECT id FROM agroseed_guest_carts WHERE updated_at <= datetime('now', '-30 days') ORDER BY updated_at LIMIT 20)").run();
+      send(response, 200, { items, updatedAt }); return true;
     }
     if (pathname === "/api/v1/admin/session" && method === "POST") {
-      if (!demoEnabled) { send(response, 503, { error: "The staff demo is available in local development only." }); return true; }
       const ip = request.socket.remoteAddress || "unknown";
       const attemptKey = hash(ip);
-      const savedAttempt = env?.DB ? await env.DB.prepare("SELECT count, window_started FROM agroseed_admin_login_attempts WHERE ip_hash = ?").bind(attemptKey).first() : null;
-      const attempt = savedAttempt ? { count: Number(savedAttempt.count) || 0, since: Number(savedAttempt.window_started) || Date.now() } : (loginAttempts.get(ip) || { count: 0, since: Date.now() });
+      const savedAttempt = await env.DB.prepare("SELECT count, window_started FROM agroseed_admin_login_attempts WHERE ip_hash = ?").bind(attemptKey).first();
+      const attempt = savedAttempt ? { count: Number(savedAttempt.count) || 0, since: Number(savedAttempt.window_started) || Date.now() } : { count: 0, since: Date.now() };
       if (Date.now() - attempt.since > 15 * 60_000) { attempt.count = 0; attempt.since = Date.now(); }
       if (attempt.count >= 8) { send(response, 429, { error: "Too many sign-in attempts. Try again in 15 minutes." }); return true; }
       const input = await body(request, 2048);
-      const configured = String(env?.AGROSEED_ADMIN_PASSWORD || process.env.AGROSEED_ADMIN_PASSWORD || "");
-      if (!configured) { send(response, 503, { error: env?.DB ? "The staff sign-in password is not configured on this Worker." : "Set AGROSEED_ADMIN_PASSWORD in your local environment to enable the staff demo." }); return true; }
+      const configured = String(env.AGROSEED_ADMIN_PASSWORD || "");
+      if (!configured) { send(response, 503, { error: "The staff password is not configured." }); return true; }
       const supplied = Buffer.from(String(input.password || "")); const expected = Buffer.from(configured);
       const match = supplied.length === expected.length && timingSafeEqual(supplied, expected);
       if (!match) {
         attempt.count++;
-        if (env?.DB) await env.DB.prepare(`INSERT INTO agroseed_admin_login_attempts (ip_hash, count, window_started) VALUES (?, ?, ?)
+        await env.DB.prepare(`INSERT INTO agroseed_admin_login_attempts (ip_hash, count, window_started) VALUES (?, ?, ?)
           ON CONFLICT(ip_hash) DO UPDATE SET count = excluded.count, window_started = excluded.window_started, updated_at = CURRENT_TIMESTAMP`)
           .bind(attemptKey, attempt.count, attempt.since).run();
-        else loginAttempts.set(ip, attempt);
+
         send(response, 401, { error: "That password did not match." }); return true;
       }
-      if (env?.DB) await env.DB.prepare("DELETE FROM agroseed_admin_login_attempts WHERE ip_hash = ?").bind(attemptKey).run();
-      else loginAttempts.delete(ip);
+      await env.DB.prepare("DELETE FROM agroseed_admin_login_attempts WHERE ip_hash = ?").bind(attemptKey).run();
+
       const raw = randomBytes(32).toString("base64url");
       const csrf = randomBytes(24).toString("base64url");
       const expires = Date.now() + 8 * 60 * 60_000;
-      if (env?.DB) await env.DB.prepare("INSERT INTO agroseed_admin_sessions (token_hash, role, csrf_token, expires_at) VALUES (?, ?, ?, ?)")
+      await env.DB.prepare("INSERT INTO agroseed_admin_sessions (token_hash, role, csrf_token, expires_at) VALUES (?, ?, ?, ?)")
         .bind(hash(raw), "Owner", csrf, new Date(expires).toISOString()).run();
-      else sessions.set(hash(raw), { role: "Owner", csrf, expires });
-      const secure = env?.DB ? "; Secure" : "";
+
+      const secure = request.socket.encrypted ? "; Secure" : "";
       send(response, 200, { user: { name: "Store owner", role: "Owner" }, csrf }, { "Set-Cookie": `agroseed_admin=${encodeURIComponent(raw)}; HttpOnly; SameSite=Strict; Path=/api/v1/admin; Max-Age=28800${secure}` }); return true;
     }
     if (pathname === "/api/v1/admin/session" && (method === "GET" || method === "DELETE")) {
-      if (!demoEnabled) { send(response, 503, { error: "Staff demo is disabled." }); return true; }
       const session = await requireAdmin(request, response, method === "DELETE", env); if (!session) return true;
       if (method === "DELETE") {
         const tokenHash = hash(cookieValue(request, "agroseed_admin"));
-        if (env?.DB) await env.DB.prepare("DELETE FROM agroseed_admin_sessions WHERE token_hash = ?").bind(tokenHash).run();
-        else sessions.delete(tokenHash);
+        await env.DB.prepare("DELETE FROM agroseed_admin_sessions WHERE token_hash = ?").bind(tokenHash).run();
+
         send(response, 200, { ok: true }, { "Set-Cookie": "agroseed_admin=; HttpOnly; SameSite=Strict; Path=/api/v1/admin; Max-Age=0" });
       }
       else send(response, 200, { user: { name: "Store owner", role: session.role || "Owner" }, csrf: session.csrf }); return true;
     }
-    if (!demoEnabled) { send(response, 503, { error: "Preview workflows are disabled. Connect the approved production services before launch." }); return true; }
-    await expireSandboxReservations(env);
 
     if (pathname === "/api/v1/products" && method === "GET") {
       const data = await state(env);
@@ -440,7 +363,7 @@ export async function handleSandboxRequest(request, response, pathname, env) {
     const service = pathname.match(/^\/api\/v1\/serviceability\/(\d{6})$/);
     if (service && method === "GET") {
       const data = await state(env); const area = data.serviceAreas.find((item) => item.pincode === service[1] && item.active !== false);
-      send(response, 200, { available: data.serviceAreas.length ? Boolean(area) : false, configured: data.serviceAreas.length > 0, previewOnly: !data.serviceAreas.length, area: area || null }); return true;
+      send(response, 200, { available: data.serviceAreas.length ? Boolean(area) : false, configured: data.serviceAreas.length > 0, area: area || null }); return true;
     }
     if (pathname === "/api/v1/support/requests" && method === "POST") {
       const input = await body(request, 12_000);
@@ -452,83 +375,19 @@ export async function handleSandboxRequest(request, response, pathname, env) {
       const input = await body(request, 16_000); const data = await state(env);
       const quote = calculate(data, input);
       if (input.address && !/^\d{6}$/.test(String(input.address.pincode || ""))) { send(response, 400, { error: "Enter a valid 6-digit PIN code." }); return true; }
-      send(response, 200, { ...quote, expiresAt: new Date(Date.now() + 5 * 60_000).toISOString(), currency: "INR", previewOnly: true }); return true;
+      send(response, 200, { ...quote, currency: "INR" }); return true;
     }
     if (pathname === "/api/v1/orders" && method === "POST") {
-      const input = await body(request, 24_000);
-      if (!(env?.DB ? String(env.AGROSEED_ALLOW_SANDBOX_ORDERS || "true") !== "false" : allowSandboxOrders)) { send(response, 503, { error: "Sandbox order creation is turned off." }); return true; }
-      if (!input.items && input.productId) input.items = [{ sku: String(input.productId), quantity: input.quantity || 1 }];
-      if (Array.isArray(input.items)) {
-        const current = await state(env);
-        input.items = input.items.map((item) => {
-          if (item.sku || !item.productId) return item;
-          const product = current.products.find((p) => p.id === Number(item.productId));
-          return { ...item, sku: product?.variants?.[0]?.sku || String(item.productId) };
-        });
-      }
-      if (input.address) {
-        for (const field of ["name", "phone", "line1", "city", "state", "pincode"]) if (!String(input.address[field] || "").trim()) { send(response, 400, { error: `Complete the ${field} field.` }); return true; }
-        if (!/^[6-9]\d{9}$/.test(String(input.address.phone).replace(/\D/g, ""))) { send(response, 400, { error: "Enter a valid Indian mobile number." }); return true; }
-        if (!/^\d{6}$/.test(String(input.address.pincode))) { send(response, 400, { error: "Enter a valid 6-digit PIN code." }); return true; }
-      }
-      const order = await change(env, (data) => {
-        const quote = calculate(data, input);
-        for (const line of quote.items) {
-          const found = findVariant(data, line.sku); found.variant.stock -= line.quantity; found.variant.reserved += line.quantity;
-          found.product.stock = found.product.variants.reduce((sum, item) => sum + item.stock, 0);
-          data.inventoryTransactions.unshift({ id: randomBytes(8).toString("hex"), sku: line.sku, delta: -line.quantity, reason: "Sandbox order reservation", orderNumber: "pending", actor: "Preview customer", createdAt: now() });
-        }
-        if (quote.couponCode) { const coupon = data.coupons.find((item) => item.code === quote.couponCode); if (coupon) coupon.usesCount = (Number(coupon.usesCount) || 0) + 1; }
-        const number = `AS-SBX-${Date.now().toString(36).toUpperCase()}-${randomBytes(3).toString("hex").toUpperCase()}`;
-        const token = randomBytes(32).toString("base64url");
-        const createdAt = now();
-        const created = { orderNumber: number, status: "sandbox_pending", paymentStatus: "not_connected", paymentMethod: "not_connected", items: quote.items, subtotalPaise: quote.subtotalPaise, discountPaise: quote.discountPaise, shippingPaise: quote.shippingPaise, totalPaise: quote.totalPaise, taxStatus: quote.taxStatus, serviceability: quote.serviceability, address: input.address || null, couponCode: quote.couponCode, lookupTokenHash: hash(token), createdAt, reservationExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), statusHistory: [{ status: "sandbox_pending", actor: input.address?.name || "Preview customer", at: createdAt }], previewOnly: true };
-        data.orders.unshift(created);
-        data.inventoryTransactions.filter((row) => row.orderNumber === "pending").forEach((row) => { row.orderNumber = number; });
-        audit(data, "sandbox_order_created", "order", number, "Preview order created and stock reserved");
-        return { ...publicOrder(created), lookupToken: token };
-      });
-      send(response, 201, order); return true;
+      send(response, 503, { error: "Order placement is currently unavailable." }); return true;
     }
-    const customerOrder = pathname.match(/^\/api\/v1\/orders\/([^/]+)$/);
-    if (customerOrder && method === "GET") {
-      const number = decodeURIComponent(customerOrder[1]);
-      if (!orderPattern.test(number)) { send(response, 404, { error: "Order not found." }); return true; }
-      const credential = String(request.headers.authorization || "").replace(/^Bearer\s+/i, "");
-      const data = await state(env); const order = data.orders.find((item) => item.orderNumber === number);
-      const credentialHash = Buffer.from(hash(credential)); const storedHash = Buffer.from(order?.lookupTokenHash || "");
-      if (!order || !credential || credentialHash.length !== storedHash.length || !timingSafeEqual(credentialHash, storedHash)) { send(response, 404, { error: "Order not found. Check the number and private tracking code." }); return true; }
-      send(response, 200, publicOrder(order)); return true;
-    }
-
     if (pathname.startsWith("/api/v1/admin/")) {
-      if (!demoEnabled) { send(response, 503, { error: "The staff preview is disabled." }); return true; }
       const mutating = method !== "GET";
       const session = await requireAdmin(request, response, mutating, env); if (!session) return true;
       const adminPath = pathname.slice("/api/v1/admin".length);
       if (!canAccessAdminPath(session.role || "Owner", adminPath)) { send(response, 403, { error: "Your staff role cannot access this area." }); return true; }
-      if (adminPath === "/media" && method === "POST") {
-        if (env?.DB) { send(response, 503, { error: "Image uploads are disabled until an R2 storage binding is configured." }); return true; }
-        const input = await body(request, 6 * 1024 * 1024);
-        const match = String(input.data || "").match(/^data:(image\/(?:png|jpeg|webp));base64,([A-Za-z0-9+/=]+)$/);
-        if (!match) { send(response, 400, { error: "Choose a PNG, JPG, or WebP image." }); return true; }
-        const buffer = Buffer.from(match[2], "base64");
-        if (!buffer.length || buffer.length > 4 * 1024 * 1024) { send(response, 413, { error: "Images must be smaller than 4 MB." }); return true; }
-        const isPng = buffer.length > 8 && buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
-        const isJpeg = buffer.length > 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[buffer.length - 2] === 0xff && buffer[buffer.length - 1] === 0xd9;
-        const isWebp = buffer.length > 12 && buffer.toString("ascii", 0, 4) === "RIFF" && buffer.toString("ascii", 8, 12) === "WEBP";
-        if (!(isPng || isJpeg || isWebp)) { send(response, 400, { error: "The image contents do not match PNG, JPG, or WebP format." }); return true; }
-        const extension = isPng ? "png" : isJpeg ? "jpg" : "webp";
-        const name = `${randomBytes(18).toString("hex")}.${extension}`;
-        const directory = path.join(storageRoot, "uploads");
-        await mkdir(directory, { recursive: true });
-        await writeFile(path.join(directory, name), buffer, { flag: "wx" });
-        await change(env, (data) => audit(data, "image_uploaded", "image", name, "Product image uploaded to the local sandbox"));
-        send(response, 201, { url: `/uploads/${name}`, filename: name }); return true;
-      }
       if (adminPath === "/overview" && method === "GET") {
         const data = await state(env); const published = data.products.filter((p) => p.status === "published").length;
-        send(response, 200, { products: data.products.length, published, drafts: data.products.filter((p) => p.status === "draft" || p.status === "review").length, lowStock: data.products.flatMap((p) => p.variants.map((v) => ({ ...v, product: p.nameEn }))).filter((v) => v.stock <= 5).length, orders: data.orders.length, openOrders: data.orders.filter((o) => !["cancelled", "expired", "delivered", "refund_recorded"].includes(o.status)).length, revenuePaise: data.orders.filter((o) => o.status !== "cancelled").reduce((sum, o) => sum + o.totalPaise, 0), support: data.supportRequests.filter((item) => item.status === "new").length, recentOrders: data.orders.slice(0, 6).map(publicOrder) }); return true;
+        send(response, 200, { products: data.products.length, published, lowStock: data.products.flatMap(p => p.variants).filter(v => v.stock <= 5).length }); return true;
       }
       if (adminPath === "/products" && method === "GET") {
         const data = await state(env); let products = data.products;
@@ -545,7 +404,7 @@ export async function handleSandboxRequest(request, response, pathname, env) {
       const productRoute = adminPath.match(/^\/products\/(\d+)$/);
       if (productRoute && (method === "GET" || method === "PATCH" || method === "DELETE")) {
         if (method === "GET") { const data = await state(env); const product = data.products.find((p) => p.id === Number(productRoute[1])); if (!product) send(response, 404, { error: "Product not found." }); else send(response, 200, product); return true; }
-        const product = await change(async (data) => { const current = data.products.find((p) => p.id === Number(productRoute[1])); if (!current) throw Object.assign(new Error("Product not found."), { statusCode: 404 }); if (method === "DELETE") { current.status = "archived"; current.active = false; current.updatedAt = now(); audit(data, "product_archived", "product", current.id, current.nameEn); return current; } const updated = cleanProduct(await body(request), current, data); Object.assign(current, updated); audit(data, "product_updated", "product", current.id, current.nameEn); return current; }); send(response, 200, product); return true;
+        const input = method === "PATCH" ? await body(request) : null; const product = await change(env, (data) => { const current = data.products.find((p) => p.id === Number(productRoute[1])); if (!current) throw Object.assign(new Error("Product not found."), { statusCode: 404 }); if (method === "DELETE") { current.status = "archived"; current.active = false; current.updatedAt = now(); audit(data, "product_archived", "product", current.id, current.nameEn); return current; } const updated = cleanProduct(input, current, data); Object.assign(current, updated); audit(data, "product_updated", "product", current.id, current.nameEn); return current; }); send(response, 200, product); return true;
       }
       if (adminPath === "/inventory" && method === "GET") { const data = await state(env); send(response, 200, { products: data.products, transactions: data.inventoryTransactions.slice(0, 300) }); return true; }
       if (adminPath === "/inventory" && method === "POST") {
@@ -554,54 +413,6 @@ export async function handleSandboxRequest(request, response, pathname, env) {
       if (adminPath === "/import" && method === "POST") {
         const input = await body(request); if (!Array.isArray(input.rows) || !["create", "upsert"].includes(input.mode)) { send(response, 400, { error: "Choose create or update, and include CSV rows." }); return true; }
         const result = await change(env, (data) => { const created = []; const updated = []; const errors = []; input.rows.slice(0, 1000).forEach((row, index) => { try { const incoming = { ...row, status: row.status || "draft", variants: Array.isArray(row.variants) ? row.variants : [{ sku: row.sku, pack: row.pack || "1 pack", pricePaise: Number(row.pricePaise), mrpPaise: Number(row.mrpPaise), stock: Number(row.stock) }] }; const existing = data.products.find((p) => p.variants.some((v) => v.sku === String(incoming.variants[0]?.sku || "").toUpperCase())); if (existing) { if (input.mode !== "upsert") throw new Error("SKU already exists; select update after reviewing."); Object.assign(existing, cleanProduct(incoming, existing, data)); updated.push(existing.sku); audit(data, "product_import_updated", "product", existing.id, existing.sku); } else { const product = cleanProduct(incoming, null, data); data.products.push(product); created.push(product.sku); audit(data, "product_import_created", "product", product.id, product.sku); } } catch (error) { errors.push({ row: index + 2, error: error.message }); } }); return { created, updated, errors }; }); send(response, 200, result); return true;
-      }
-      if (adminPath === "/orders" && method === "GET") {
-        const data = await state(env); let orders = data.orders;
-        const status = url.searchParams.get("status") || "";
-        const q = (url.searchParams.get("q") || "").trim().toLowerCase();
-        if (status) orders = orders.filter((order) => order.status === status);
-        if (q) orders = orders.filter((order) => [order.orderNumber, order.address?.name, order.address?.phone, order.address?.pincode].join(" ").toLowerCase().includes(q));
-        const total = orders.length; const page = Math.max(1, Number(url.searchParams.get("page")) || 1); const limit = Math.min(100, Math.max(1, Number(url.searchParams.get("limit")) || 20));
-        send(response, 200, { items: orders.slice((page - 1) * limit, page * limit).map(publicOrder), total, page, limit, pages: Math.max(1, Math.ceil(total / limit)) }); return true;
-      }
-      const orderRoute = adminPath.match(/^\/orders\/([^/]+)$/);
-      if (orderRoute && method === "GET") { const data = await state(env); const order = data.orders.find((item) => item.orderNumber === decodeURIComponent(orderRoute[1])); if (!order) send(response, 404, { error: "Order not found." }); else send(response, 200, publicOrder(order)); return true; }
-      if (orderRoute && method === "PATCH") {
-        const input = await body(request);
-        const result = await change(env, (data) => {
-          const order = data.orders.find((item) => item.orderNumber === decodeURIComponent(orderRoute[1]));
-          if (!order) throw Object.assign(new Error("Order not found."), { statusCode: 404 });
-          const allowed = { sandbox_pending: ["confirmed", "cancelled"], confirmed: ["packing", "cancelled"], packing: ["shipped", "cancelled"], shipped: ["delivered", "returned"], delivered: ["returned"], returned: ["refund_recorded"], expired: [], cancelled: [], refund_recorded: [] };
-          if (!allowed[order.status]?.includes(input.status)) throw Object.assign(new Error(`Cannot move an order from ${order.status} to ${input.status}.`), { statusCode: 400 });
-          if (input.status === "cancelled") {
-            for (const line of order.items) {
-              const found = findVariant(data, line.sku); if (!found) continue;
-              found.variant.stock += line.quantity; found.variant.reserved = Math.max(0, found.variant.reserved - line.quantity); found.product.stock = found.product.variants.reduce((sum, variant) => sum + variant.stock, 0);
-              data.inventoryTransactions.unshift({ id: randomBytes(8).toString("hex"), sku: line.sku, delta: line.quantity, reason: "Sandbox cancellation stock release", orderNumber: order.orderNumber, actor: "Store owner", createdAt: now() });
-            }
-          }
-          if (input.status === "shipped") {
-            for (const line of order.items) { const found = findVariant(data, line.sku); if (!found || found.variant.reserved < line.quantity) throw Object.assign(new Error(`The reservation for ${line.sku} is missing or incomplete.`), { statusCode: 409 }); }
-            for (const line of order.items) { const found = findVariant(data, line.sku); found.variant.reserved -= line.quantity; data.inventoryTransactions.unshift({ id: randomBytes(8).toString("hex"), sku: line.sku, delta: 0, reservedDelta: -line.quantity, reason: "Reservation fulfilled at shipment", orderNumber: order.orderNumber, actor: "Store owner", createdAt: now() }); }
-          }
-          if (input.status === "returned") {
-            const reason = String(input.returnReason || "").trim();
-            if (reason.length < 5) throw Object.assign(new Error("Record a return reason of at least 5 characters."), { statusCode: 400 });
-            order.returnRecord = { reason: reason.slice(0, 500), recordedAt: now(), actor: "Store owner" };
-          }
-          if (input.status === "refund_recorded") {
-            const amount = Number(input.refundAmountPaise);
-            if (!Number.isSafeInteger(amount) || amount < 1 || amount > order.totalPaise) throw Object.assign(new Error("Enter a refund amount in paise, between 1 and the order total."), { statusCode: 400 });
-            order.refundRecord = { amountPaise: amount, reference: String(input.refundReference || "").slice(0, 100), recordedAt: now(), actor: "Store owner", previewOnly: true };
-          }
-          if (input.trackingNumber !== undefined) order.trackingNumber = String(input.trackingNumber).trim().slice(0, 80);
-          order.status = input.status; order.updatedAt = now();
-          order.statusHistory ||= [{ status: "sandbox_pending", actor: "Preview customer", at: order.createdAt }];
-          order.statusHistory.push({ status: input.status, actor: "Store owner", at: order.updatedAt, note: String(input.note || "").slice(0, 300) });
-          audit(data, "order_status_changed", "order", order.orderNumber, input.status);
-          return publicOrder(order);
-        });
-        send(response, 200, result); return true;
       }
       if (adminPath === "/settings" && (method === "GET" || method === "PATCH")) {
         if (method === "GET") { const data = await state(env); const collections = deriveCollections(data.products, data.categories, data.brands, true); send(response, 200, { settings: data.settings, categories: collections.categories, brands: collections.brands, serviceAreas: data.serviceAreas, coupons: data.coupons }); return true; }
@@ -642,17 +453,6 @@ export async function handleSandboxRequest(request, response, pathname, env) {
       if (adminPath === "/support" && method === "GET") { const data = await state(env); send(response, 200, { items: data.supportRequests }); return true; }
       const supportRoute = adminPath.match(/^\/support\/([^/]+)$/);
       if (supportRoute && method === "PATCH") { const input = await body(request); const result = await change(env, (data) => { const item = data.supportRequests.find((row) => row.id === supportRoute[1]); if (!item) throw Object.assign(new Error("Request not found."), { statusCode: 404 }); item.status = input.status === "resolved" ? "resolved" : "in_progress"; audit(data, "support_request_updated", "support", item.id, item.status); return item; }); send(response, 200, result); return true; }
-      if (adminPath === "/reports" && method === "GET") {
-        const from = url.searchParams.get("from") || "", to = url.searchParams.get("to") || "";
-        if ((from && !/^\d{4}-\d{2}-\d{2}$/.test(from)) || (to && !/^\d{4}-\d{2}-\d{2}$/.test(to))) { send(response, 400, { error: "Report dates must use YYYY-MM-DD." }); return true; }
-        const start = from ? Date.parse(`${from}T00:00:00Z`) : 0; const end = to ? Date.parse(`${to}T23:59:59.999Z`) : Date.now();
-        if (start > end) { send(response, 400, { error: "Start date must be before end date." }); return true; }
-        const data = await state(env); const orders = data.orders.filter((order) => { const time = Date.parse(order.createdAt); return time >= start && time <= end && order.status !== "cancelled"; });
-        const products = new Map();
-        for (const order of orders) for (const line of order.items || []) { const row = products.get(line.sku) || { sku: line.sku, name: line.nameEn || line.name, quantity: 0, revenuePaise: 0 }; row.quantity += line.quantity; row.revenuePaise += line.lineTotalPaise || line.unitPricePaise * line.quantity; products.set(line.sku, row); }
-        const lowStock = data.products.flatMap((product) => product.variants.map((variant) => ({ sku: variant.sku, product: product.nameEn, pack: variant.pack, stock: variant.stock }))).filter((variant) => variant.stock <= 5).sort((a, b) => a.stock - b.stock);
-        send(response, 200, { from: from || null, to: to || null, orderCount: orders.length, revenuePaise: orders.reduce((sum, order) => sum + order.totalPaise, 0), lowStock, topProducts: [...products.values()].sort((a, b) => b.revenuePaise - a.revenuePaise).slice(0, 20) }); return true;
-      }
       if (adminPath === "/audit" && method === "GET") { const data = await state(env); send(response, 200, { items: data.audit.slice(0, 500), inventory: data.inventoryTransactions.slice(0, 500) }); return true; }
       send(response, 404, { error: "Staff API route not found." }); return true;
     }
@@ -660,7 +460,8 @@ export async function handleSandboxRequest(request, response, pathname, env) {
     return false;
   } catch (error) {
     if (response.headersSent || response.destroyed) return true;
-    send(response, error.statusCode || 500, { error: error.statusCode ? error.message : "Sandbox API error" });
+    if (!error.statusCode) console.error("Store request failed", { route: pathname, message: String(error.message).slice(0, 200) });
+    send(response, error.statusCode || 500, { error: error.statusCode ? error.message : "Store service is temporarily unavailable" });
     return true;
   }
 }

@@ -46,7 +46,9 @@ async function verifyAccess(request, env) {
     const claims = decodeJsonSegment(parts[1]);
     if (header.alg !== "RS256" || !header.kid || claims.iss !== `https://${domain}`) return null;
     if (!Array.isArray(claims.aud) || !claims.aud.includes(audience)) return null;
-    if (!claims.sub || !claims.email || claims.exp * 1000 <= Date.now()) return null;
+    if (typeof claims.sub !== "string" || !claims.sub || typeof claims.email !== "string" || !claims.email ||
+        !Number.isFinite(claims.exp) || claims.exp * 1000 <= Date.now() ||
+        (claims.nbf != null && (!Number.isFinite(claims.nbf) || claims.nbf * 1000 > Date.now()))) return null;
     const key = (await accessKeys(domain)).find((item) => item.kid === header.kid && item.kty === "RSA");
     if (!key) return null;
     const cryptoKey = await crypto.subtle.importKey("jwk", key, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["verify"]);
@@ -76,15 +78,31 @@ async function customerRecord(db, identity) {
 }
 
 async function body(request, maxBytes = 16 * 1024) {
-  const raw = await request.text();
-  if (new TextEncoder().encode(raw).byteLength > maxBytes) throw Object.assign(new Error("Request body is too large."), { status: 413 });
-  try { return JSON.parse(raw); } catch { throw Object.assign(new Error("Request must contain valid JSON."), { status: 400 }); }
+  const reader = request.body?.getReader();
+  const decoder = new TextDecoder();
+  let raw = "", bytes = 0;
+  try {
+    while (reader) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      bytes += value.byteLength;
+      if (bytes > maxBytes) throw Object.assign(new Error("Request body is too large."), { status: 413 });
+      raw += decoder.decode(value, { stream: true });
+    }
+  } finally {
+    if (reader) { await reader.cancel().catch(() => {}); reader.releaseLock(); }
+  }
+  try {
+    const input = JSON.parse(raw + decoder.decode());
+    if (!input || typeof input !== "object" || Array.isArray(input)) throw new Error();
+    return input;
+  } catch { throw Object.assign(new Error("Request must contain a JSON object."), { status: 400 }); }
 }
 
 function sameOrigin(request) {
   const origin = request.headers.get("origin");
   if (!origin) return true;
-  try { return new URL(origin).host === new URL(request.url).host; } catch { return false; }
+  try { return new URL(origin).origin === new URL(request.url).origin; } catch { return false; }
 }
 
 function normalizeCartItems(items) {
@@ -93,7 +111,7 @@ function normalizeCartItems(items) {
   for (const item of items) {
     const sku = String(item?.sku || "").trim().toUpperCase();
     const quantity = Number(item?.quantity);
-    if (!/^[A-Z0-9_-]{1,64}$/.test(sku) || !Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
+    if (!/^[A-Z0-9._-]{1,64}$/.test(sku) || !Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
       throw Object.assign(new Error("Each cart item needs a valid SKU and a quantity from 1 to 99."), { status: 400 });
     }
     const total = (quantities.get(sku) || 0) + quantity;
@@ -122,7 +140,15 @@ export async function handleCustomerAuth(request, env, pathname) {
   if (pathname === "/api/v1/customer/login" && request.method === "GET") {
     const identity = await verifyAccess(request, env);
     if (!identity) return json({ error: "Complete Cloudflare email-code sign-in and try again." }, 401);
-    return Response.redirect(new URL("/account?access=1", request.url), 302);
+    try {
+      await customerRecord(env.DB, identity);
+      return new Response(null, { status: 302, headers: {
+        Location: new URL("/account?access=1", request.url).href, "Cache-Control": "no-store"
+      } });
+    } catch (error) {
+      console.error("Customer provisioning failed", { message: String(error?.message || "unknown").slice(0, 300) });
+      return json({ error: "Your account could not be opened. Try signing in again." }, 503);
+    }
   }
 
   const identity = await verifyAccess(request, env);
@@ -139,8 +165,6 @@ export async function handleCustomerAuth(request, env, pathname) {
     if (method === "GET" && pathname === "/api/v1/customer/session") {
       return json({ customer: { id: profile.id, email: profile.email, name: profile.name, phone: null, authProvider: "cloudflare_access" }, csrf: profile.csrf_token });
     }
-
-    if (method === "DELETE" && pathname === "/api/v1/customer/session") return json({ ok: true });
 
     if (method === "GET" && pathname === "/api/v1/customer/cart") {
       const row = await env.DB.prepare("SELECT items_json FROM agroseed_customer_carts WHERE customer_id = ?").bind(identity.id).first();
@@ -160,16 +184,20 @@ export async function handleCustomerAuth(request, env, pathname) {
 
     if (method === "POST" && pathname === "/api/v1/customer/cart/merge") {
       const guestItems = normalizeCartItems((await body(request)).items);
-      const row = await env.DB.prepare("SELECT items_json, guest_snapshot_json FROM agroseed_customer_carts WHERE customer_id = ?").bind(identity.id).first();
-      let accountItems = [], previousGuest = [];
-      try { accountItems = JSON.parse(row?.items_json || "[]"); } catch {}
-      try { previousGuest = JSON.parse(row?.guest_snapshot_json || "[]"); } catch {}
-      const items = mergeCartItems(accountItems, guestItems, previousGuest);
-      await env.DB.prepare(`INSERT INTO agroseed_customer_carts (customer_id, items_json, guest_snapshot_json, updated_at)
-        VALUES (?, ?, ?, CURRENT_TIMESTAMP)
-        ON CONFLICT(customer_id) DO UPDATE SET items_json = excluded.items_json, guest_snapshot_json = excluded.guest_snapshot_json, updated_at = CURRENT_TIMESTAMP`)
-        .bind(identity.id, JSON.stringify(items), JSON.stringify(guestItems)).run();
-      return json({ items });
+      const snapshot = JSON.stringify(guestItems);
+      await env.DB.prepare(`INSERT OR IGNORE INTO agroseed_customer_carts
+        (customer_id, items_json, guest_snapshot_json) VALUES (?, '[]', '[]')`).bind(identity.id).run();
+      for (let attempt = 0; attempt < 5; attempt++) {
+        const row = await env.DB.prepare("SELECT items_json, guest_snapshot_json FROM agroseed_customer_carts WHERE customer_id = ?").bind(identity.id).first();
+        const items = mergeCartItems(JSON.parse(row.items_json), guestItems, JSON.parse(row.guest_snapshot_json));
+        if (items.length > 50) return json({ error: "Remove items from your bag before combining carts." }, 409);
+        const result = await env.DB.prepare(`UPDATE agroseed_customer_carts
+          SET items_json = ?, guest_snapshot_json = ?, updated_at = CURRENT_TIMESTAMP
+          WHERE customer_id = ? AND items_json = ? AND guest_snapshot_json = ?`)
+          .bind(JSON.stringify(items), snapshot, identity.id, row.items_json, row.guest_snapshot_json).run();
+        if (result.meta.changes === 1) return json({ items });
+      }
+      return json({ error: "Your bag changed during syncing. Try again." }, 409);
     }
 
     if (method === "GET" && pathname === "/api/v1/customer/addresses") {
@@ -214,7 +242,7 @@ export async function handleCustomerAuth(request, env, pathname) {
 
     return json({ error: "Customer route not found." }, 404);
   } catch (error) {
-    if (error.status) return json({ error: error.message }, error.status);
+    if (error.statusCode) return json({ error: error.message }, error.statusCode);
     console.error("Customer API error", { message: String(error?.message || "unknown").slice(0, 300) });
     return json({ error: "Customer account service is temporarily unavailable." }, 503);
   }

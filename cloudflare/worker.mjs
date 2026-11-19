@@ -1,15 +1,15 @@
-import { handleSandboxRequest } from "../backend/sandbox.mjs";
+import { handleStoreRequest } from "../backend/store.mjs";
 import { handleCustomerAuth } from "./customer-auth.mjs";
 import { staticAssets } from "./static-assets.generated.mjs";
 
 const appRoutes = new Set([
   "/", "/shop", "/cart", "/checkout", "/search", "/help", "/contact", "/shipping-returns",
-  "/privacy", "/terms", "/guides", "/track-order"
+  "/privacy", "/terms"
 ]);
 
 function isAppRoute(pathname) {
   return appRoutes.has(pathname) ||
-    /^\/(category|brand|product|order|guides)\/[^/]+$/.test(pathname) ||
+    /^\/(category|brand|product)\/[^/]+$/.test(pathname) ||
     /^\/account(?:\/(?:login|orders|addresses))?$/.test(pathname) ||
     /^\/admin(?:\/.*)?$/.test(pathname);
 }
@@ -51,7 +51,17 @@ function requestAdapter(request) {
     },
     async *[Symbol.asyncIterator]() {
       if (!request.body) return;
-      yield Buffer.from(await request.arrayBuffer());
+      const reader = request.body.getReader();
+      try {
+        for (;;) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          yield Buffer.from(value);
+        }
+      } finally {
+        await reader.cancel().catch(() => {});
+        reader.releaseLock();
+      }
     }
   };
 }
@@ -96,11 +106,18 @@ export default {
     const pathname = url.pathname.replace(/\/+$/, "") || "/";
 
     if (pathname === "/health" || pathname === "/api/v1/health") {
-      return json({ status: "ok", service: "agroseed-worker", database: "D1", mode: "preview" });
+      try {
+        await env.DB.prepare("SELECT revision FROM agroseed_app_state WHERE state_id = 1").first("revision").then(revision => {
+          if (revision == null) throw new Error("Store state unavailable");
+        });
+        return json({ status: "ok" });
+      } catch {
+        return json({ status: "unavailable" }, 503);
+      }
     }
 
     if (pathname === "/runtime-config.js") {
-      const runtimeConfig = { mode: "preview", demoMode: true, checkoutEnabled: false, customerAuthEnabled: Boolean(env.ACCESS_CUSTOMER_AUD) };
+      const runtimeConfig = { customerAuthEnabled: Boolean(env.ACCESS_AUTH_DOMAIN && env.ACCESS_CUSTOMER_AUD) };
       return new Response(
         `window.AGROSEED_CONFIG = Object.freeze(${JSON.stringify(runtimeConfig)});`,
         { headers: { "Content-Type": "text/javascript; charset=utf-8", "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" } }
@@ -111,6 +128,13 @@ export default {
       return Response.redirect(new URL("/api/v1/customer/login", url), 302);
     }
 
+    if (pathname === "/account/logout" && request.method === "GET") {
+      if (!env.ACCESS_AUTH_DOMAIN) return Response.redirect(new URL("/account", url), 302);
+      const logout = new URL("/cdn-cgi/access/logout", url);
+      logout.searchParams.set("returnTo", new URL("/account", url).href);
+      return Response.redirect(logout, 302);
+    }
+
     if (pathname.startsWith("/api/v1/customer/")) {
       return await handleCustomerAuth(request, env, pathname) || json({ error: "Customer API route not found." }, 404);
     }
@@ -118,7 +142,7 @@ export default {
     if (pathname.startsWith("/api/")) {
       const req = requestAdapter(request);
       const res = responseAdapter();
-      const handled = await handleSandboxRequest(req, res, pathname, env);
+      const handled = await handleStoreRequest(req, res, pathname, env);
       return handled ? res.toResponse() : json({ error: "API route not found." }, 404);
     }
 

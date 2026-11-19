@@ -3,17 +3,11 @@ node_modules/
 .env.*
 .dev.vars*
 !.env.example
-.npm/
 npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*
 .DS_Store
 Thumbs.db
 dist/
-.amplify-hosting/
 .wrangler/
 cloudflare/static-assets.generated.mjs
-storage/sandbox-store.json
-storage/sandbox-store.json.tmp
-storage/uploads/
-storage/audit-cookie.txt

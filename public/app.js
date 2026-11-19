@@ -109,9 +109,62 @@ function updatePageMetadata(path){
  setMeta("property","og:image",imageUrl);setMeta("property","og:image:alt",imageUrl?(app.querySelector(".detail-image img")?.alt||title):"");setMeta("name","twitter:card",imageUrl?"summary_large_image":"summary");setMeta("name","twitter:image",imageUrl);
 }
 async function home(){
- let data; try{data=await api("/api/v1/products?limit=24");}catch(e){return wrap(`<section class="container page-wrap">${empty("Catalog unavailable",e.message)}</section>`);}
- const cats=data.categories||[];
- return wrap(`<div class="container"><section class="hero"><div class="hero-copy"><p class="eyebrow">${esc(storefrontSettings.homeHeroEyebrow||"AgroSeed")}</p><h1>${esc(storefrontSettings.homeHeroHeadline||"Farm supplies for your season").replace(/\r?\n/g,"<br>")}</h1><p>${esc(storefrontSettings.homeHeroBody||"Find seeds, plant nutrition, crop care, tools and irrigation supplies. Compare pack sizes and prices before adding products to your bag.")}</p><div class="hero-actions"><a class="btn btn-primary" href="/shop">${esc(storefrontSettings.homeHeroPrimaryCta||"Browse the catalog")} <span>↗</span></a><a class="btn btn-secondary" href="/help">Get growing advice</a></div><div class="trust-row"><span>Seeds and farm supplies</span><span>Compare pack sizes and prices</span><span>Hindi & English</span></div></div><div class="hero-art"><div class="sun"></div><div class="field"></div><div class="harvest">🌾</div><div class="hero-tag">${esc(storefrontSettings.homeHeroNote||"Search by product, category or crop need.")}</div></div></section>${offerStrip()}${discountShelf(data.items)}<section class="section"><div class="section-head"><div><p class="eyebrow">FIND YOUR FIELD</p><h2>Shop by category</h2><p>Start with what your crop needs today.</p></div><a class="text-link" href="/shop">Browse everything →</a></div><div class="category-grid">${cats.map(c=>`<a class="category-card" href="/category/${esc(c.slug||slug(c.nameEn))}"><span class="category-icon">${icons[c.nameEn]||"🌾"}</span><b>${esc(language()==="hi"?c.name:c.nameEn)}</b><small>Browse products&nbsp; ↗</small></a>`).join("")||"<p class='muted'>Categories will appear as products are approved.</p>"}</div></section><section class="section"><div class="section-head"><div><p class="eyebrow">FARMER PICKS</p><h2>Farm products</h2><p>Browse products available from AgroSeed.</p></div><a class="text-link" href="/shop">Shop all →</a></div><div class="product-grid">${data.items.map(productCard).join("")||empty("No products listed yet","Check back for new listings.")}</div></section><section class="promo-band"><div><h3>Need a hand choosing?</h3><p>Tell us what you’re growing and we’ll point you to the right place.</p></div><a class="btn btn-secondary" href="/contact">Talk to AgroSeed →</a></section></div>`);
+ const data = await api("/api/v1/products?limit=24").catch(() => null);
+ const products = data?.items || [];
+ const categories = (data?.categories || []).slice(0, 6);
+ const picks = [...products.filter(p => p.featured), ...products.filter(p => !p.featured)].slice(0, 8);
+ const offers = storefrontOffers.slice(0, 3).map(offer => ({
+   eyebrow: say("Current offer", "मौजूदा ऑफ़र"),
+   title: offer.type === "percent" ? `${offer.value}% ${say("off", "की छूट")}` : `${money(offer.value)} ${say("off", "की छूट")}`,
+   text: `${say("Use code", "कोड इस्तेमाल करें")} ${offer.code}`,
+   href: `/shop?coupon=${encodeURIComponent(offer.code)}`, icon: "✳"
+ }));
+ const shortcuts = [
+   { title: say("Browse the catalog", "कैटलॉग देखें"), text: say("Find products for your farm.", "अपने खेत के लिए उत्पाद खोजें।"), href: "/shop", icon: "✿" },
+   { title: say("Search by name", "नाम से खोजें"), text: say("Look up a product, brand or SKU.", "उत्पाद, ब्रांड या SKU खोजें।"), href: "/search", icon: "⌕" },
+   { title: say("Talk to AgroSeed", "AgroSeed से बात करें"), text: say("Get help finding the right supplies.", "ज़रूरी कृषि सामग्री खोजने में मदद लें।"), href: "/contact", icon: "↗" }
+ ];
+ const panels = [...offers, ...shortcuts].slice(0, 3);
+ const featured = panels.map(({eyebrow, title, text, href, icon}) => `
+   <a class="home-panel" href="${esc(href)}">
+     <span class="home-panel-art" aria-hidden="true">${icon}</span>
+     <span class="home-panel-copy">${eyebrow ? `<small>${esc(eyebrow)}</small>` : ""}
+       <strong>${esc(title)}</strong><span>${esc(text)}</span>
+     </span>
+     <span class="home-panel-arrow" aria-hidden="true">↗</span>
+   </a>`).join("");
+ const categoryCards = categories.map(category => `
+   <a class="category-card" href="/category/${encodeURIComponent(category.slug || slug(category.nameEn))}">
+     <span class="category-icon" aria-hidden="true">${icons[category.nameEn] || "🌾"}</span>
+     <b>${esc(language() === "hi" ? category.name : category.nameEn)}</b>
+     <small>${say("Browse products", "उत्पाद देखें")} ↗</small>
+   </a>`).join("");
+ const title = storefrontSettings.homeHeroHeadline || say("Farm supplies for your season", "आपके मौसम के लिए कृषि सामग्री");
+ const intro = storefrontSettings.homeHeroBody || say("Find what your crop needs.", "अपनी फसल की ज़रूरत का सामान खोजें।");
+ return wrap(`
+   <div class="home-ribbon"><div class="container">${esc(storefrontSettings.homeHeroNote || say("For Indian farms", "भारतीय खेतों के लिए"))}</div></div>
+   <div class="container home-content">
+     <section class="home-feature" aria-labelledby="home-title">
+       <div class="home-feature-heading"><div><h1 id="home-title">${esc(title)}</h1><p>${esc(intro)}</p></div>
+       <a href="/shop">${esc(storefrontSettings.homeHeroPrimaryCta || say("Shop all", "सभी उत्पाद"))} ↗</a></div>
+       <div class="home-panels">${featured}</div>
+     </section>
+     ${categories.length ? `<section class="section">
+       <div class="section-head"><div><h2>${say("Start with what you need", "अपनी ज़रूरत से शुरुआत करें")}</h2></div>
+       <a class="text-link" href="/shop">${say("Browse the catalog", "कैटलॉग देखें")} ↗</a></div>
+       <div class="category-grid">${categoryCards}</div>
+     </section>` : ""}
+     <section class="section">
+       <div class="section-head"><div><h2>${say("Farm products", "कृषि उत्पाद")}</h2></div>
+       <a class="text-link" href="/shop">${say("View all products", "सभी उत्पाद देखें")} ↗</a></div>
+       ${picks.length ? `<div class="product-grid">${picks.map(productCard).join("")}</div>` :
+       empty(data ? say("No products listed yet", "अभी कोई उत्पाद सूचीबद्ध नहीं है") : say("Catalog unavailable", "कैटलॉग उपलब्ध नहीं है"),
+         data ? say("Check back for new listings.", "नए उत्पादों के लिए फिर आएँ।") : say("Please try again in a moment.", "कृपया थोड़ी देर में फिर कोशिश करें।"))}
+     </section>
+     <section class="promo-band"><div><h3>${say("Need a hand choosing?", "चुनने में मदद चाहिए?")}</h3>
+       <p>${say("Tell us what you’re growing.", "बताइए आप क्या उगा रहे हैं।")}</p></div>
+       <a class="btn btn-secondary" href="/contact">${say("Talk to AgroSeed", "AgroSeed से बात करें")} ↗</a></section>
+   </div>`, "agro-home");
 }
 function empty(title,desc,button="") {return `<div class="empty-state"><div class="empty-icon">🌱</div><h2>${esc(title)}</h2><p>${esc(desc)}</p>${button}</div>`;}
 function pagination(page,pages,total,base=location.href){if(pages<2)return `<p class="pagination-meta">${total} products</p>`;const href=n=>{const u=new URL(base);u.searchParams.set("page",n);return u.pathname+u.search;};return `<nav class="pagination" aria-label="Catalog pages"><span>Page ${page} of ${pages} · ${total} products</span><div>${page>1?`<a class="btn btn-secondary btn-small" href="${esc(href(page-1))}">← Previous</a>`:""}${page<pages?`<a class="btn btn-secondary btn-small" href="${esc(href(page+1))}">Next →</a>`:""}</div></nav>`;}

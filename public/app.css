@@ -45,3 +45,44 @@
 
 .logo-mark img,.brand-mark img{display:block;width:72%;height:72%;object-fit:contain}
 .account-signout{display:flex;justify-content:flex-end;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+
+.agro-home { background: #f6f4ea; }
+.agro-home .home-ribbon {
+  padding: 9px 0; background: #dce6d2; border-block: 1px solid #bfcdb7;
+  color: #244f37; font-size: 13px; font-weight: 700; text-align: center;
+}
+.agro-home .home-content { padding-top: 22px; padding-bottom: 38px; }
+.agro-home .home-feature {
+  margin: 0 6px 34px 0; overflow: hidden; border: 3px solid #18241c;
+  border-radius: 17px; background: #dce6d2; box-shadow: 6px 7px 0 #bd2d1b;
+}
+.agro-home .home-feature-heading {
+  display: flex; justify-content: space-between; align-items: end;
+  gap: 14px; padding: clamp(14px, 3vw, 30px); background: #244f37; color: #fff;
+}
+.agro-home .home-feature-heading h1 { margin: 0; font-size: clamp(23px, 4vw, 43px); line-height: 1.12; }
+.agro-home .home-feature-heading p { margin: 6px 0 0; color: #e4ecd9; font-size: 14px; }
+.agro-home .home-feature-heading a { color: #f0f6e6; font-weight: 700; font-size: 13px; }
+.agro-home .home-panels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 7px; gap: 5px; }
+.agro-home .home-panel {
+  position: relative; isolation: isolate; overflow: hidden; display: flex; align-items: end;
+  min-width: 0; min-height: clamp(140px, 19vw, 245px); padding: clamp(12px, 2.2vw, 26px);
+  border: 1px solid #243529; border-radius: 8px; background: #cedcb9; color: #18241c;
+}
+.agro-home .home-panel:nth-child(2) { background: #f1deb4; }
+.agro-home .home-panel:nth-child(3) { background: #eacdb8; }
+.agro-home .home-panel-art {
+  position: absolute; z-index: -1; inset: 4% 7% auto auto; opacity: .16;
+  font-size: clamp(66px, 12vw, 170px); line-height: 1; color: #244f37;
+}
+.agro-home .home-panel-copy { display: grid; gap: 5px; padding-right: 24px; }
+.agro-home .home-panel-copy strong { font-size: clamp(18px, 2.4vw, 33px); line-height: 1.12; }
+.agro-home .home-panel-copy span { font-size: 13px; }
+.agro-home .home-panel-copy small { font-weight: 700; }
+.agro-home .home-panel-arrow { position: absolute; right: 12px; bottom: 12px; font-size: 19px; }
+.agro-home .home-panel:focus-visible { outline: 3px solid #18241c; outline-offset: -5px; }
+@media (max-width: 600px) {
+  .agro-home .home-feature-heading { align-items: start; flex-direction: column; }
+  .agro-home .home-panels { grid-template-columns: 1fr; }
+  .agro-home .home-panel { min-height: 92px; align-items: center; }
+}

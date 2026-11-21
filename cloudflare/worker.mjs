@@ -1,4 +1,5 @@
 import { handleStoreRequest } from "../backend/store.mjs";
+import { serveCatalogImage } from "./catalog-images.mjs";
 import { handleCustomerAuth } from "./customer-auth.mjs";
 import { staticAssets } from "./static-assets.generated.mjs";
 
@@ -149,6 +150,9 @@ export default {
     if (request.method !== "GET" && request.method !== "HEAD") {
       return new Response("Method not allowed", { status: 405, headers: { "Allow": "GET, HEAD" } });
     }
+
+    const image = pathname.match(/^\/media\/images\/([a-f0-9]{64})$/);
+    if (image) return serveCatalogImage(request, env.DB, image[1]);
 
     if (isAppRoute(pathname)) {
       return staticResponse(request, "/app.html");

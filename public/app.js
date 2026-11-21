@@ -141,7 +141,7 @@ async function home(){
    ? categories.map(category => ({
        name: language()==="hi" ? category.name : category.nameEn,
        url: "/category/" + encodeURIComponent(category.slug || slug(category.nameEn)),
-       icon: icons[category.nameEn] || "🌱"
+       icon: browseCategoryArt(category)
      }))
    : [{ name: say("Browse catalog", "कैटलॉग देखें"), url: "/shop", icon: "🌱" }];
  const featured = [...products].sort((a,b) => Number(Boolean(b.featured))-Number(Boolean(a.featured)));
@@ -181,39 +181,217 @@ async function home(){
 }
 function empty(title,desc,button="") {return `<div class="empty-state"><div class="empty-icon">🌱</div><h2>${esc(title)}</h2><p>${esc(desc)}</p>${button}</div>`;}
 function pagination(page,pages,total,base=location.href){if(pages<2)return `<p class="pagination-meta">${total} products</p>`;const href=n=>{const u=new URL(base);u.searchParams.set("page",n);return u.pathname+u.search;};return `<nav class="pagination" aria-label="Catalog pages"><span>Page ${page} of ${pages} · ${total} products</span><div>${page>1?`<a class="btn btn-secondary btn-small" href="${esc(href(page-1))}">← Previous</a>`:""}${page<pages?`<a class="btn btn-secondary btn-small" href="${esc(href(page+1))}">Next →</a>`:""}</div></nav>`;}
-async function categoriesPage(){
- const activeSlug = new URLSearchParams(location.search).get("category") || "";
- const data = await api("/api/v1/products?" + new URLSearchParams({limit:"100", ...(activeSlug ? {category:activeSlug} : {})}));
- const categories = data.categories || [];
- const active = categories.find(category => category.slug === activeSlug);
- const selected = active?.slug || "";
- const categoryPath = value => "/categories" + (value ? "?" + new URLSearchParams({category:value}) : "");
- const label = category => (language()==="hi" ? category.name : category.nameEn) || category.nameEn;
- const symbol = category => icons[category.nameEn.replace(/^Demo /,"")] || "🌱";
- const rail = (text, icon, value) => `<a href="${esc(categoryPath(value))}" ${value===selected?'aria-current="page"':''}><span aria-hidden="true">${icon}</span><b>${esc(text)}</b></a>`;
- const tile = (name, art, href) => `<a class="browse-tile" href="${esc(href)}"><span class="browse-tile-art">${art}</span><b>${esc(name)}</b></a>`;
- const section = (title, tiles) => tiles ? `<section class="browse-section"><h2>${esc(title)}</h2><div class="browse-tiles">${tiles}</div></section>` : "";
- const products = activeSlug && !active ? [] : data.items || [];
- const productTiles = rows => rows.slice(0,9).map(product => tile(prodName(product), productImage(product), "/product/" + encodeURIComponent(product.slug))).join("");
- const featured = products.filter(product => product.featured);
- const custom = (active?.sectionCopy || "").split("\n").map(line => {
-   const [title = "", raw = ""] = line.split("|");
-   const skus = new Set(raw.split(",").map(sku => sku.trim().toUpperCase()).filter(Boolean));
-   return title.trim() ? section(title.trim(), productTiles(products.filter(product => product.variants.some(variant => skus.has(variant.sku))))) : "";
+const browseCategoryPath = (category, editing = false) =>
+ (editing ? "/admin/catalog" : "/categories") + (category ? "?" + new URLSearchParams({category}) : "");
+const browseCategoryLabel = category => (language() === "hi" ? category.name : category.nameEn) || category.nameEn;
+const browseImage = (src, fallback, cls = "") => src ? `<img class="${cls}" src="${esc(src)}" alt="">` : fallback;
+const browseCategoryArt = category => browseImage(category.image, icons[category.nameEn.replace(/^Demo /,"")] || "🌱", "browse-category-image");
+
+function browseAction(action, label, id = "") {
+ return `<button type="button" class="browse-action" data-browse-action="${action}" data-browse-id="${esc(id)}">${esc(label)}</button>`;
+}
+
+function browseCatalog(data, editor) {
+ const selected = new URLSearchParams(location.search).get("category") || "";
+ const editing = Boolean(editor);
+ const hidden = (editor?.categories || []).filter(category => !data.categories.some(item => item.id === category.id));
+ const categories = [...data.categories, ...hidden];
+ const active = categories.find(category => category.slug === selected);
+ const path = value => browseCategoryPath(value, editing);
+ const products = active || !selected ? data.items : [];
+ const edit = (action, label, id = "") => editing ? browseAction(action, label, id) : "";
+ const productLink = id => `/admin/products/${id}?${new URLSearchParams({from:"categories", category:selected})}`;
+ const rail = (text, art, category) => {
+  const slug = category?.slug || "";
+  return `<div class="browse-rail-row"><a href="${esc(path(slug))}" ${slug === selected ? 'aria-current="page"' : ""}><span aria-hidden="true">${art}</span><b>${esc(text)}</b>${category?.active === false ? "<small>Hidden</small>" : ""}</a>
+   ${category ? edit("category", "Edit", category.id) : ""}</div>`;
+ };
+ const tile = (name, art, href, action = "") =>
+  `<div class="browse-tile-wrap"><a class="browse-tile" href="${esc(href)}"><span class="browse-tile-art">${art}</span><b>${esc(name)}</b></a>${action}</div>`;
+ const section = (title, tiles, controls = "", image = "") => tiles || editing ?
+  `<section class="browse-section"><div class="browse-section-heading"><h2>${browseImage(image, "", "browse-section-image")}${esc(title)}</h2>${controls}</div>
+    <div class="browse-tiles">${tiles}</div></section>` : "";
+ const productTiles = rows => rows.slice(0, 9).map(product =>
+  tile(prodName(product), productImage(product), editing ? productLink(product.id) : `/product/${encodeURIComponent(product.slug)}`)).join("");
+ const custom = (active?.sections || []).map(item => {
+  const shown = item.skus.map(sku => products.find(product => product.variants.some(variant => variant.sku === sku))).filter(Boolean);
+  return section(item.title, productTiles([...new Set(shown)]), edit("section", "+ Add products / edit", item.id), item.image);
  }).join("");
- const brandNames = [...new Set(products.map(product => product.brandEn).filter(Boolean))];
- const categoryShop = active ? "/category/" + encodeURIComponent(selected) : "/shop";
- const brandTiles = brandNames.filter(name => (data.brands || []).some(brand => brand.nameEn === name)).slice(0,9).map(name => tile(name, '<span aria-hidden="true">✿</span>', "/brand/" + encodeURIComponent(slug(name)) + (selected ? "?" + new URLSearchParams({category:selected}) : ""))).join("");
- return wrap(`<div class="container browse-page"><h1>All categories</h1><div class="browse-layout">
-   <nav class="browse-rail" aria-label="Categories">${rail("All categories","✿","")}${categories.map(category => rail(label(category),symbol(category),category.slug)).join("")}</nav>
-   <div class="browse-content">
-     <a class="browse-banner" href="${esc(categoryShop)}"><span><strong>${esc(active?.banner || (active ? label(active) : "Browse farm supplies"))}</strong><small>View catalog ↗</small></span><i aria-hidden="true">${active ? symbol(active) : "🌾"}</i></a>
-     ${active ? custom : section("Shop by category",categories.map(category=>tile(label(category),symbol(category),categoryPath(category.slug))).join(""))}
-     ${section("Featured products",productTiles(featured))}
-     ${active ? section("Shop by brand",brandTiles) : ""}
-     ${section("Browse products",productTiles(products))}
-     ${!products.length ? '<p class="browse-empty">No products listed here yet.</p>' : ""}
-   </div></div></div>`);
+ const categoryTiles = data.categories.map(category => tile(browseCategoryLabel(category), browseCategoryArt(category), path(category.slug))).join("");
+ const knownBrands = new Set(products.map(product => product.brandEn));
+ const brandTiles = data.brands.filter(brand => knownBrands.has(brand.nameEn) || active?.brandIds?.includes(brand.id)).slice(0, 9).map(brand =>
+  tile(browseCategoryLabel(brand), browseImage(brand.image, '<span aria-hidden="true">✿</span>'),
+   `/brand/${encodeURIComponent(brand.slug)}?${new URLSearchParams({category:selected})}`, edit("brand", "Edit", brand.id))).join("");
+ const globalBanner = editor?.banner ?? storefrontSettings.catalogBannerTitle;
+ const globalBannerImage = editor?.bannerImage ?? storefrontSettings.catalogBannerImage;
+ const bannerTitle = active ? active.banner || browseCategoryLabel(active) : globalBanner || "Browse farm supplies";
+ const bannerImage = active ? active.bannerImage : globalBannerImage;
+ const shopLink = active ? `/category/${encodeURIComponent(active.slug)}` : "/shop";
+ return `<div class="container browse-page${editing ? " browse-editor" : ""}"><h1>All categories</h1><div class="browse-layout">
+  <nav class="browse-rail" aria-label="Categories">
+   ${rail("All categories", "✿")}${categories.map(category => rail(browseCategoryLabel(category), browseCategoryArt(category), category)).join("")}
+   ${edit("category", "+ Add category")}
+  </nav>
+  <div class="browse-content">
+   <a class="browse-banner" href="${esc(shopLink)}"><span><strong>${esc(bannerTitle)}</strong><small>View catalog ↗</small></span>
+     <i aria-hidden="true">${browseImage(bannerImage, active ? browseCategoryArt(active) : "🌾", "browse-banner-image")}</i></a>
+   ${edit("banner", bannerImage ? "Edit banner" : "+ Add banner image")}
+   ${active ? custom + edit("section", "+ Add section") : section("Shop by category", categoryTiles, edit("category", "+ Add category") + edit("brands", "Manage brands"))}
+   ${section("Featured products", productTiles(products.filter(product => product.featured)), edit("featured", "+ Add featured product"))}
+   ${active ? section("Shop by brand", brandTiles, edit("brand", "+ Add brand")) : ""}
+   ${section("Browse products", productTiles(products), editing ? `<a class="browse-action" href="${esc(productLink("new"))}">+ Add product</a>` : "")}
+   ${!products.length ? '<p class="browse-empty">No products listed here yet.</p>' : ""}
+  </div></div></div>`;
+}
+
+let browseEditor;
+async function categoriesPage(editing = false) {
+ const selected = new URLSearchParams(location.search).get("category") || "";
+ const query = new URLSearchParams({limit:"100", ...(selected ? {category:selected} : {})});
+ const [data, editor] = await Promise.all([
+  api(`/api/v1/products?${query}`),
+  editing ? api(`/api/v1/admin/catalog?${query}`) : null
+ ]);
+ if (editing) {
+  browseEditor = { ...editor, active: editor.categories.find(category => category.slug === selected) };
+  return browseCatalog(data, editor);
+ }
+ return wrap(browseCatalog(data));
+}
+
+function imageFields(name, label, url = "") {
+ return `<fieldset class="image-fields"><legend>${esc(label)}</legend>
+  ${url ? `<img class="editor-image-preview" src="${esc(url)}" alt="">` : ""}
+  <label>Upload an image <input type="file" name="${name}File" accept="image/png,image/jpeg,image/webp,image/gif"></label>
+  <label>Image URL <input type="text" name="${name}" value="${esc(url)}" placeholder="https://…" maxlength="1000"></label>
+  <small>PNG, JPEG, WebP or GIF, up to 750 KB. Clear the URL to remove the image.</small>
+ </fieldset>`;
+}
+
+async function uploadImage(file) {
+ if (file.size > 750 * 1024) throw new Error("Images must be 750 KB or smaller.");
+ const encoded = await new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.onload = () => resolve(String(reader.result).split(",")[1]);
+  reader.onerror = () => reject(new Error("Could not read the image."));
+  reader.readAsDataURL(file);
+ });
+ const { url } = await api("/api/v1/admin/media", {method:"POST",body:JSON.stringify({type:file.type,content:encoded})});
+ return url;
+}
+
+async function saveImageFields(form, values) {
+ for (const input of form.querySelectorAll('.image-fields input[type="file"]')) {
+  const name = input.name.slice(0, -4);
+  if (input.files[0]) values[name] = await uploadImage(input.files[0]);
+  delete values[input.name];
+ }
+}
+
+function productImageFields(product) {
+ return `<fieldset class="image-fields span-2"><legend>Product images</legend>
+  ${(product.images || []).map((entry, index) => {
+   const url = typeof entry === "string" ? entry : entry?.url;
+   if (!url) return "";
+   return `<div class="editor-gallery-row"><img src="${esc(url)}" alt="">
+    <div><label>Image URL <input name="existingImage" value="${esc(url)}" maxlength="1000"></label>
+    <label>Alt text <input name="existingAlt" value="${esc(product.imageAlt?.[index] || entry?.alt || "")}" maxlength="180"></label></div></div>`;
+  }).join("")}
+  <label>Upload images <input type="file" name="productFiles" accept="image/png,image/jpeg,image/webp,image/gif" multiple></label>
+  <label>Additional image URL <input name="additionalImage" placeholder="https://…" maxlength="1000"></label>
+  <small>Up to eight PNG, JPEG, WebP or GIF images, 750 KB each. Clear an existing URL to remove it.</small>
+ </fieldset>`;
+}
+
+async function readProductImages(form) {
+ const fields = new FormData(form);
+ const alts = fields.getAll("existingAlt");
+ const pictures = fields.getAll("existingImage").map((url, index) => [url.trim(), alts[index]]).filter(([url]) => url);
+ const additional = fields.get("additionalImage").trim();
+ if (additional) pictures.push([additional, ""]);
+ const files = [...form.elements.productFiles.files];
+ if (pictures.length + files.length > 8) throw new Error("A product can have up to eight images.");
+ for (const file of files) pictures.push([await uploadImage(file), ""]);
+ return { images:pictures.map(([url]) => url), imageAlt:pictures.map(([, alt]) => alt) };
+}
+
+function openBrowseEditor(action, id) {
+ const { active, categories, brands, items, banner, bannerImage } = browseEditor;
+ const labelInput = (name, label, value, required = false) =>
+  `<label>${label}<input name="${name}" value="${esc(value || "")}" maxlength="100" ${required ? "required" : ""}></label>`;
+ const selectOption = (value, label) => `<option value="${esc(value)}">${esc(label)}</option>`;
+ let title, description = "", fields;
+ if (action === "brands") {
+  title = "Manage brands";
+  fields = `<button type="button" class="browse-action" data-browse-action="brand" data-browse-id="">+ Add brand</button>
+   ${brands.map(row => `<div class="browse-brand-row"><span>${esc(row.nameEn)}${row.active === false ? " · Hidden" : ""}</span>
+    ${browseAction("brand", "Edit", row.id)}</div>`).join("")}`;
+ } else if (action === "category" || action === "brand") {
+  const current = (action === "category" ? categories : brands).find(row => row.id === id);
+  title = `${current ? "Edit" : "Add"} ${action}`;
+  const canLink = action === "brand" && !current && active && brands.some(row => row.active !== false);
+  fields = `${canLink ? `<label>Existing brand <select name="existingId">${selectOption("", "Create a new brand")}${brands.filter(row => row.active !== false).map(row => selectOption(row.id, row.nameEn)).join("")}</select></label>` : ""}
+   ${labelInput("nameEn", "English name", current?.nameEn, !canLink)}
+   ${labelInput("name", "Hindi name", current?.name)}
+   <label>Display order <input type="number" name="order" min="0" max="1000" value="${current?.order ?? (action === "category" ? categories.length : brands.length)}"></label>
+   <label>Visibility <select name="active"><option value="true">Visible</option><option value="false" ${current?.active === false ? "selected" : ""}>Hidden</option></select></label>
+   ${imageFields("image", action === "category" ? "Category icon" : "Brand logo", current?.image)}`;
+ } else if (action === "banner") {
+  title = "Edit category banner";
+  fields = labelInput("banner", "Banner title", active ? active.banner : banner) +
+   imageFields("bannerImage", "Banner image", active ? active.bannerImage : bannerImage);
+ } else if (action === "section") {
+  const current = active.sections.find(section => section.id === id);
+  title = current ? "Edit section" : "Add section";
+  description = "Choose the published products to display in this section.";
+  const available = items.map(item => [item.skus.find(sku => current?.skus.includes(sku)) || item.skus[0], item.nameEn]);
+  const choices = new Map([...(current?.skus || []).map(sku => [sku, sku]), ...available]);
+  fields = labelInput("title", "Section title", current?.title, true) +
+   `<fieldset class="browse-product-choices"><legend>Products</legend>${[...choices].map(([sku, name]) =>
+    `<label><input type="checkbox" name="sectionSku" value="${esc(sku)}" ${current?.skus.includes(sku) ? "checked" : ""}> ${esc(name)} <small>${esc(sku)}</small></label>`).join("") || "<p>Publish a product in this category to add it here.</p>"}</fieldset>` +
+   imageFields("image", "Section image", current?.image);
+ } else if (action === "featured") {
+  title = "Add featured product";
+  description = "Featuring a product also adds it to the store’s featured selection.";
+  fields = `<label>Published product <select name="productId" required>${selectOption("", "Choose a product")}
+   ${items.filter(item => !item.featured).map(item => selectOption(item.id, item.nameEn)).join("")}</select></label>`;
+ }
+ showDialog(title, description, `<div class="browse-edit-fields">${fields}</div>`);
+ const form = $("#dialog-form");
+ if (action === "brands") form.querySelector(".dialog-actions .btn-primary").remove();
+ else form.dataset.browseForm = action;
+ form.dataset.browseId = id;
+ form.querySelector('input:not([type="file"]),select')?.focus();
+}
+
+async function saveBrowseEditor(form) {
+ const action = form.dataset.browseForm;
+ const id = form.dataset.browseId;
+ const { active } = browseEditor;
+ const input = readForm(form);
+ if (action === "section") input.skus = new FormData(form).getAll("sectionSku").join(",");
+ delete input.sectionSku;
+ await saveImageFields(form, input);
+ let path = `/api/v1/admin/catalog/${action}${id ? "/" + encodeURIComponent(id) : ""}`;
+ let method = id ? "PATCH" : "POST";
+ if (action === "banner") {
+  if (active) path = `/api/v1/admin/catalog/category/${encodeURIComponent(active.id)}`;
+  method = "PATCH";
+ }
+ if (action === "section") path = `/api/v1/admin/catalog/category/${encodeURIComponent(active.id)}/sections${id ? "/" + encodeURIComponent(id) : ""}`;
+ if (action === "brand" && !id && active) input.categoryId = active.id;
+ if (action === "featured") {
+  path = `/api/v1/admin/catalog/featured/${encodeURIComponent(input.productId)}`;
+  input.featured = true;
+  method = "PATCH";
+ }
+ const saved = await api(path, {method,body:JSON.stringify(input)});
+ $("#dialog-root").innerHTML = "";
+ toast("Saved.");
+ if (action === "category" && saved.slug !== active?.slug && (!id || active?.id === id)) {
+  history.replaceState(null, "", browseCategoryPath(saved.slug, true));
+ }
+ await render();
 }
 
 async function listing(pathname){
@@ -304,8 +482,15 @@ async function adminPage(path){
   const params=new URLSearchParams(location.search),q=params.get("q")||"",status=params.get("status")||"",page=Math.max(1,Number(params.get("page"))||1);const query=new URLSearchParams({page:String(page),limit:"20"});if(q)query.set("q",q);if(status)query.set("status",status);const d=await api(`/api/v1/admin/products?${query}`);content=adminHead("Products","Create, review, feature and publish the store catalog.",'<a class="btn btn-primary" href="/admin/products/new">＋ Add product</a>')+`<div class="admin-card"><form class="search-tools" action="/admin/products"><input class="control" name="q" placeholder="Search name, brand, SKU…" value="${esc(q)}"><select class="control" name="status"><option value="">All statuses</option><option value="published" ${status==="published"?"selected":""}>Published</option><option value="draft" ${status==="draft"?"selected":""}>Draft</option><option value="review" ${status==="review"?"selected":""}>Review</option><option value="archived" ${status==="archived"?"selected":""}>Archived</option></select><button class="btn btn-secondary">Filter</button><a class="btn btn-secondary" href="/admin/products/import">CSV import</a></form><div class="table-wrap"><table class="data-table"><thead><tr><th>Product</th><th>SKU / variants</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead><tbody>${d.items.map(p=>`<tr data-product-row><td><b class="table-primary">${esc(p.nameEn)}</b><span class="table-secondary">${esc(p.brandEn)} · ${esc(p.categoryEn)}${p.featured?" · Featured":""}</span></td><td>${esc(p.sku)}<span class="table-secondary">${p.variants.length} pack option(s)</span></td><td>${money(p.pricePaise)}</td><td>${p.stock}</td><td><span class="status-pill ${p.status==="published"?"":"warning"}">${p.status}</span></td><td><div class="table-actions"><a class="btn btn-secondary btn-small" href="/admin/products/${p.id}">Edit</a><button class="btn btn-secondary btn-small" data-publish="${p.id}" data-next="${p.status==="published"?"draft":"published"}">${p.status==="published"?"Unpublish":"Publish"}</button><button class="btn btn-secondary btn-small" data-feature="${p.id}" data-next="${!p.featured}">${p.featured?"Unfeature":"Feature"}</button></div></td></tr>`).join("")||"<tr><td colspan='6'>No products match these filters.</td></tr>"}</tbody></table></div>${pagination(d.page,d.pages,d.total)}</div>`;
  } else if(path==="/admin/products/new"||/^\/admin\/products\/\d+$/.test(path)){
   const id=Number(path.split("/").pop());let p={name:"",nameEn:"",brand:"",brandEn:"",category:"",categoryEn:"",description:"",descriptionEn:"",labelInfo:"",labelInfoHi:"",directions:"",directionsHi:"",safetyInfo:"",safetyInfoHi:"",status:"draft",images:[],variants:[{sku:"",pack:"",pricePaise:0,mrpPaise:0,stock:0}]};if(id)p=await api(`/api/v1/admin/products/${id}`);
+  const params = new URLSearchParams(location.search);
+  if (!id && params.get("from") === "categories" && params.get("category")) {
+   const { categories } = await api("/api/v1/admin/catalog?" + new URLSearchParams({category:params.get("category")}));
+   const category = categories.find(item => item.slug === params.get("category"));
+   if (category) { p.category = category.name; p.categoryEn = category.nameEn; }
+  }
+  const returnTo = params.get("from") === "categories" ? browseCategoryPath(params.get("category"), true) : "/admin/products";
   const variants=(p.variants||[]).map(v=>`${v.pack} | ${v.sku} | ${(v.pricePaise/100).toFixed(2)} | ${(v.mrpPaise/100).toFixed(2)} | ${v.stock}`).join("\n");
-  content=adminHead(id?"Edit product":"Add a product",`${id?"Update":"Create"} bilingual catalog details and pack variants.`)+`<form id="product-form" class="admin-card admin-product-form" data-id="${id||""}"><div class="field-grid"><div class="field"><label>Product name · English *</label><input name="nameEn" required value="${esc(p.nameEn)}"></div><div class="field"><label>Product name · Hindi *</label><input name="name" required value="${esc(p.name)}"></div><div class="field"><label>Brand · English</label><input name="brandEn" value="${esc(p.brandEn)}"></div><div class="field"><label>Brand · Hindi</label><input name="brand" value="${esc(p.brand)}"></div><div class="field"><label>Category · English</label><input name="categoryEn" value="${esc(p.categoryEn)}"></div><div class="field"><label>Category · Hindi</label><input name="category" value="${esc(p.category)}"></div><div class="field"><label>Status</label><select name="status"><option value="draft" ${p.status==="draft"?"selected":""}>Draft</option><option value="review" ${p.status==="review"?"selected":""}>Review</option><option value="published" ${p.status==="published"?"selected":""}>Published</option><option value="archived" ${p.status==="archived"?"selected":""}>Archived</option></select></div><input type="hidden" name="images" value="${esc((p.images||[]).join(","))}"><div class="field span-2"><label>Description · English</label><textarea name="descriptionEn">${esc(p.descriptionEn||"")}</textarea></div><div class="field span-2"><label>Description · Hindi</label><textarea name="description">${esc(p.description||"")}</textarea></div><div class="span-2 settings-section"><h3>Product label and use information</h3><p class="hint">Enter information copied from the approved product label. Leave fields blank if the supplier has not provided it yet.</p></div><div class="field span-2"><label>Label information · English</label><textarea name="labelInfo" maxlength="20000" placeholder="Product label details, composition, or manufacturer information">${esc(p.labelInfo||"")}</textarea></div><div class="field span-2"><label>Label information · Hindi</label><textarea name="labelInfoHi" maxlength="20000" placeholder="उत्पाद के लेबल की जानकारी">${esc(p.labelInfoHi||"")}</textarea></div><div class="field span-2"><label>Directions for use · English</label><textarea name="directions" maxlength="20000" placeholder="Use only the directions supplied with this product">${esc(p.directions||"")}</textarea></div><div class="field span-2"><label>Directions for use · Hindi</label><textarea name="directionsHi" maxlength="20000" placeholder="उपयोग के निर्देश">${esc(p.directionsHi||"")}</textarea></div><div class="field span-2"><label>Safety and precautions · English</label><textarea name="safetyInfo" maxlength="20000" placeholder="Safety and precaution information from the approved label">${esc(p.safetyInfo||"")}</textarea></div><div class="field span-2"><label>Safety and precautions · Hindi</label><textarea name="safetyInfoHi" maxlength="20000" placeholder="सुरक्षा और सावधानियां">${esc(p.safetyInfoHi||"")}</textarea></div><div class="field span-2"><label>Pack variants * (one per line)</label><textarea name="variants" required placeholder="250 g | SKU-001 | 199.00 | 249.00 | 20">${esc(variants)}</textarea><small>Format: pack | SKU | price in ₹ | MRP in ₹ | available stock. Use unique SKUs; keep prices and label details client-approved.</small></div></div><div class="hero-actions" style="margin-top:18px"><button class="btn btn-primary">Save product</button><a class="btn btn-secondary" href="/admin/products">Cancel</a>${id?`<button type="button" class="btn btn-danger" data-archive="${id}">Archive product</button>`:""}</div></form>`;
+  content=adminHead(id?"Edit product":"Add a product",`${id?"Update":"Create"} bilingual catalog details and pack variants.`)+`<form id="product-form" class="admin-card admin-product-form" data-id="${id||""}" data-return="${esc(returnTo)}"><div class="field-grid"><div class="field"><label>Product name · English *</label><input name="nameEn" required value="${esc(p.nameEn)}"></div><div class="field"><label>Product name · Hindi *</label><input name="name" required value="${esc(p.name)}"></div><div class="field"><label>Brand · English</label><input name="brandEn" value="${esc(p.brandEn)}"></div><div class="field"><label>Brand · Hindi</label><input name="brand" value="${esc(p.brand)}"></div><div class="field"><label>Category · English</label><input name="categoryEn" value="${esc(p.categoryEn)}"></div><div class="field"><label>Category · Hindi</label><input name="category" value="${esc(p.category)}"></div><div class="field"><label>Status</label><select name="status"><option value="draft" ${p.status==="draft"?"selected":""}>Draft</option><option value="review" ${p.status==="review"?"selected":""}>Review</option><option value="published" ${p.status==="published"?"selected":""}>Published</option><option value="archived" ${p.status==="archived"?"selected":""}>Archived</option></select></div>${productImageFields(p)}<div class="field span-2"><label>Description · English</label><textarea name="descriptionEn">${esc(p.descriptionEn||"")}</textarea></div><div class="field span-2"><label>Description · Hindi</label><textarea name="description">${esc(p.description||"")}</textarea></div><div class="span-2 settings-section"><h3>Product label and use information</h3><p class="hint">Enter information copied from the approved product label. Leave fields blank if the supplier has not provided it yet.</p></div><div class="field span-2"><label>Label information · English</label><textarea name="labelInfo" maxlength="20000" placeholder="Product label details, composition, or manufacturer information">${esc(p.labelInfo||"")}</textarea></div><div class="field span-2"><label>Label information · Hindi</label><textarea name="labelInfoHi" maxlength="20000" placeholder="उत्पाद के लेबल की जानकारी">${esc(p.labelInfoHi||"")}</textarea></div><div class="field span-2"><label>Directions for use · English</label><textarea name="directions" maxlength="20000" placeholder="Use only the directions supplied with this product">${esc(p.directions||"")}</textarea></div><div class="field span-2"><label>Directions for use · Hindi</label><textarea name="directionsHi" maxlength="20000" placeholder="उपयोग के निर्देश">${esc(p.directionsHi||"")}</textarea></div><div class="field span-2"><label>Safety and precautions · English</label><textarea name="safetyInfo" maxlength="20000" placeholder="Safety and precaution information from the approved label">${esc(p.safetyInfo||"")}</textarea></div><div class="field span-2"><label>Safety and precautions · Hindi</label><textarea name="safetyInfoHi" maxlength="20000" placeholder="सुरक्षा और सावधानियां">${esc(p.safetyInfoHi||"")}</textarea></div><div class="field span-2"><label>Pack variants * (one per line)</label><textarea name="variants" required placeholder="250 g | SKU-001 | 199.00 | 249.00 | 20">${esc(variants)}</textarea><small>Format: pack | SKU | price in ₹ | MRP in ₹ | available stock. Use unique SKUs; keep prices and label details client-approved.</small></div></div><div class="hero-actions" style="margin-top:18px"><button class="btn btn-primary">Save product</button><a class="btn btn-secondary" href="${esc(returnTo)}">Cancel</a>${id?`<button type="button" class="btn btn-danger" data-archive="${id}">Archive product</button>`:""}</div></form>`;
  } else if(path==="/admin/products/import"){
   content=adminHead("Catalog import","Preview rows and resolve duplicates before applying changes.")+`<section class="admin-card"><p>Upload a CSV with columns: name,nameEn,brand,brandEn,category,categoryEn,sku,pack,pricePaise,mrpPaise,stock,status. Use integer paise for prices.</p><button class="btn btn-secondary" data-template>Download CSV template</button><div class="field" style="margin-top:17px"><label>Choose CSV</label><input id="csv-file" type="file" accept=".csv,text/csv"></div><div id="csv-preview"></div><div class="field" style="max-width:300px;margin-top:12px"><label>Duplicate SKU behavior</label><select class="control" id="import-mode"><option value="create">Create only · report duplicates</option><option value="upsert">Update matching products</option></select></div><button class="btn btn-primary" id="apply-import" data-import disabled style="margin-top:12px">Apply reviewed import</button></section>`;
  } else if(path==="/admin/orders"){
@@ -313,7 +498,7 @@ async function adminPage(path){
  } else if(path==="/admin/inventory"){
   const d=await api("/api/v1/admin/inventory");const vars=d.products.flatMap(p=>p.variants.map(v=>({p,v})));content=adminHead("Inventory","Adjust stock by SKU and leave a reason for each change.")+`<section class="admin-card"><div class="table-wrap"><table class="data-table"><thead><tr><th>Product</th><th>Pack</th><th>SKU</th><th>Available</th><th>Reserved</th><th>Action</th></tr></thead><tbody>${vars.map(({p,v})=>`<tr><td>${esc(p.nameEn)}</td><td>${esc(v.pack)}</td><td>${esc(v.sku)}</td><td>${v.stock}</td><td>${v.reserved||0}</td><td><button class="btn btn-secondary btn-small" data-adjust="${esc(v.sku)}">Adjust stock</button></td></tr>`).join("")}</tbody></table></div><h2 style="margin-top:22px">Recent adjustments</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>When</th><th>SKU</th><th>Change</th><th>Reason</th><th>Order</th></tr></thead><tbody>${d.transactions.slice(0,40).map(x=>`<tr><td>${new Date(x.createdAt).toLocaleString()}</td><td>${esc(x.sku)}</td><td>${x.delta>0?"+":""}${x.delta}</td><td>${esc(x.reason)}</td><td>${esc(x.orderNumber||"—")}</td></tr>`).join("")}</tbody></table></div></section>`;
  } else if(path==="/admin/catalog"){
-  const d=await api("/api/v1/admin/settings");content=adminHead("Categories & brands","Edit names, reorder or hide browse labels.")+`<section class="admin-card"><h2>Categories</h2><div class="taxonomy-list">${taxonomyEditor(d.categories,"category")}</div><form id="category-form" class="hero-actions" style="margin-top:16px"><input class="control" name="nameEn" required placeholder="Category · English" style="max-width:220px"><input class="control" name="name" placeholder="Category · Hindi" style="max-width:220px"><button class="btn btn-secondary">Add category</button></form></section><section class="admin-card"><h2>Brands</h2><div class="taxonomy-list">${taxonomyEditor(d.brands,"brand")}</div><form id="brand-form" class="hero-actions" style="margin-top:16px"><input class="control" name="nameEn" required placeholder="Brand · English" style="max-width:220px"><input class="control" name="name" placeholder="Brand · Hindi" style="max-width:220px"><button class="btn btn-secondary">Add brand</button></form></section>`;
+  content=await categoriesPage(true);
  } else if(path==="/admin/promotions"){
   const d=await api("/api/v1/admin/coupons");content=adminHead("Promotions","Set a discount, expiry, minimum order and usage cap.")+`<section class="admin-card"><form id="coupon-form" class="field-grid"><div class="field"><label>Code</label><input class="control" name="code" placeholder="GROW10" required maxlength="20"></div><div class="field"><label>Discount type</label><select class="control" name="type"><option value="percent">Percent off</option><option value="flat">Amount in ₹</option></select></div><div class="field"><label>Discount value</label><input class="control" name="value" type="number" min="0.01" step="0.01" required></div><div class="field"><label>Minimum order · ₹</label><input class="control" name="minSubtotal" type="number" min="0" step="0.01" value="0"></div><div class="field"><label>Maximum uses (optional)</label><input class="control" name="maxUses" type="number" min="1" step="1" placeholder="Unlimited"></div><div class="field"><label>Expires (optional)</label><input class="control" name="expiresAt" type="date"></div><div class="span-2"><button class="btn btn-primary">Create promotion</button></div></form></section><section class="admin-card"><div class="table-wrap"><table class="data-table"><thead><tr><th>Code</th><th>Discount</th><th>Minimum</th><th>Uses</th><th>Expires</th><th>Status</th><th>Action</th></tr></thead><tbody>${d.items.map(c=>`<tr><td><b>${esc(c.code)}</b></td><td>${c.type==="percent"?`${c.value}%`:`${money(c.value)}`}</td><td>${money(c.minSubtotalPaise||0)}</td><td>${Number(c.usesCount)||0}${c.maxUses?` / ${c.maxUses}`:" / ∞"}</td><td>${c.expiresAt?esc(c.expiresAt):"No expiry"}</td><td>${c.active===false?"Paused":"Active"}</td><td><div class="table-actions"><button class="btn btn-secondary btn-small" data-toggle-coupon="${c.id}" data-active="${c.active===false?"true":"false"}">${c.active===false?"Activate":"Pause"}</button><button class="btn btn-danger btn-small" data-delete-coupon="${c.id}">Remove</button></div></td></tr>`).join("")||"<tr><td colspan='7'>No codes yet.</td></tr>"}</tbody></table></div></section>`;
  } else if(path==="/admin/shipping"){
@@ -327,7 +512,6 @@ async function adminPage(path){
  }
  return adminShell(path,content,role);
 }
-function taxonomyEditor(rows,kind){return rows.map(x=>`<form class="taxonomy-row" data-taxonomy-form data-kind="${kind}" data-id="${esc(x.id||slug(x.nameEn))}"><input class="control" name="nameEn" aria-label="${kind} name in English" value="${esc(x.nameEn)}" required><input class="control" name="name" aria-label="${kind} name in Hindi" value="${esc(x.name||x.nameEn)}"><input class="control taxonomy-order" type="number" name="order" min="0" max="1000" value="${Number(x.order)||0}" aria-label="Display order"><select class="control taxonomy-active" name="active" aria-label="Availability"><option value="true" ${x.active!==false?"selected":""}>Active</option><option value="false" ${x.active===false?"selected":""}>Hidden</option></select>${kind==="category"?`<details class="category-admin-details"><summary>Category page sections</summary><label>Banner title<input class="control" name="banner" maxlength="100" value="${esc(x.banner||"")}"></label><label>Custom sections<textarea class="control" name="sectionCopy" rows="3" maxlength="2000" placeholder="Seasonal picks | SKU-1, SKU-2">${esc(x.sectionCopy||"")}</textarea></label><small>Enter one section per line as Heading | SKU-1, SKU-2. Use published products in this category.</small></details>`:""}<button class="btn btn-secondary btn-small">Save</button></form>`).join("")||`<p class="muted">No ${kind}s yet.</p>`;}
 function readForm(form){return Object.fromEntries(new FormData(form).entries());}
 function parseVariants(text){return text.split(/\r?\n/).map(line=>line.trim()).filter(Boolean).map(line=>{const [pack,sku,price,mrp,stock]=line.split("|").map(x=>x.trim());return {pack,sku,pricePaise:Math.round(Number(price)*100),mrpPaise:Math.round(Number(mrp)*100),stock:Number(stock)};});}
 function parseCsv(text){const rows=[];let row=[],value="",quoted=false;for(let i=0;i<text.length;i++){const c=text[i];if(c==='"'&&quoted&&text[i+1]==='"'){value+='"';i++;}else if(c==='"')quoted=!quoted;else if(c===","&&!quoted){row.push(value.trim());value="";}else if((c==="\n"||c==="\r")&&!quoted){if(c==="\r"&&text[i+1]==="\n")i++;row.push(value.trim());if(row.some(Boolean))rows.push(row);row=[];value="";}else value+=c;}if(quoted)throw new Error("CSV has an unclosed quoted field.");row.push(value.trim());if(row.some(Boolean))rows.push(row);const head=rows.shift()?.map(x=>x.replace(/^\uFEFF/,""))||[];if(!head.length||head.some(x=>!x))throw new Error("CSV needs a header row with column names.");return rows.map(r=>Object.fromEntries(head.map((h,i)=>[h,r[i]||""])));}
@@ -353,7 +537,7 @@ async function validateImport(mode){
 function renderImportPreview(){const target=$("#csv-preview");if(!target)return;const shown=rawImportRows.slice(0,20);target.innerHTML=`<p class="hint">${rawImportRows.length} CSV rows · ${importRows.length} ready · ${importErrors.length} need correction${importErrors.some(x=>x.row===0)?`<br>${esc(importErrors[0].error)}`:""}</p><div class="table-wrap"><table class="data-table"><thead><tr><th>Row</th><th>English name</th><th>SKU</th><th>Pack</th><th>Price paise</th><th>Stock</th><th>Validation</th></tr></thead><tbody>${shown.map((x,i)=>{const err=importErrors.find(y=>y.row===i+2);return `<tr><td>${i+2}</td><td>${esc(x.nameEn)}</td><td>${esc(x.sku)}</td><td>${esc(x.pack)}</td><td>${esc(x.pricePaise)}</td><td>${esc(x.stock)}</td><td class="${err?"text-danger":""}">${err?esc(err.error):"Ready"}</td></tr>`;}).join("")}</tbody></table></div>${rawImportRows.length>20?`<p class="hint">Showing first 20 rows.</p>`:""}`;$("[data-import]").disabled=!importRows.length;}
 function showDialog(title,desc,fields,confirmLabel="Save"){$("#dialog-root").innerHTML=`<div class="dialog-scrim"><form id="dialog-form" class="dialog-card"><h2>${esc(title)}</h2><p>${esc(desc)}</p>${fields}<div class="dialog-actions"><button type="button" class="btn btn-secondary" data-dismiss>Cancel</button><button class="btn btn-primary">${esc(confirmLabel)}</button></div></form></div>`;}
 function formDataJson(form){return JSON.stringify(readForm(form));}
-async function initPublicGallery(path){try{const product=await api(`/api/v1/products/${encodeURIComponent(path.split("/").pop())}`),images=(product.images||[]).map((url,index)=>({url,alt:product.imageAlt?.[index]||prodName(product)}));if(images.length<2)return;const host=$(".detail-image");if(!host)return;host.outerHTML=`<div class="product-gallery-display"><div class="detail-image"><img id="detail-main-image" src="${esc(images[0].url)}" alt="${esc(images[0].alt)}"></div><div class="gallery-thumbnails">${images.map((image,index)=>`<button type="button" class="gallery-thumbnail ${index===0?"active":""}" data-public-image="${index}" aria-label="View product image ${index+1}"><img src="${esc(image.url)}" alt=""></button>`).join("")}</div></div>`;app.dataset.galleryImages=JSON.stringify(images);}catch{}}
+async function initPublicGallery(path){try{const product=await api(`/api/v1/products/${encodeURIComponent(path.split("/").pop())}`),images=(product.images||[]).map((image,index)=>({url:typeof image==="string"?image:image?.url,alt:product.imageAlt?.[index]||image?.alt||prodName(product)})).filter(image=>image.url);if(images.length<2)return;const host=$(".detail-image");if(!host)return;host.outerHTML=`<div class="product-gallery-display"><div class="detail-image"><img id="detail-main-image" src="${esc(images[0].url)}" alt="${esc(images[0].alt)}"></div><div class="gallery-thumbnails">${images.map((image,index)=>`<button type="button" class="gallery-thumbnail ${index===0?"active":""}" data-public-image="${index}" aria-label="View product image ${index+1}"><img src="${esc(image.url)}" alt=""></button>`).join("")}</div></div>`;app.dataset.galleryImages=JSON.stringify(images);}catch{}}
 function initProductDeliveryCheck(){const detail=$(".detail-copy");if(!detail||$("#delivery-check-form"))return;detail.insertAdjacentHTML("beforeend",'<form id="delivery-check-form" class="product-delivery-check"><label for="product-pincode">Check delivery by PIN code</label><div><input id="product-pincode" name="pincode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="6-digit PIN"><button class="btn btn-secondary">Check</button></div><p id="delivery-check-result" class="hint" aria-live="polite">Enter your PIN to check delivery availability.</p></form>');}
 async function initAdminSettingsEditor(){const form=$("#settings-form");if(!form)return;try{const d=await api("/api/v1/admin/settings"),settings=d.settings||{},sections=[{"Page and business copy":[["storeAbout","Store introduction"],["businessDetails","Legal business identity and address"],["supportPhone","Support phone"],["supportDetails","Support hours and contact instructions"]]},{"Home page copy":[["homeHeroEyebrow","Home eyebrow"],["homeHeroHeadline","Home headline"],["homeHeroBody","Home introduction"],["homeHeroNote","Supporting note"],["homeHeroPrimaryCta","Primary button label"],["homeBannerTitle","Catalog banner title"],["homeBannerText","Catalog banner description"],["homeHelpTitle","Help banner title"],["homeHelpText","Help banner description"],["homeProductsTitle","Product shelf heading"]]},{"Policies and operating rules":[["deliveryRules","Delivery regions, fees and estimates (text)"],["codPolicy","Cash on delivery policy"],["cancellationReturnsRules","Cancellation and return rules"],["shippingReturnsPolicy","Shipping & returns page"],["privacyPolicy","Privacy page"],["termsPolicy","Terms page"],["productUseNotice","Product-use notice"]]}];const save=form.querySelector(".span-2:last-child");const markup=sections.map(([title,fields])=>`<div class="span-2 settings-section"><h3>${esc(title)}</h3><p class="hint">Leave blank until AgroSeed provides approved text. These values appear on the customer site.</p></div>${fields.map(([name,label])=>`<div class="field span-2"><label for="setting-${name}">${esc(label)}</label><textarea id="setting-${name}" name="${name}" maxlength="20000" placeholder="Not configured. Enter approved text here.">${esc(settings[name]||"")}</textarea></div>`).join("")}`).join("");save?.insertAdjacentHTML("beforebegin",markup + adminNavigationFields(settings));}catch{}}
 function applyEditableCustomerCopy(path){const lineBreak=value=>esc(value).replace(/\r?\n/g,"<br>");if(path==="/contact"){const title=$(".page-title")?.outerHTML,form=$("#support-form");if(form){const support=[storefrontSettings.supportDetails,storefrontSettings.supportPhone,storefrontSettings.supportEmail?`Email: ${storefrontSettings.supportEmail}`:"",storefrontSettings.businessDetails].filter(Boolean);form.insertAdjacentHTML("beforebegin",support.length?`<div class="notice support-details">${support.map(lineBreak).join("<br>")}</div>`:`<div class="notice support-details">Support contact details are not configured. Add approved details in Admin &gt; Settings.</div>`);}return title;}
@@ -398,6 +582,7 @@ document.addEventListener("click",async e=>{
   if(t.hasAttribute("data-detail-add")){addToCart(pickedVariant,Number($("#detail-qty").value||1));return;}
   if(t.hasAttribute("data-menu")){ $(".site-header")?.classList.toggle("menu-open");return;}
   if(t.hasAttribute("data-language")){localStorage.setItem(languageKey,language()==="en"?"hi":"en");render();return;}
+  if(t.dataset.browseAction){openBrowseEditor(t.dataset.browseAction,t.dataset.browseId);return;}
   if(t.dataset.demoAction){
    const remove=t.dataset.demoAction==="remove";
    t.disabled=true;
@@ -445,13 +630,29 @@ document.addEventListener("submit",async e=>{
   if(f.id==="checkout-form") return;
   if(f.id==="support-form"){const d=await api("/api/v1/support/requests",{method:"POST",body:formDataJson(f)});f.innerHTML=`<div class="notice">Your message was sent to AgroSeed. Reference: <b>${esc(d.ticket)}</b>.</div>`;return;}
   if(f.id==="admin-login-form"){const d=await api("/api/v1/admin/session",{method:"POST",body:formDataJson(f)});csrf=d.csrf;route(d.user?.role==="Catalog"?"/admin/products":d.user?.role==="Orders"?"/admin/orders":"/admin");return;}
-  if(f.id==="product-form"){const d=readForm(f);delete d.images;d.variants=parseVariants(d.variants);const id=f.dataset.id;await api(id?`/api/v1/admin/products/${id}`:"/api/v1/admin/products",{method:id?"PATCH":"POST",body:JSON.stringify(d)});toast("Product saved.");route("/admin/products");return;}
+  if(f.id==="product-form"){
+   const d=readForm(f);
+   for(const name of ["existingImage","existingAlt","productFiles","additionalImage"])delete d[name];
+   d.variants=parseVariants(d.variants);
+   Object.assign(d,await readProductImages(f));
+   const id=f.dataset.id;
+   await api(id?`/api/v1/admin/products/${id}`:"/api/v1/admin/products",{method:id?"PATCH":"POST",body:JSON.stringify(d)});
+   toast("Product saved.");
+   route(f.dataset.return);
+   return;
+  }
+  if(f.dataset.browseForm){
+   if(f.dataset.saving)return;
+   f.dataset.saving="true";
+   const submit=f.querySelector(".dialog-actions .btn-primary");
+   submit.disabled=true;
+   try{await saveBrowseEditor(f);}finally{delete f.dataset.saving;submit.disabled=false;}
+   return;
+  }
   if(f.id==="dialog-form"){await api("/api/v1/admin/inventory",{method:"POST",body:JSON.stringify({...readForm(f),sku:f.dataset.sku,delta:Number(readForm(f).delta)})});$("#dialog-root").innerHTML="";toast("Inventory adjustment saved.");render();return;}
   if(f.id==="coupon-form"){await api("/api/v1/admin/coupons",{method:"POST",body:formDataJson(f)});toast("Promotion created.");render();return;}
   if(f.id==="area-form"){await api("/api/v1/admin/service-areas",{method:"POST",body:formDataJson(f)});toast("Delivery area added.");render();return;}
   if(f.id==="settings-form"){await api("/api/v1/admin/settings",{method:"PATCH",body:formDataJson(f)});toast("Store profile saved.");return;}
-  if(f.matches("[data-taxonomy-form]")){const d=readForm(f);await api(`/api/v1/admin/catalog/${f.dataset.kind}/${encodeURIComponent(f.dataset.id)}`,{method:"PATCH",body:JSON.stringify({...d,order:Number(d.order),active:d.active==="true"})});toast("Browse label updated.");render();return;}
-  if(f.id==="category-form"||f.id==="brand-form"){const d=await api("/api/v1/admin/settings"),key=f.id==="category-form"?"categories":"brands",row=readForm(f);if(d[key].some(x=>x.nameEn.toLowerCase()===row.nameEn.trim().toLowerCase()))throw new Error("That browse label already exists.");d[key]=[...d[key],{id:slug(row.nameEn),name:row.name||row.nameEn,nameEn:row.nameEn,slug:slug(row.nameEn),active:true,order:d[key].length}];await api("/api/v1/admin/settings",{method:"PATCH",body:JSON.stringify(d)});toast("Browse label added.");render();return;}
  }catch(err){toast(err.message,true);}
 });
 document.addEventListener("click",async e=>{

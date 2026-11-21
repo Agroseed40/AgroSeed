@@ -311,3 +311,17 @@ a:focus-visible, button:focus-visible {
 .store-nav-icon-support::before { inset:4px 2px; border:2px solid; border-radius:3px; }
 .store-nav-icon-support::after { left:7px; top:5px; width:8px; height:8px; border:solid; border-width:0 2px 2px 0; transform:rotate(45deg); }
 .store-nav-icon-more::before { top:9px; left:9px; width:4px; height:4px; border-radius:50%; background:currentColor; box-shadow:-6px 0,6px 0; }
+
+.admin-app { background:#f5f7f6; }
+.admin-top { background:#fff; border-bottom:1px solid #e2e8e4; }
+.admin-card { border:1px solid #e2e8e4; border-radius:14px; box-shadow:0 2px 8px #182c2010; }
+.admin-page-head h1 { letter-spacing:-.025em; }
+.admin-nav a { border-radius:9px; }
+.admin-nav a.active { background:#e5efe4; color:#173f2d; }
+.admin-content input,.admin-content select,.admin-content textarea { border-radius:8px; }
+.admin-content .settings-section { padding-top:22px; border-top:1px solid #e2e8e4; }
+.admin-content .settings-section h3 { margin:0; }
+#settings-form > .image-fields { grid-column:1/-1; }
+#settings-form > .span-2:last-child { position:sticky; bottom:70px; background:white; padding:12px 0; border-top:1px solid #e2e8e4; }
+.field-banner-art img { width:90px; height:90px; object-fit:contain; }
+@media(min-width:721px){#settings-form > .span-2:last-child { bottom:0; }}

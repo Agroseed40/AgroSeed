@@ -368,26 +368,14 @@ export async function handleStoreRequest(request, response, pathname, env) {
       send(response, 200, { items, updatedAt }); return true;
     }
     if (pathname === "/api/v1/admin/session" && method === "POST") {
-      const ip = request.socket.remoteAddress || "unknown";
-      const attemptKey = hash(ip);
-      const savedAttempt = await env.DB.prepare("SELECT count, window_started FROM agroseed_admin_login_attempts WHERE ip_hash = ?").bind(attemptKey).first();
-      const attempt = savedAttempt ? { count: Number(savedAttempt.count) || 0, since: Number(savedAttempt.window_started) || Date.now() } : { count: 0, since: Date.now() };
-      if (Date.now() - attempt.since > 15 * 60_000) { attempt.count = 0; attempt.since = Date.now(); }
-      if (attempt.count >= 8) { send(response, 429, { error: "Too many sign-in attempts. Try again in 15 minutes." }); return true; }
       const input = await body(request, 2048);
       const configured = String(env.AGROSEED_ADMIN_PASSWORD || "");
       if (!configured) { send(response, 503, { error: "The staff password is not configured." }); return true; }
       const supplied = Buffer.from(String(input.password || "")); const expected = Buffer.from(configured);
       const match = supplied.length === expected.length && timingSafeEqual(supplied, expected);
       if (!match) {
-        attempt.count++;
-        await env.DB.prepare(`INSERT INTO agroseed_admin_login_attempts (ip_hash, count, window_started) VALUES (?, ?, ?)
-          ON CONFLICT(ip_hash) DO UPDATE SET count = excluded.count, window_started = excluded.window_started, updated_at = CURRENT_TIMESTAMP`)
-          .bind(attemptKey, attempt.count, attempt.since).run();
-
         send(response, 401, { error: "That password did not match." }); return true;
       }
-      await env.DB.prepare("DELETE FROM agroseed_admin_login_attempts WHERE ip_hash = ?").bind(attemptKey).run();
 
       const raw = randomBytes(32).toString("base64url");
       const csrf = randomBytes(24).toString("base64url");

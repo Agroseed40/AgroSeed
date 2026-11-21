@@ -137,10 +137,11 @@ export function canAccessAdminPath(role, path) {
 }
 
 function audit(data, action, entity, entityId, detail) {
-  data.audit.unshift({ id: randomBytes(9).toString("hex"), actor: "Store owner", action, entity, entityId: String(entityId), detail: String(detail || ""), createdAt: now() });
+  const collection = { product: "products", coupon: "coupons", "service-area": "serviceAreas", support: "supportRequests", category: "categories", brand: "brands" }[entity];
+  const demo = collection ? data[collection]?.some((item) => String(item.id) === String(entityId) && item.demo === true) : entity === "variant" && data.products.some((product) => product.demo === true && product.variants.some((variant) => variant.sku === entityId));
+  data.audit.unshift({ id: randomBytes(9).toString("hex"), actor: "Store owner", demo: demo || undefined, action, entity, entityId: String(entityId), detail: String(detail || ""), createdAt: now() });
   data.audit = data.audit.slice(0, 1500);
 }
-
 function deriveCollections(products, configuredCategories = [], configuredBrands = [], includeInactive = false) {
   const categoryMap = new Map(products.map((p) => [p.categoryEn, { id: slug(p.categoryEn), name: p.category, nameEn: p.categoryEn, slug: slug(p.categoryEn), active: true, order: 0 }]));
   const brandMap = new Map(products.map((p) => [p.brandEn, { id: slug(p.brandEn), name: p.brand, nameEn: p.brandEn, slug: slug(p.brandEn), active: true, order: 0 }]));
@@ -152,6 +153,12 @@ function deriveCollections(products, configuredCategories = [], configuredBrands
   return { categories, brands };
 }
 
+function categoryPresentation(input) {
+  return {
+    banner: String(input.banner || "").trim().slice(0, 100),
+    sectionCopy: String(input.sectionCopy || "").trim().slice(0, 2000)
+  };
+}
 function normalizeTaxonomy(rows, label) {
   if (!Array.isArray(rows) || rows.length > 100) throw Object.assign(new Error(`${label} must contain at most 100 rows.`), { statusCode: 400 });
   const seen = new Set();
@@ -161,7 +168,7 @@ function normalizeTaxonomy(rows, label) {
     const key = nameEn.toLocaleLowerCase();
     if (seen.has(key)) throw Object.assign(new Error(`${label} names must be unique.`), { statusCode: 400 });
     seen.add(key);
-    return { id: slug(nameEn), slug: slug(nameEn), name: String(row.name || nameEn).trim().slice(0, 100), nameEn, active: row.active !== false && row.active !== "false", order: Math.min(1000, Math.max(0, Number(row.order) || 0)) };
+    return { ...categoryPresentation(row), id: slug(nameEn), slug: slug(nameEn), name: String(row.name || nameEn).trim().slice(0, 100), nameEn, active: row.active !== false && row.active !== "false", order: Math.min(1000, Math.max(0, Number(row.order) || 0)) };
   });
 }
 
@@ -207,6 +214,71 @@ function cleanProduct(input, previous, data) {
   };
 }
 
+const demoCollections = [
+  "products",
+  "categories",
+  "brands",
+  "coupons",
+  "serviceAreas",
+  "supportRequests",
+  "inventoryTransactions",
+  "audit"
+];
+function demoCounts(data) {
+  return Object.fromEntries(demoCollections.map((key) => [
+    key,
+    (data[key] || []).filter((row) => row.demo === true).length
+  ]));
+}
+function updateDemo(data, remove) {
+  if (remove) {
+    for (const key of demoCollections) {
+      if (data[key]) data[key] = data[key].filter((row) => row.demo !== true);
+    }
+    return demoCounts(data);
+  }
+  const samples = [
+    ["Tomato seeds", "टमाटर के बीज", "Seeds", "10 g"],
+    ["Compost", "खाद", "Soil Nutrition", "1 kg"],
+    ["Sticky traps", "चिपचिपे ट्रैप", "Crop Protection", "10 sheets"],
+    ["Hand trowel", "हाथ की खुरपी", "Farm Tools", "1 piece"],
+    ["Drip connectors", "ड्रिप कनेक्टर", "Irrigation", "5 pieces"]
+  ];
+  for (const [index, [nameEn, name, category, pack]] of samples.entries()) {
+    const number = index + 1;
+    const key = randomBytes(6).toString("hex");
+    const sku = "DEMO-" + key.toUpperCase();
+    const code = "DEMO" + key.toUpperCase();
+    const categoryEn = "Demo " + category;
+    const brandEn = "Demo Brand " + number;
+    const pricePaise = 7900 + index * 2000;
+    const product = cleanProduct({
+      nameEn: "Demo · " + nameEn,
+      name: "डेमो · " + name,
+      categoryEn,
+      brandEn,
+      status: "published",
+      featured: true,
+      descriptionEn: "Sample product for previewing the AgroSeed catalog.",
+      variants: [{ sku, pack, pricePaise, mrpPaise: pricePaise + 2000, stock: 12 + index }]
+    }, null, data);
+    data.products.push({ ...product, demo: true });
+    for (const [collection, label] of [["categories", categoryEn], ["brands", brandEn]]) {
+      data[collection] ||= [];
+      if (!data[collection].some((row) => row.slug === slug(label))) {
+        data[collection].push({ id: slug(label), slug: slug(label), name: label, nameEn: label, active: true, order: index, demo: true });
+      }
+    }
+    data.coupons.push({ id: key, code, type: "percent", value: 5 + index, minSubtotalPaise: 10_000, maxUses: 20, usesCount: 0, active: true, demo: true });
+    let pin = 900_000 + index;
+    while (data.serviceAreas.some((row) => row.pincode === String(pin))) pin += 5;
+    data.serviceAreas.push({ id: key, pincode: String(pin), city: "Demo delivery area " + number, feePaise: 2900, estimate: "2–4 days", active: true, demo: true });
+    data.supportRequests.unshift({ id: key, name: "Demo shopper " + number, email: "shopper" + number + "@example.invalid", topic: "Product question", message: "Sample request about " + nameEn.toLowerCase() + ".", status: ["new", "in_progress", "resolved"][index % 3], createdAt: now(), demo: true });
+    data.inventoryTransactions.unshift({ id: key, sku, delta: 12 + index, reason: "Demo opening stock", actor: "Demo data", createdAt: now(), demo: true });
+    data.audit.unshift({ id: key, actor: "Demo data", action: "demo_product_created", entity: "product", entityId: String(product.id), detail: product.nameEn, createdAt: now(), demo: true });
+  }
+  return demoCounts(data);
+}
 function findVariant(data, sku) {
   for (const product of data.products) {
     const variant = product.variants.find((item) => item.sku.toLowerCase() === String(sku || "").toLowerCase());
@@ -256,7 +328,7 @@ export async function handleStoreRequest(request, response, pathname, env) {
   try {
     const url = new URL(request.url || "/", "http://localhost");
     const method = request.method;
-    if (pathname === "/api/v1/storefront/settings" && method === "GET") { const data = await state(env), allowed = ["storeName", "publicDomain", "storeAbout", "supportEmail", "supportPhone", "supportDetails", "businessDetails", "language", "homeHeroEyebrow", "homeHeroHeadline", "homeHeroBody", "homeHeroNote", "homeHeroPrimaryCta", "deliveryRules", "codPolicy", "cancellationReturnsRules", "shippingReturnsPolicy", "privacyPolicy", "termsPolicy", "productUseNotice"]; send(response, 200, Object.fromEntries(allowed.map((key) => [key, String(data.settings?.[key] || "")]))); return true; }
+    if (pathname === "/api/v1/storefront/settings" && method === "GET") { const data = await state(env), allowed = ["storeName", "publicDomain", "storeAbout", "supportEmail", "supportPhone", "supportDetails", "businessDetails", "language", "homeHeroEyebrow", "homeHeroHeadline", "homeHeroBody", "homeHeroNote", "homeHeroPrimaryCta", "homeBannerTitle", "homeBannerText", "homeHelpTitle", "homeHelpText", "homeProductsTitle", "navHome", "navCategories", "navSearch", "navCart", "navAccount", "deliveryRules", "codPolicy", "cancellationReturnsRules", "shippingReturnsPolicy", "privacyPolicy", "termsPolicy", "productUseNotice"]; send(response, 200, Object.fromEntries(allowed.map((key) => [key, String(data.settings?.[key] || "")]))); return true; }
     if (pathname === "/api/v1/storefront/offers" && method === "GET") { const data = await state(env), time = Date.now(), items = (data.coupons || []).filter((item) => item.active !== false && (!item.expiresAt || time <= Date.parse(`${item.expiresAt}T23:59:59Z`)) && (!item.maxUses || (Number(item.usesCount) || 0) < item.maxUses)).map(({ code, type, value, minSubtotalPaise, expiresAt }) => ({ code, type, value, minSubtotalPaise: Number(minSubtotalPaise) || 0, expiresAt: expiresAt || null })); send(response, 200, { items }); return true; }
     if (pathname === "/api/v1/cart" && (method === "GET" || method === "PUT")) {
       const id = String(request.headers["x-agroseed-cart-id"] || "").trim();
@@ -385,9 +457,17 @@ export async function handleStoreRequest(request, response, pathname, env) {
       const session = await requireAdmin(request, response, mutating, env); if (!session) return true;
       const adminPath = pathname.slice("/api/v1/admin".length);
       if (!canAccessAdminPath(session.role || "Owner", adminPath)) { send(response, 403, { error: "Your staff role cannot access this area." }); return true; }
+      if (adminPath === "/demo" && ["POST", "DELETE"].includes(method)) {
+        const counts = await change(env, (data) => {
+          if (method === "POST" && Object.values(demoCounts(data)).some(Boolean)) return demoCounts(data);
+          return updateDemo(data, method === "DELETE");
+        });
+        send(response, 200, { counts });
+        return true;
+      }
       if (adminPath === "/overview" && method === "GET") {
         const data = await state(env); const published = data.products.filter((p) => p.status === "published").length;
-        send(response, 200, { products: data.products.length, published, lowStock: data.products.flatMap(p => p.variants).filter(v => v.stock <= 5).length }); return true;
+        send(response, 200, { demo: demoCounts(data), products: data.products.length, published, lowStock: data.products.flatMap(p => p.variants).filter(v => v.stock <= 5).length }); return true;
       }
       if (adminPath === "/products" && method === "GET") {
         const data = await state(env); let products = data.products;
@@ -408,7 +488,7 @@ export async function handleStoreRequest(request, response, pathname, env) {
       }
       if (adminPath === "/inventory" && method === "GET") { const data = await state(env); send(response, 200, { products: data.products, transactions: data.inventoryTransactions.slice(0, 300) }); return true; }
       if (adminPath === "/inventory" && method === "POST") {
-        const input = await body(request); const result = await change(env, (data) => { const found = findVariant(data, input.sku); const delta = Number(input.delta); const reason = String(input.reason || "").trim(); if (!found) throw Object.assign(new Error("SKU not found."), { statusCode: 404 }); if (!Number.isInteger(delta) || delta === 0 || Math.abs(delta) > 10000) throw Object.assign(new Error("Stock change must be a non-zero whole number."), { statusCode: 400 }); if (found.variant.stock + delta < 0) throw Object.assign(new Error("Stock cannot go below zero."), { statusCode: 400 }); if (reason.length < 5) throw Object.assign(new Error("Add a reason (at least 5 characters)."), { statusCode: 400 }); found.variant.stock += delta; found.product.stock = found.product.variants.reduce((sum, item) => sum + item.stock, 0); const row = { id: randomBytes(8).toString("hex"), sku: found.variant.sku, delta, reason, actor: "Store owner", createdAt: now() }; data.inventoryTransactions.unshift(row); audit(data, "inventory_adjusted", "variant", found.variant.sku, `${delta > 0 ? "+" : ""}${delta}: ${reason}`); return row; }); send(response, 201, result); return true;
+        const input = await body(request); const result = await change(env, (data) => { const found = findVariant(data, input.sku); const delta = Number(input.delta); const reason = String(input.reason || "").trim(); if (!found) throw Object.assign(new Error("SKU not found."), { statusCode: 404 }); if (!Number.isInteger(delta) || delta === 0 || Math.abs(delta) > 10000) throw Object.assign(new Error("Stock change must be a non-zero whole number."), { statusCode: 400 }); if (found.variant.stock + delta < 0) throw Object.assign(new Error("Stock cannot go below zero."), { statusCode: 400 }); if (reason.length < 5) throw Object.assign(new Error("Add a reason (at least 5 characters)."), { statusCode: 400 }); found.variant.stock += delta; found.product.stock = found.product.variants.reduce((sum, item) => sum + item.stock, 0); const row = { id: randomBytes(8).toString("hex"), sku: found.variant.sku, demo: found.product.demo === true || undefined, delta, reason, actor: "Store owner", createdAt: now() }; data.inventoryTransactions.unshift(row); audit(data, "inventory_adjusted", "variant", found.variant.sku, `${delta > 0 ? "+" : ""}${delta}: ${reason}`); return row; }); send(response, 201, result); return true;
       }
       if (adminPath === "/import" && method === "POST") {
         const input = await body(request); if (!Array.isArray(input.rows) || !["create", "upsert"].includes(input.mode)) { send(response, 400, { error: "Choose create or update, and include CSV rows." }); return true; }
@@ -416,7 +496,9 @@ export async function handleStoreRequest(request, response, pathname, env) {
       }
       if (adminPath === "/settings" && (method === "GET" || method === "PATCH")) {
         if (method === "GET") { const data = await state(env); const collections = deriveCollections(data.products, data.categories, data.brands, true); send(response, 200, { settings: data.settings, categories: collections.categories, brands: collections.brands, serviceAreas: data.serviceAreas, coupons: data.coupons }); return true; }
-        const input = await body(request); const rawDomain = Object.hasOwn(input, "publicDomain") ? String(input.publicDomain || "").trim() : String((await state(env)).settings?.publicDomain || ""); let publicDomain = ""; if (rawDomain) { let parsed; try { parsed = new URL(rawDomain); } catch { send(response, 400, { error: "Public website domain must be a full URL such as https://agroseed.in." }); return true; } if (!["http:", "https:"].includes(parsed.protocol) || parsed.username || parsed.password || parsed.pathname !== "/" || parsed.search || parsed.hash) { send(response, 400, { error: "Enter only the public site base URL, such as https://agroseed.in, without a path." }); return true; } publicDomain = parsed.origin; } const result = await change(env, (data) => { data.settings ||= {}; data.settings = { ...data.settings, storeName: String(input.storeName || data.settings.storeName || "AgroSeed").slice(0, 80), publicDomain, supportEmail: Object.hasOwn(input, "supportEmail") ? String(input.supportEmail || "").trim().slice(0, 160) : String(data.settings.supportEmail || ""), supportPhone: Object.hasOwn(input, "supportPhone") ? String(input.supportPhone || "").trim().slice(0, 40) : String(data.settings.supportPhone || ""), language: ["en", "hi"].includes(input.language) ? input.language : (data.settings.language || "en") }; for (const field of ["storeAbout", "supportDetails", "businessDetails", "homeHeroEyebrow", "homeHeroHeadline", "homeHeroBody", "homeHeroNote", "homeHeroPrimaryCta", "deliveryRules", "codPolicy", "cancellationReturnsRules", "shippingReturnsPolicy", "privacyPolicy", "termsPolicy", "productUseNotice"]) if (Object.hasOwn(input, field)) data.settings[field] = String(input[field] || "").trim().slice(0, 20000); if (Array.isArray(input.categories)) data.categories = normalizeTaxonomy(input.categories, "Categories"); if (Array.isArray(input.brands)) data.brands = normalizeTaxonomy(input.brands, "Brands"); audit(data, "store_settings_updated", "settings", "store", "Store details and editable copy updated"); return data.settings; }); send(response, 200, result); return true;
+        const input = await body(request); const rawDomain = Object.hasOwn(input, "publicDomain") ? String(input.publicDomain || "").trim() : String((await state(env)).settings?.publicDomain || ""); let publicDomain = ""; if (rawDomain) { let parsed; try { parsed = new URL(rawDomain); } catch { send(response, 400, { error: "Public website domain must be a full URL such as https://agroseed.in." }); return true; } if (!["http:", "https:"].includes(parsed.protocol) || parsed.username || parsed.password || parsed.pathname !== "/" || parsed.search || parsed.hash) { send(response, 400, { error: "Enter only the public site base URL, such as https://agroseed.in, without a path." }); return true; } publicDomain = parsed.origin; } const result = await change(env, (data) => { data.settings ||= {}; data.settings = { ...data.settings, storeName: String(input.storeName || data.settings.storeName || "AgroSeed").slice(0, 80), publicDomain, supportEmail: Object.hasOwn(input, "supportEmail") ? String(input.supportEmail || "").trim().slice(0, 160) : String(data.settings.supportEmail || ""), supportPhone: Object.hasOwn(input, "supportPhone") ? String(input.supportPhone || "").trim().slice(0, 40) : String(data.settings.supportPhone || ""), language: ["en", "hi"].includes(input.language) ? input.language : (data.settings.language || "en") }; for (const field of ["storeAbout", "supportDetails", "businessDetails", "homeHeroEyebrow", "homeHeroHeadline", "homeHeroBody", "homeHeroNote", "homeHeroPrimaryCta", "homeBannerTitle", "homeBannerText", "homeHelpTitle", "homeHelpText", "homeProductsTitle", "deliveryRules", "codPolicy", "cancellationReturnsRules", "shippingReturnsPolicy", "privacyPolicy", "termsPolicy", "productUseNotice"]) if (Object.hasOwn(input, field)) data.settings[field] = String(input[field] || "").trim().slice(0, 20000); for (const field of ["navHome", "navCategories", "navSearch", "navCart", "navAccount"]) if (Object.hasOwn(input, field)) data.settings[field] = String(input[field] ?? "").trim().slice(0, 20);
+          if (Array.isArray(input.categories)) data.categories = normalizeTaxonomy(input.categories, "Categories").map((row) => ({ ...row, demo: data.categories?.some((old) => old.demo === true && old.slug === row.slug) || undefined }));
+          if (Array.isArray(input.brands)) data.brands = normalizeTaxonomy(input.brands, "Brands").map((row) => ({ ...row, demo: data.brands?.some((old) => old.demo === true && old.slug === row.slug) || undefined })); audit(data, "store_settings_updated", "settings", "store", "Store details and editable copy updated"); return data.settings; }); send(response, 200, result); return true;
       }
       const taxonomyRoute = adminPath.match(/^\/catalog\/(category|brand)\/([^/]+)$/);
       if (taxonomyRoute && method === "PATCH") {
@@ -424,7 +506,7 @@ export async function handleStoreRequest(request, response, pathname, env) {
         const result = await change(env, (data) => {
           const key = taxonomyRoute[1] === "category" ? "categories" : "brands";
           const derived = deriveCollections(data.products, data.categories, data.brands, true)[key];
-          const rows = (data[key]?.length ? data[key] : derived).map((item) => ({ ...item }));
+          const rows = derived.map((item) => ({ ...item }));
           const entry = rows.find((item) => String(item.id || slug(item.nameEn)) === taxonomyRoute[2]);
           if (!entry) throw Object.assign(new Error("Browse label not found."), { statusCode: 404 });
           const nameEn = String(input.nameEn || "").trim();
@@ -433,6 +515,7 @@ export async function handleStoreRequest(request, response, pathname, env) {
           const oldEn = entry.nameEn, oldHi = entry.name;
           entry.nameEn = nameEn; entry.name = String(input.name || nameEn).trim().slice(0, 100); entry.slug = slug(nameEn); entry.id = entry.slug;
           entry.order = Math.min(1000, Math.max(0, Number(input.order) || 0)); entry.active = input.active !== false && input.active !== "false";
+          if (key === "categories" && Object.hasOwn(input, "sectionCopy")) Object.assign(entry, categoryPresentation(input));
           for (const product of data.products) {
             if (taxonomyRoute[1] === "category" && product.categoryEn === oldEn) { product.categoryEn = nameEn; product.category = String(input.name || oldHi || nameEn); }
             if (taxonomyRoute[1] === "brand" && product.brandEn === oldEn) { product.brandEn = nameEn; product.brand = String(input.name || oldHi || nameEn); }
@@ -445,11 +528,11 @@ export async function handleStoreRequest(request, response, pathname, env) {
       if (adminPath === "/coupons" && method === "POST") { const input = await body(request); const result = await change(env, (data) => { const code = String(input.code || "").trim().toUpperCase(); const value = Number(input.value); const maxUses = input.maxUses === "" || input.maxUses === undefined ? null : Number(input.maxUses); const minimum = input.minSubtotal === "" || input.minSubtotal === undefined ? 0 : Number(input.minSubtotal); if (!/^[A-Z0-9_-]{3,20}$/.test(code) || !["percent", "flat"].includes(input.type) || !Number.isFinite(value) || value <= 0 || (input.type === "percent" && value > 100)) throw Object.assign(new Error("Check promotion code and discount value."), { statusCode: 400 }); if (maxUses !== null && (!Number.isInteger(maxUses) || maxUses < 1 || maxUses > 1000000)) throw Object.assign(new Error("Maximum uses must be a positive whole number."), { statusCode: 400 }); if (!Number.isFinite(minimum) || minimum < 0) throw Object.assign(new Error("Minimum order amount cannot be negative."), { statusCode: 400 }); if (input.expiresAt && !/^\d{4}-\d{2}-\d{2}$/.test(input.expiresAt)) throw Object.assign(new Error("Enter a valid expiration date."), { statusCode: 400 }); if (data.coupons.some((c) => c.code === code)) throw Object.assign(new Error("That code already exists."), { statusCode: 409 }); const item = { id: randomBytes(6).toString("hex"), code, type: input.type, value: input.type === "flat" ? Math.round(value * 100) : Math.round(value), minSubtotalPaise: Math.round(minimum * 100), maxUses, usesCount: 0, active: true, expiresAt: input.expiresAt || null, createdAt: now() }; data.coupons.push(item); audit(data, "coupon_created", "coupon", item.id, code); return item; }); send(response, 201, result); return true; }
       const couponRoute = adminPath.match(/^\/coupons\/([^/]+)$/);
       if (couponRoute && method === "PATCH") { const input = await body(request); const result = await change(env, (data) => { const item = data.coupons.find((row) => row.id === couponRoute[1]); if (!item) throw Object.assign(new Error("Promotion not found."), { statusCode: 404 }); item.active = input.active === true || input.active === "true"; audit(data, "coupon_status_changed", "coupon", item.id, item.active ? "activated" : "paused"); return item; }); send(response, 200, result); return true; }
-      if (couponRoute && method === "DELETE") { await change(env, (data) => { data.coupons = data.coupons.filter((item) => item.id !== couponRoute[1]); audit(data, "coupon_deleted", "coupon", couponRoute[1], "Promotion removed"); }); send(response, 200, { ok: true }); return true; }
+      if (couponRoute && method === "DELETE") { await change(env, (data) => { audit(data, "coupon_deleted", "coupon", couponRoute[1], "Promotion removed"); data.coupons = data.coupons.filter((item) => item.id !== couponRoute[1]); }); send(response, 200, { ok: true }); return true; }
       if (adminPath === "/service-areas" && method === "GET") { const data = await state(env); send(response, 200, { items: data.serviceAreas }); return true; }
       if (adminPath === "/service-areas" && method === "POST") { const input = await body(request); const result = await change(env, (data) => { const pincode = String(input.pincode || "").trim(); if (!/^\d{6}$/.test(pincode)) throw Object.assign(new Error("PIN code must have 6 digits."), { statusCode: 400 }); if (data.serviceAreas.some((area) => area.pincode === pincode)) throw Object.assign(new Error("That PIN code is already configured."), { statusCode: 409 }); const area = { id: randomBytes(6).toString("hex"), pincode, city: String(input.city || "").slice(0, 80), feePaise: Math.max(0, Math.round(Number(input.feeRupees || 0) * 100)), estimate: String(input.estimate || "").slice(0, 80), active: true }; data.serviceAreas.push(area); audit(data, "service_area_added", "service-area", area.id, pincode); return area; }); send(response, 201, result); return true; }
       const areaRoute = adminPath.match(/^\/service-areas\/([^/]+)$/);
-      if (areaRoute && method === "DELETE") { await change(env, (data) => { data.serviceAreas = data.serviceAreas.filter((item) => item.id !== areaRoute[1]); audit(data, "service_area_removed", "service-area", areaRoute[1], "PIN code removed"); }); send(response, 200, { ok: true }); return true; }
+      if (areaRoute && method === "DELETE") { await change(env, (data) => { audit(data, "service_area_removed", "service-area", areaRoute[1], "PIN code removed"); data.serviceAreas = data.serviceAreas.filter((item) => item.id !== areaRoute[1]); }); send(response, 200, { ok: true }); return true; }
       if (adminPath === "/support" && method === "GET") { const data = await state(env); send(response, 200, { items: data.supportRequests }); return true; }
       const supportRoute = adminPath.match(/^\/support\/([^/]+)$/);
       if (supportRoute && method === "PATCH") { const input = await body(request); const result = await change(env, (data) => { const item = data.supportRequests.find((row) => row.id === supportRoute[1]); if (!item) throw Object.assign(new Error("Request not found."), { statusCode: 404 }); item.status = input.status === "resolved" ? "resolved" : "in_progress"; audit(data, "support_request_updated", "support", item.id, item.status); return item; }); send(response, 200, result); return true; }

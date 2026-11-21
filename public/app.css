@@ -46,83 +46,6 @@
 .logo-mark img,.brand-mark img{display:block;width:72%;height:72%;object-fit:contain}
 .account-signout{display:flex;justify-content:flex-end;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
 
-.agro-home { background: #f6f4ea; }
-.agro-home .home-ribbon {
-  padding: 9px 0; background: #dce6d2; border-block: 1px solid #bfcdb7;
-  color: #244f37; font-size: 13px; font-weight: 700; text-align: center;
-}
-.agro-home .home-content { padding-top: 22px; padding-bottom: 38px; }
-.agro-home .home-feature {
-  margin: 0 6px 34px 0; overflow: hidden; border: 3px solid #18241c;
-  border-radius: 17px; background: #dce6d2; box-shadow: 6px 7px 0 #bd2d1b;
-}
-.agro-home .home-feature-heading {
-  display: flex; justify-content: space-between; align-items: end;
-  gap: 14px; padding: clamp(14px, 3vw, 30px); background: #244f37; color: #fff;
-}
-.agro-home .home-feature-heading h1 { margin: 0; font-size: clamp(23px, 4vw, 43px); line-height: 1.12; }
-.agro-home .home-feature-heading p { margin: 6px 0 0; color: #e4ecd9; font-size: 14px; }
-.agro-home .home-feature-heading a { color: #f0f6e6; font-weight: 700; font-size: 13px; }
-.agro-home .home-panels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 7px; gap: 5px; }
-.agro-home .home-panel {
-  position: relative; isolation: isolate; overflow: hidden; display: flex; align-items: end;
-  min-width: 0; min-height: clamp(140px, 19vw, 245px); padding: clamp(12px, 2.2vw, 26px);
-  border: 1px solid #243529; border-radius: 8px; background: #cedcb9; color: #18241c;
-}
-.agro-home .home-panel:nth-child(2) { background: #f1deb4; }
-.agro-home .home-panel:nth-child(3) { background: #eacdb8; }
-.agro-home .home-panel-art {
-  position: absolute; z-index: -1; inset: 4% 7% auto auto; opacity: .16;
-  font-size: clamp(66px, 12vw, 170px); line-height: 1; color: #244f37;
-}
-.agro-home .home-panel-copy { display: grid; gap: 5px; padding-right: 24px; }
-.agro-home .home-panel-copy strong { font-size: clamp(18px, 2.4vw, 33px); line-height: 1.12; }
-.agro-home .home-panel-copy span { font-size: 13px; }
-.agro-home .home-panel-copy small { font-weight: 700; }
-.agro-home .home-panel-arrow { position: absolute; right: 12px; bottom: 12px; font-size: 19px; transition: transform .16s ease; }
-.agro-home .home-panel,
-.agro-home .category-card,
-.agro-home .product-card,
-.agro-home .btn,
-.agro-home .text-link,
-.agro-home .home-feature-heading a {
-  -webkit-tap-highlight-color: transparent;
-  transition: transform .16s cubic-bezier(.2,.75,.25,1), box-shadow .16s ease, border-color .16s ease, background-color .16s ease;
-}
-.agro-home .home-panel { box-shadow: 0 0 0 0 #18241c00; }
-.agro-home .home-panel:hover { transform: translateY(-3px); box-shadow: 0 5px 0 #18241c; }
-.agro-home .home-panel:hover .home-panel-arrow { transform: translate(2px,-2px); }
-.agro-home .home-panel:active,
-.agro-home .category-card:active,
-.agro-home .product-card:active,
-.agro-home .btn:active,
-.agro-home .text-link:active,
-.agro-home .home-feature-heading a:active { transform: scale(.975); }
-.agro-home .home-panel:active { box-shadow: 0 1px 0 #18241c; }
-.agro-home .home-panel:active .home-panel-arrow { transform: translate(3px,-3px); }
-.agro-home .home-panel:focus-visible { outline: 3px solid #18241c; outline-offset: -5px; }
-@media (prefers-reduced-motion: reduce) {
-  .agro-home .home-panel,
-  .agro-home .category-card,
-  .agro-home .product-card,
-  .agro-home .btn,
-  .agro-home .text-link,
-  .agro-home .home-feature-heading a,
-  .agro-home .home-panel-arrow { transition: none; }
-  .agro-home .home-panel:hover,
-  .agro-home .home-panel:active,
-  .agro-home .category-card:active,
-  .agro-home .product-card:active,
-  .agro-home .btn:active,
-  .agro-home .text-link:active,
-  .agro-home .home-feature-heading a:active { transform: none; }
-}
-@media (max-width: 600px) {
-  .agro-home .home-feature-heading { align-items: start; flex-direction: column; }
-  .agro-home .home-panels { grid-template-columns: 1fr; }
-  .agro-home .home-panel { min-height: 92px; align-items: center; }
-}
-
 /* Calm full-screen transition for document navigation. */
 .page-transition {
   position: fixed; z-index: 1000; inset: 0; display: grid; place-items: center;
@@ -212,4 +135,118 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .page-transition,.page-transition-card,.transition-seed,.transition-leaf,.transition-progress i,.account-overview-links>a { animation: none; transition: none; }
+}
+
+/* AgroSeed storefront shelves and browse navigation */
+.agro-home { background:#f8f8f1; }
+.field-hero { background:linear-gradient(130deg,#15382b,#285944 65%,#3b6747); color:#fff; border-radius:0 0 28px 28px; padding:24px 0 18px; }
+.field-intro { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.field-intro h1 { margin:0; font-size:clamp(23px,5vw,46px); letter-spacing:-.045em; line-height:1.08; }
+.field-intro p { margin:6px 0; color:#e5efda; font-size:13px; }
+.field-intro>a { flex:none; background:#e3edc7; color:#173b2b; font-weight:800; border-radius:99px; padding:10px 14px; font-size:12px; }
+.field-categories { display:flex; gap:10px; overflow-x:auto; padding:14px 2px 7px; margin-top:8px; scrollbar-width:thin; }
+.field-categories>a { flex:0 0 85px; display:grid; justify-items:center; align-content:start; gap:6px; text-align:center; font-size:11px; line-height:1.25; }
+.field-categories span { display:grid; place-items:center; width:57px; height:54px; border-radius:17px; background:#f2f6e2; font-size:28px; }
+.field-note { margin:12px 0 0; padding:9px 12px; background:#fff2; color:white; font-size:12px; border-radius:10px; overflow-wrap:anywhere; }
+.field-shelves { padding-block:14px 32px; }
+.field-shelves .deal-strip { width:100%; margin:0 0 12px; }
+.field-banners { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.field-banner { position:relative; isolation:isolate; overflow:hidden; display:grid; align-items:center; min-height:125px; border-radius:18px; padding:16px 65px 16px 15px; color:#213023; }
+.field-gold { background:linear-gradient(110deg,#ffe9a6,#f3b970); }
+.field-mint { background:linear-gradient(110deg,#e2f2d0,#a9cc9f); }
+.field-banner strong,.field-banner small { display:block; overflow-wrap:anywhere; }
+.field-banner strong { font-size:clamp(18px,3vw,32px); line-height:1.1; letter-spacing:-.04em; }
+.field-banner small { margin-top:8px; font-size:12px; }
+.field-banner-art { position:absolute; z-index:-1; right:24px; bottom:-14px; font-size:clamp(58px,12vw,126px); opacity:.35; transform:rotate(-13deg); }
+.field-banner-arrow { position:absolute; right:10px; top:10px; width:29px; height:29px; display:grid; place-items:center; color:white; background:#214a37; border-radius:50%; }
+.field-products { margin-top:20px; }
+.field-products .section-head { align-items:center; margin-bottom:10px; }
+.field-categories>a,.field-banner { transition:transform 160ms ease,filter 160ms ease; }
+.field-categories>a:active,.field-banner:active { transform:scale(.97); }
+@media(hover:hover) { .field-categories>a:hover,.field-banner:hover { filter:brightness(1.06); transform:translateY(-2px); } }
+@media(max-width:720px) {
+ .field-hero .container,.field-shelves { width:calc(100% - 24px); }
+ .field-banners { grid-template-columns:1fr; }
+ .field-banner { min-height:106px; }
+ .product-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .product-grid>.empty-state { grid-column:1/-1; }
+ .product-card { min-width:0; }
+ .product-title,.product-brand { overflow-wrap:anywhere; }
+ .product-actions { flex-wrap:wrap; }
+ .product-actions .btn { min-width:54px; }
+}
+@media(prefers-reduced-motion:reduce) {
+ .field-categories>a,.field-banner { transition:none; }
+ .field-categories>a:is(:hover,:active),.field-banner:is(:hover,:active) { transform:none; }
+}
+@media(max-width:720px) {
+ .mobile-admin-nav { justify-content:flex-start; overflow-x:auto; gap:4px; }
+ .mobile-admin-nav a { flex:0 0 66px; min-height:42px; }
+}
+.agro-home .product-card>a { display:block; transition:opacity 140ms ease; }
+.agro-home .product-card>a:active { opacity:.8; }
+@media(prefers-reduced-motion:reduce) {
+ .agro-home .product-card>a { transition:none; }
+}
+
+/* Match native touch feedback to the storefront palette. */
+:root { -webkit-tap-highlight-color: #32644740; }
+a:focus-visible, button:focus-visible {
+  outline: 2px solid #517c42;
+  outline-offset: 3px;
+}
+
+/* Category directory */
+.browse-page { padding:22px 0 38px; }
+.browse-page h1 { margin:0 0 16px; font-size:clamp(21px,4vw,32px); }
+.browse-layout { display:grid; grid-template-columns:minmax(82px,19%) minmax(0,1fr); gap:clamp(10px,3vw,30px); align-items:start; }
+.browse-rail { position:sticky; top:85px; max-height:calc(100dvh - 170px); overflow:auto; background:#e9efe5; border-radius:16px; scrollbar-width:thin; }
+.browse-rail a { display:grid; justify-items:center; gap:5px; padding:12px 5px; border-left:3px solid transparent; text-align:center; font-size:clamp(10px,2vw,14px); overflow-wrap:anywhere; }
+.browse-rail a[aria-current] { background:#fff; border-color:#326447; color:#214a37; }
+.browse-rail a span { font-size:24px; }
+.browse-banner { display:flex; align-items:center; justify-content:space-between; gap:7px; background:linear-gradient(120deg,#e8f0d8,#c7dfbf); border-radius:17px; padding:14px; color:#204332; }
+.browse-banner strong,.browse-banner small { display:block; overflow-wrap:anywhere; }
+.browse-banner strong { font-size:clamp(17px,3vw,30px); }
+.browse-banner small { margin-top:6px; }
+.browse-banner i { font-size:clamp(34px,8vw,72px); font-style:normal; }
+.browse-section { margin:20px 0; }
+.browse-section h2 { font-size:clamp(15px,3vw,23px); margin:0 0 10px; }
+.browse-tiles { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px 8px; }
+.browse-tile { min-width:0; text-align:center; font-size:clamp(10px,2vw,14px); overflow-wrap:anywhere; }
+.browse-tile-art { display:grid; place-items:center; aspect-ratio:1; width:100%; max-width:120px; margin:0 auto 5px; background:#edf3e6; border-radius:14px; font-size:clamp(22px,7vw,50px); overflow:hidden; }
+.browse-tile-art img { width:100%; height:100%; object-fit:contain; }
+.browse-tile-art .product-emoji { font-size:inherit; }
+.browse-empty { color:var(--muted); }
+.category-admin-details { grid-column:1/-1; display:grid; }
+.category-admin-details label { display:grid; gap:4px; margin-top:8px; }
+.category-admin-details small { display:block; margin-top:5px; }
+@media(max-width:720px) {
+ .browse-page { width:calc(100% - 20px); }
+ .browse-rail { top:101px; }
+ .customer-bottom-nav a>small { font-size:clamp(8px,2.4vw,10px); }
+}
+
+.store-nav-icon { position:relative; display:block; width:22px; height:22px; color:inherit; }
+.store-nav-icon::before,.store-nav-icon::after,.store-nav-icon i { position:absolute; display:block; box-sizing:border-box; content:""; }
+.store-nav-icon-home::before { inset:8px 4px 2px; border:2px solid; border-top:0; border-radius:0 0 3px 3px; }
+.store-nav-icon-home::after { top:3px; left:5px; width:12px; height:12px; border-top:2px solid; border-left:2px solid; transform:rotate(45deg); border-radius:2px; }
+.store-nav-icon-shop::before,.store-nav-icon-shop::after,.store-nav-icon-shop i { width:7px; height:7px; border:1.6px solid; border-radius:2px; }
+.store-nav-icon-shop::before { top:3px; left:3px; }
+.store-nav-icon-shop::after { top:3px; right:3px; }
+.store-nav-icon-shop i { bottom:3px; left:3px; box-shadow:9px 0 0 -1px currentColor; }
+.store-nav-icon-search::before { inset:2px 6px 6px 2px; border:2px solid; border-radius:50%; }
+.store-nav-icon-search::after { width:8px; height:2px; right:1px; bottom:4px; background:currentColor; transform:rotate(45deg); border-radius:2px; }
+.store-nav-icon-bag::before { inset:7px 3px 2px; border:2px solid; border-radius:3px 3px 5px 5px; }
+.store-nav-icon-bag::after { inset:2px 7px 11px; border:2px solid; border-bottom:0; border-radius:8px 8px 0 0; }
+.store-nav-icon-account::before { inset:2px 7px 12px; border:2px solid; border-radius:50%; }
+.store-nav-icon-account::after { inset:12px 3px 2px; border:2px solid; border-radius:9px 9px 4px 4px; }
+.admin-nav-fields { min-width:0; border:1px solid #dce7da; border-radius:12px; padding:12px; }
+.admin-nav-preview { display:grid; grid-template-columns:repeat(auto-fit,minmax(108px,1fr)); gap:8px; margin-bottom:8px; }
+.admin-nav-preview label { display:grid; justify-items:center; gap:6px; padding:8px; border-radius:8px; background:#f1f5ef; color:#214a37; }
+.admin-nav-preview input { width:100%; min-width:0; }
+@media(max-width:720px) {
+ .customer-bottom-nav { padding-inline:8px; color:#315448; }
+ .customer-bottom-nav a { min-width:0; min-height:44px; color:#496054; border-radius:12px; }
+ .customer-bottom-nav a[aria-current] { background:#e5efe4; color:#173f2d; }
+ .customer-bottom-nav small { max-width:100%; text-overflow:ellipsis; overflow:hidden; }
 }

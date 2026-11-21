@@ -91,11 +91,35 @@ function header() {
 function footer(){return `<footer class="site-footer"><div class="container"><div class="footer-grid"><div class="footer-brand"><a class="logo" href="/"><span class="logo-mark"><img src="/agroseed-mark-v2.png" alt="" aria-hidden="true"></span><span>AGRO <b>SEED</b></span></a><p>${esc(storefrontSettings.storeAbout||"Shop farm supplies, compare pack sizes and see current offers.")}</p></div><div class="footer-col"><h3>Shop</h3><a href="/shop">All products</a><a href="/category/seeds">Seeds</a><a href="/category/plant-nutrition">Plant nutrition</a></div><div class="footer-col"><h3>Help</h3><a href="/help">Help centre</a><a href="/contact">Contact us</a></div><div class="footer-col"><h3>Information</h3><a href="/shipping-returns">Shipping & returns</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></div></div><div class="footer-bottom"><span>© AgroSeed</span></div></div></footer>`;}
 function offerStrip(){if(!storefrontOffers.length)return "";return `<section class="deal-strip" aria-label="Current coupon offers"><div class="deal-strip-head"><b>Deals for your farm</b><a href="/shop">Shop products →</a></div><div class="deal-list">${storefrontOffers.map(offer=>`<a class="deal-card" href="/shop?coupon=${encodeURIComponent(offer.code)}"><span class="deal-mark">OFFER</span><b>${offer.type==="percent"?`${esc(offer.value)}% off`:`${money(offer.value)} off`}</b><span>Code <strong>${esc(offer.code)}</strong></span>${offer.minSubtotalPaise?`<small>On orders above ${money(offer.minSubtotalPaise)}</small>`:""}</a>`).join("")}</div></section>`;}
 function discountShelf(items){const discounted=items.filter(p=>(p.variants||[]).some(v=>v.active!==false&&v.mrpPaise>v.pricePaise)).slice(0,8);if(!discounted.length)return "";return `<section class="section sale-shelf"><div class="section-head"><div><p class="eyebrow">SPECIAL PRICES</p><h2>Offers on farm supplies</h2><p>Compare the listed price with MRP. </p></div><a class="text-link" href="/shop">See all products →</a></div><div class="product-grid">${discounted.map(productCard).join("")}</div></section>`;}
+const bottomNavItems = [
+ {key:"home", href:"/", field:"navHome", en:"Home", hi:"मुखपृष्ठ"},
+ {key:"shop", href:"/categories", field:"navCategories", en:"Categories", hi:"श्रेणियाँ"},
+ {key:"search", href:"/search", field:"navSearch", en:"Search", hi:"खोज"},
+ {key:"bag", href:"/cart", field:"navCart", en:"Cart", hi:"कार्ट"},
+ {key:"account", href:"/account", field:"navAccount", en:"Account", hi:"खाता"}
+];
+function bottomNavLabel(item, settings){
+ return settings[item.field] || say(item.en,item.hi);
+}
+function bottomNavIcon(key){
+ return `<span class="store-nav-icon store-nav-icon-${key}" aria-hidden="true"><i></i></span>`;
+}
+function bottomNavLink(item, current, settings){
+ return `<a href="${item.href}"${current?' aria-current="page"':''}>${bottomNavIcon(item.key)}<small>${esc(bottomNavLabel(item,settings))}</small></a>`;
+}
+function adminNavigationFields(settings){
+ return `<fieldset class="span-2 admin-nav-fields"><legend>Mobile navigation</legend>
+   <div class="admin-nav-preview">${bottomNavItems.map(item => `<label>
+     ${bottomNavIcon(item.key)}<b>${item.en}</b>
+     <input class="control" name="${item.field}" value="${esc(settings[item.field]||"")}" maxlength="20" placeholder="${item.en}">
+   </label>`).join("")}</div>
+   <small>Leave a label blank to use the default in the shopper’s language.</small>
+ </fieldset>`;
+}
 function customerBottomNav(){
  const path=decodeURI(location.pathname.replace(/\/+$/,""))||"/";
- const active={home:path==="/",shop:path==="/shop"||path.startsWith("/category/")||path.startsWith("/brand/")||path.startsWith("/product/"),search:path==="/search",bag:path==="/cart"||path==="/checkout"||path.startsWith("/order/"),account:path==="/account"||path.startsWith("/account/")};
- const item=(key,href,icon,label)=>`<a href="${href}"${active[key]?' aria-current="page"':''}><span aria-hidden="true">${icon}</span><small>${label}</small></a>`;
- return `<nav class="customer-bottom-nav" aria-label="Main navigation">${item("home","/","⌂","Home")}${item("shop","/shop","▦","Shop")}${item("search","/search","⌕","Search")}${item("bag","/cart","🛒","Bag")}${item("account","/account","♙","Account")}</nav>`;
+ const active={home:path==="/",shop:path==="/categories"||path==="/shop"||path.startsWith("/category/")||path.startsWith("/brand/")||path.startsWith("/product/"),search:path==="/search",bag:path==="/cart"||path==="/checkout"||path.startsWith("/order/"),account:path==="/account"||path.startsWith("/account/")};
+ return `<nav class="customer-bottom-nav" aria-label="Main navigation">${bottomNavItems.map(item => bottomNavLink(item,active[item.key],storefrontSettings)).join("")}</nav>`;
 }
 const wrap = (content, cls="") => `${header()}<main class="site-main ${cls}">${content}</main>${footer()}${customerBottomNav()}`;
 function pageTitle(title,sub="",action=""){return `<div class="page-title"><div><h1>${title}</h1>${sub?`<p>${sub}</p>`:""}</div>${action}</div>`;}
@@ -109,67 +133,91 @@ function updatePageMetadata(path){
  setMeta("property","og:image",imageUrl);setMeta("property","og:image:alt",imageUrl?(app.querySelector(".detail-image img")?.alt||title):"");setMeta("name","twitter:card",imageUrl?"summary_large_image":"summary");setMeta("name","twitter:image",imageUrl);
 }
 async function home(){
- const data = await api("/api/v1/products?limit=24").catch(() => null);
+ const data = await api("/api/v1/products?limit=48").catch(() => null);
  const products = data?.items || [];
- const categories = (data?.categories || []).slice(0, 6);
- const picks = [...products.filter(p => p.featured), ...products.filter(p => !p.featured)].slice(0, 8);
- const offers = storefrontOffers.slice(0, 3).map(offer => ({
-   eyebrow: say("Current offer", "मौजूदा ऑफ़र"),
-   title: offer.type === "percent" ? `${offer.value}% ${say("off", "की छूट")}` : `${money(offer.value)} ${say("off", "की छूट")}`,
-   text: `${say("Use code", "कोड इस्तेमाल करें")} ${offer.code}`,
-   href: `/shop?coupon=${encodeURIComponent(offer.code)}`, icon: "✳"
- }));
- const shortcuts = [
-   { title: say("Browse the catalog", "कैटलॉग देखें"), text: say("Find products for your farm.", "अपने खेत के लिए उत्पाद खोजें।"), href: "/shop", icon: "✿" },
-   { title: say("Search by name", "नाम से खोजें"), text: say("Look up a product, brand or SKU.", "उत्पाद, ब्रांड या SKU खोजें।"), href: "/search", icon: "⌕" },
-   { title: say("Talk to AgroSeed", "AgroSeed से बात करें"), text: say("Get help finding the right supplies.", "ज़रूरी कृषि सामग्री खोजने में मदद लें।"), href: "/contact", icon: "↗" }
- ];
- const panels = [...offers, ...shortcuts].slice(0, 3);
- const featured = panels.map(({eyebrow, title, text, href, icon}) => `
-   <a class="home-panel" href="${esc(href)}">
-     <span class="home-panel-art" aria-hidden="true">${icon}</span>
-     <span class="home-panel-copy">${eyebrow ? `<small>${esc(eyebrow)}</small>` : ""}
-       <strong>${esc(title)}</strong><span>${esc(text)}</span>
-     </span>
-     <span class="home-panel-arrow" aria-hidden="true">↗</span>
-   </a>`).join("");
- const categoryCards = categories.map(category => `
-   <a class="category-card" href="/category/${encodeURIComponent(category.slug || slug(category.nameEn))}">
-     <span class="category-icon" aria-hidden="true">${icons[category.nameEn] || "🌾"}</span>
-     <b>${esc(language() === "hi" ? category.name : category.nameEn)}</b>
-     <small>${say("Browse products", "उत्पाद देखें")} ↗</small>
-   </a>`).join("");
- const title = storefrontSettings.homeHeroHeadline || say("Farm supplies for your season", "आपके मौसम के लिए कृषि सामग्री");
- const intro = storefrontSettings.homeHeroBody || say("Find what your crop needs.", "अपनी फसल की ज़रूरत का सामान खोजें।");
+ const categories = data?.categories || [];
+ const settings = storefrontSettings;
+ const categoryLinks = categories.length
+   ? categories.map(category => ({
+       name: language()==="hi" ? category.name : category.nameEn,
+       url: "/category/" + encodeURIComponent(category.slug || slug(category.nameEn)),
+       icon: icons[category.nameEn] || "🌱"
+     }))
+   : [{ name: say("Browse catalog", "कैटलॉग देखें"), url: "/shop", icon: "🌱" }];
+ const featured = [...products].sort((a,b) => Number(Boolean(b.featured))-Number(Boolean(a.featured)));
+ const banner = (title, detail, href, symbol, theme) => `
+   <a class="field-banner ${theme}" href="${href}">
+     <span><strong>${esc(title)}</strong><small>${esc(detail)}</small></span>
+     <span class="field-banner-art" aria-hidden="true">${symbol}</span>
+     <span class="field-banner-arrow" aria-hidden="true">↗</span>
+   </a>`;
  return wrap(`
-   <div class="home-ribbon"><div class="container">${esc(storefrontSettings.homeHeroNote || say("For Indian farms", "भारतीय खेतों के लिए"))}</div></div>
-   <div class="container home-content">
-     <section class="home-feature" aria-labelledby="home-title">
-       <div class="home-feature-heading"><div><h1 id="home-title">${esc(title)}</h1><p>${esc(intro)}</p></div>
-       <a href="/shop">${esc(storefrontSettings.homeHeroPrimaryCta || say("Shop all", "सभी उत्पाद"))} ↗</a></div>
-       <div class="home-panels">${featured}</div>
+   <section class="field-hero">
+     <div class="container">
+       <div class="field-intro"><div>
+         ${settings.homeHeroEyebrow ? `<p>${esc(settings.homeHeroEyebrow)}</p>` : ""}
+         <h1>${esc(settings.homeHeroHeadline || say("Find what your farm needs", "खेती का ज़रूरी सामान"))}</h1>
+         <p>${esc(settings.homeHeroBody || say("Seeds, crop care and farm supplies.", "बीज, फसल सुरक्षा और कृषि सामग्री।"))}</p>
+       </div><a href="/shop">${esc(settings.homeHeroPrimaryCta || say("Shop all", "सभी उत्पाद"))} ↗</a></div>
+       <nav class="field-categories" aria-label="Shop categories">
+         ${categoryLinks.map(({name,url,icon})=>`<a href="${url}"><span aria-hidden="true">${icon}</span><b>${esc(name)}</b></a>`).join("")}
+       </nav>
+       ${settings.homeHeroNote ? `<p class="field-note">${esc(settings.homeHeroNote)}</p>` : ""}
+     </div>
+   </section>
+   <div class="container field-shelves">
+     ${offerStrip()}
+     <div class="field-banners">
+       ${banner(settings.homeBannerTitle || say("Explore farm supplies", "कृषि सामग्री देखें"), settings.homeBannerText || say("Browse the AgroSeed catalog", "AgroSeed कैटलॉग देखें"), "/shop", "🌾", "field-gold")}
+       ${banner(settings.homeHelpTitle || say("Find the right supplies", "सही कृषि सामग्री चुनें"), settings.homeHelpText || say("Ask AgroSeed for help", "AgroSeed से मदद लें"), "/contact", "🌿", "field-mint")}
+     </div>
+     <section class="field-products">
+       <div class="section-head"><h2>${esc(settings.homeProductsTitle || say("Shop farm products", "कृषि उत्पाद देखें"))}</h2><a class="text-link" href="/shop">${say("View all →", "सभी देखें →")}</a></div>
+       ${featured.length ? `<div class="product-grid">${featured.slice(0,12).map(productCard).join("")}</div>` :
+         empty(data ? say("No products listed yet", "अभी कोई उत्पाद सूचीबद्ध नहीं है") : say("Catalog unavailable", "कैटलॉग उपलब्ध नहीं है"),
+           data ? say("Check back for new listings.", "नए उत्पादों के लिए फिर आएँ।") : say("Please try again shortly.", "कुछ देर बाद फिर कोशिश करें।"))}
      </section>
-     ${categories.length ? `<section class="section">
-       <div class="section-head"><div><h2>${say("Start with what you need", "अपनी ज़रूरत से शुरुआत करें")}</h2></div>
-       <a class="text-link" href="/shop">${say("Browse the catalog", "कैटलॉग देखें")} ↗</a></div>
-       <div class="category-grid">${categoryCards}</div>
-     </section>` : ""}
-     <section class="section">
-       <div class="section-head"><div><h2>${say("Farm products", "कृषि उत्पाद")}</h2></div>
-       <a class="text-link" href="/shop">${say("View all products", "सभी उत्पाद देखें")} ↗</a></div>
-       ${picks.length ? `<div class="product-grid">${picks.map(productCard).join("")}</div>` :
-       empty(data ? say("No products listed yet", "अभी कोई उत्पाद सूचीबद्ध नहीं है") : say("Catalog unavailable", "कैटलॉग उपलब्ध नहीं है"),
-         data ? say("Check back for new listings.", "नए उत्पादों के लिए फिर आएँ।") : say("Please try again in a moment.", "कृपया थोड़ी देर में फिर कोशिश करें।"))}
-     </section>
-     <section class="promo-band"><div><h3>${say("Need a hand choosing?", "चुनने में मदद चाहिए?")}</h3>
-       <p>${say("Tell us what you’re growing.", "बताइए आप क्या उगा रहे हैं।")}</p></div>
-       <a class="btn btn-secondary" href="/contact">${say("Talk to AgroSeed", "AgroSeed से बात करें")} ↗</a></section>
    </div>`, "agro-home");
 }
 function empty(title,desc,button="") {return `<div class="empty-state"><div class="empty-icon">🌱</div><h2>${esc(title)}</h2><p>${esc(desc)}</p>${button}</div>`;}
 function pagination(page,pages,total,base=location.href){if(pages<2)return `<p class="pagination-meta">${total} products</p>`;const href=n=>{const u=new URL(base);u.searchParams.set("page",n);return u.pathname+u.search;};return `<nav class="pagination" aria-label="Catalog pages"><span>Page ${page} of ${pages} · ${total} products</span><div>${page>1?`<a class="btn btn-secondary btn-small" href="${esc(href(page-1))}">← Previous</a>`:""}${page<pages?`<a class="btn btn-secondary btn-small" href="${esc(href(page+1))}">Next →</a>`:""}</div></nav>`;}
+async function categoriesPage(){
+ const activeSlug = new URLSearchParams(location.search).get("category") || "";
+ const data = await api("/api/v1/products?" + new URLSearchParams({limit:"100", ...(activeSlug ? {category:activeSlug} : {})}));
+ const categories = data.categories || [];
+ const active = categories.find(category => category.slug === activeSlug);
+ const selected = active?.slug || "";
+ const categoryPath = value => "/categories" + (value ? "?" + new URLSearchParams({category:value}) : "");
+ const label = category => (language()==="hi" ? category.name : category.nameEn) || category.nameEn;
+ const symbol = category => icons[category.nameEn.replace(/^Demo /,"")] || "🌱";
+ const rail = (text, icon, value) => `<a href="${esc(categoryPath(value))}" ${value===selected?'aria-current="page"':''}><span aria-hidden="true">${icon}</span><b>${esc(text)}</b></a>`;
+ const tile = (name, art, href) => `<a class="browse-tile" href="${esc(href)}"><span class="browse-tile-art">${art}</span><b>${esc(name)}</b></a>`;
+ const section = (title, tiles) => tiles ? `<section class="browse-section"><h2>${esc(title)}</h2><div class="browse-tiles">${tiles}</div></section>` : "";
+ const products = activeSlug && !active ? [] : data.items || [];
+ const productTiles = rows => rows.slice(0,9).map(product => tile(prodName(product), productImage(product), "/product/" + encodeURIComponent(product.slug))).join("");
+ const featured = products.filter(product => product.featured);
+ const custom = (active?.sectionCopy || "").split("\n").map(line => {
+   const [title = "", raw = ""] = line.split("|");
+   const skus = new Set(raw.split(",").map(sku => sku.trim().toUpperCase()).filter(Boolean));
+   return title.trim() ? section(title.trim(), productTiles(products.filter(product => product.variants.some(variant => skus.has(variant.sku))))) : "";
+ }).join("");
+ const brandNames = [...new Set(products.map(product => product.brandEn).filter(Boolean))];
+ const categoryShop = active ? "/category/" + encodeURIComponent(selected) : "/shop";
+ const brandTiles = brandNames.filter(name => (data.brands || []).some(brand => brand.nameEn === name)).slice(0,9).map(name => tile(name, '<span aria-hidden="true">✿</span>', "/brand/" + encodeURIComponent(slug(name)) + (selected ? "?" + new URLSearchParams({category:selected}) : ""))).join("");
+ return wrap(`<div class="container browse-page"><h1>All categories</h1><div class="browse-layout">
+   <nav class="browse-rail" aria-label="Categories">${rail("All categories","✿","")}${categories.map(category => rail(label(category),symbol(category),category.slug)).join("")}</nav>
+   <div class="browse-content">
+     <a class="browse-banner" href="${esc(categoryShop)}"><span><strong>${esc(active?.banner || (active ? label(active) : "Browse farm supplies"))}</strong><small>View catalog ↗</small></span><i aria-hidden="true">${active ? symbol(active) : "🌾"}</i></a>
+     ${active ? custom : section("Shop by category",categories.map(category=>tile(label(category),symbol(category),categoryPath(category.slug))).join(""))}
+     ${section("Featured products",productTiles(featured))}
+     ${active ? section("Shop by brand",brandTiles) : ""}
+     ${section("Browse products",productTiles(products))}
+     ${!products.length ? '<p class="browse-empty">No products listed here yet.</p>' : ""}
+   </div></div></div>`);
+}
+
 async function listing(pathname){
- const params=new URLSearchParams(location.search); let category="",brand="",title="Shop all products",description="Browse the AgroSeed catalog.";
+ const params=new URLSearchParams(location.search); let category=params.get("category")||"",brand="",title="Shop all products",description="Browse the AgroSeed catalog.";
  if(pathname==="/search"){title=`Results for “${esc(params.get("q")||"")}”`;}
  if(pathname.startsWith("/category/")){category=decodeURIComponent(pathname.split("/").pop()); title=category.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase()); description=`Farm and garden products in ${title}.`;}
  if(pathname.startsWith("/brand/")){brand=decodeURIComponent(pathname.split("/").pop()); title=brand.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase()); description=`Products from ${title}.`;}
@@ -234,8 +282,8 @@ function adminLogin(error="") {return `<main class="admin-login"><form id="admin
 function adminShell(path,content,role="Owner"){
  const allowed=role==="Catalog"?new Set(["/admin/products","/admin/inventory","/admin/catalog"]):role==="Orders"?new Set(["/admin/inventory","/admin/orders","/admin/support"]):null,links=allowed?adminLinks.filter(([href])=>allowed.has(href)):adminLinks;
  const nav=links.map(([href,label,icon,group])=>`${group?`<div class="side-label">${group}</div>`:""}<a class="${path===href||path.startsWith(href+"/")?"active":""}" href="${href}"><span>${icon}</span> &nbsp;${label}</a>`).join("");
- const bottom=links.slice(0,5).map(([href,label,icon])=>`<a href="${href}"><span>${icon}</span>${label.split(" ")[0]}</a>`).join("");
- return `<div class="admin-app"><header class="admin-top"><a class="logo" href="/admin"><span class="logo-mark">✳</span><span>AGRO <b>SEED</b> <small class="muted">/ ADMIN</small></span></a><div class="staff-tag"><span class="staff-avatar">${esc(role[0])}</span><span>${esc(role)} · Preview</span><button class="btn btn-secondary btn-small" data-logout>Sign out</button></div></header><div class="preview-strip"><b>LOCAL PREVIEW</b> Demo data · Orders do not accept payment or create real shipments.</div><div class="admin-layout"><aside class="admin-sidebar"><nav class="admin-nav">${nav}</nav><a class="admin-nav" href="/" style="margin-top:25px">↗ View storefront</a></aside><main class="admin-content">${content}</main></div><nav class="mobile-admin-nav">${bottom}</nav></div>`;
+ const bottom=links.map(([href,label,icon])=>`<a href="${href}"><span>${icon}</span>${label.split(" ")[0]}</a>`).join("");
+ return `<div class="admin-app"><header class="admin-top"><a class="logo" href="/admin"><span class="logo-mark">✳</span><span>AGRO <b>SEED</b> <small class="muted">/ ADMIN</small></span></a><div class="staff-tag"><span class="staff-avatar">${esc(role[0])}</span><span>${esc(role)} · Preview</span><button class="btn btn-secondary btn-small" data-logout>Sign out</button></div></header><div class="preview-strip"><b>LOCAL PREVIEW</b> Demo data · Orders do not accept payment or create real shipments.</div><div class="admin-layout"><aside class="admin-sidebar"><nav class="admin-nav">${nav}</nav><a class="admin-nav" href="/" style="margin-top:25px">↗ View storefront</a></aside><main class="admin-content">${content}</main></div><nav class="mobile-admin-nav" aria-label="Staff navigation">${bottom}</nav></div>`;
 }
 const adminHead=(title,desc,action="")=>`<div class="admin-page-head"><div><h1>${title}</h1><p>${desc}</p></div>${action}</div>`;
 async function adminPage(path){
@@ -245,8 +293,13 @@ async function adminPage(path){
  let content="";
  if(path==="/admin"||path==="/admin/"){
   const d = await api("/api/v1/admin/overview");
+  const demoActive = Object.values(d.demo || {}).some(Boolean);
+  const demoPanel = `<section class="admin-card"><h2>Demo data</h2>
+    <p>Preview the store with five sample products and records for the catalog, promotions, delivery, inventory, support and activity log.</p>
+    <button class="btn ${demoActive ? "btn-danger" : "btn-primary"}" data-demo-action="${demoActive ? "remove" : "add"}">${demoActive ? "Remove all demo data" : "Fill with demo data"}</button>
+  </section>`;
   content = adminHead("Overview", "Manage your catalog and inventory.", '<a class="btn btn-primary" href="/admin/products/new">＋ Add product</a>') +
-    `<section class="admin-card"><p>Products: ${d.products}</p><p>Published: ${d.published}</p><p>Low stock variants: ${d.lowStock}</p></section>`;
+    `<section class="admin-card"><p>Products: ${d.products}</p><p>Published: ${d.published}</p><p>Low stock variants: ${d.lowStock}</p></section>` + demoPanel;
  } else if(path==="/admin/products"||path==="/admin/products/"){
   const params=new URLSearchParams(location.search),q=params.get("q")||"",status=params.get("status")||"",page=Math.max(1,Number(params.get("page"))||1);const query=new URLSearchParams({page:String(page),limit:"20"});if(q)query.set("q",q);if(status)query.set("status",status);const d=await api(`/api/v1/admin/products?${query}`);content=adminHead("Products","Create, review, feature and publish the store catalog.",'<a class="btn btn-primary" href="/admin/products/new">＋ Add product</a>')+`<div class="admin-card"><form class="search-tools" action="/admin/products"><input class="control" name="q" placeholder="Search name, brand, SKU…" value="${esc(q)}"><select class="control" name="status"><option value="">All statuses</option><option value="published" ${status==="published"?"selected":""}>Published</option><option value="draft" ${status==="draft"?"selected":""}>Draft</option><option value="review" ${status==="review"?"selected":""}>Review</option><option value="archived" ${status==="archived"?"selected":""}>Archived</option></select><button class="btn btn-secondary">Filter</button><a class="btn btn-secondary" href="/admin/products/import">CSV import</a></form><div class="table-wrap"><table class="data-table"><thead><tr><th>Product</th><th>SKU / variants</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead><tbody>${d.items.map(p=>`<tr data-product-row><td><b class="table-primary">${esc(p.nameEn)}</b><span class="table-secondary">${esc(p.brandEn)} · ${esc(p.categoryEn)}${p.featured?" · Featured":""}</span></td><td>${esc(p.sku)}<span class="table-secondary">${p.variants.length} pack option(s)</span></td><td>${money(p.pricePaise)}</td><td>${p.stock}</td><td><span class="status-pill ${p.status==="published"?"":"warning"}">${p.status}</span></td><td><div class="table-actions"><a class="btn btn-secondary btn-small" href="/admin/products/${p.id}">Edit</a><button class="btn btn-secondary btn-small" data-publish="${p.id}" data-next="${p.status==="published"?"draft":"published"}">${p.status==="published"?"Unpublish":"Publish"}</button><button class="btn btn-secondary btn-small" data-feature="${p.id}" data-next="${!p.featured}">${p.featured?"Unfeature":"Feature"}</button></div></td></tr>`).join("")||"<tr><td colspan='6'>No products match these filters.</td></tr>"}</tbody></table></div>${pagination(d.page,d.pages,d.total)}</div>`;
  } else if(path==="/admin/products/new"||/^\/admin\/products\/\d+$/.test(path)){
@@ -274,7 +327,7 @@ async function adminPage(path){
  }
  return adminShell(path,content,role);
 }
-function taxonomyEditor(rows,kind){return rows.map(x=>`<form class="taxonomy-row" data-taxonomy-form data-kind="${kind}" data-id="${esc(x.id||slug(x.nameEn))}"><input class="control" name="nameEn" aria-label="${kind} name in English" value="${esc(x.nameEn)}" required><input class="control" name="name" aria-label="${kind} name in Hindi" value="${esc(x.name||x.nameEn)}"><input class="control taxonomy-order" type="number" name="order" min="0" max="1000" value="${Number(x.order)||0}" aria-label="Display order"><select class="control taxonomy-active" name="active" aria-label="Availability"><option value="true" ${x.active!==false?"selected":""}>Active</option><option value="false" ${x.active===false?"selected":""}>Hidden</option></select><button class="btn btn-secondary btn-small">Save</button></form>`).join("")||`<p class="muted">No ${kind}s yet.</p>`;}
+function taxonomyEditor(rows,kind){return rows.map(x=>`<form class="taxonomy-row" data-taxonomy-form data-kind="${kind}" data-id="${esc(x.id||slug(x.nameEn))}"><input class="control" name="nameEn" aria-label="${kind} name in English" value="${esc(x.nameEn)}" required><input class="control" name="name" aria-label="${kind} name in Hindi" value="${esc(x.name||x.nameEn)}"><input class="control taxonomy-order" type="number" name="order" min="0" max="1000" value="${Number(x.order)||0}" aria-label="Display order"><select class="control taxonomy-active" name="active" aria-label="Availability"><option value="true" ${x.active!==false?"selected":""}>Active</option><option value="false" ${x.active===false?"selected":""}>Hidden</option></select>${kind==="category"?`<details class="category-admin-details"><summary>Category page sections</summary><label>Banner title<input class="control" name="banner" maxlength="100" value="${esc(x.banner||"")}"></label><label>Custom sections<textarea class="control" name="sectionCopy" rows="3" maxlength="2000" placeholder="Seasonal picks | SKU-1, SKU-2">${esc(x.sectionCopy||"")}</textarea></label><small>Enter one section per line as Heading | SKU-1, SKU-2. Use published products in this category.</small></details>`:""}<button class="btn btn-secondary btn-small">Save</button></form>`).join("")||`<p class="muted">No ${kind}s yet.</p>`;}
 function readForm(form){return Object.fromEntries(new FormData(form).entries());}
 function parseVariants(text){return text.split(/\r?\n/).map(line=>line.trim()).filter(Boolean).map(line=>{const [pack,sku,price,mrp,stock]=line.split("|").map(x=>x.trim());return {pack,sku,pricePaise:Math.round(Number(price)*100),mrpPaise:Math.round(Number(mrp)*100),stock:Number(stock)};});}
 function parseCsv(text){const rows=[];let row=[],value="",quoted=false;for(let i=0;i<text.length;i++){const c=text[i];if(c==='"'&&quoted&&text[i+1]==='"'){value+='"';i++;}else if(c==='"')quoted=!quoted;else if(c===","&&!quoted){row.push(value.trim());value="";}else if((c==="\n"||c==="\r")&&!quoted){if(c==="\r"&&text[i+1]==="\n")i++;row.push(value.trim());if(row.some(Boolean))rows.push(row);row=[];value="";}else value+=c;}if(quoted)throw new Error("CSV has an unclosed quoted field.");row.push(value.trim());if(row.some(Boolean))rows.push(row);const head=rows.shift()?.map(x=>x.replace(/^\uFEFF/,""))||[];if(!head.length||head.some(x=>!x))throw new Error("CSV needs a header row with column names.");return rows.map(r=>Object.fromEntries(head.map((h,i)=>[h,r[i]||""])));}
@@ -302,7 +355,7 @@ function showDialog(title,desc,fields,confirmLabel="Save"){$("#dialog-root").inn
 function formDataJson(form){return JSON.stringify(readForm(form));}
 async function initPublicGallery(path){try{const product=await api(`/api/v1/products/${encodeURIComponent(path.split("/").pop())}`),images=(product.images||[]).map((url,index)=>({url,alt:product.imageAlt?.[index]||prodName(product)}));if(images.length<2)return;const host=$(".detail-image");if(!host)return;host.outerHTML=`<div class="product-gallery-display"><div class="detail-image"><img id="detail-main-image" src="${esc(images[0].url)}" alt="${esc(images[0].alt)}"></div><div class="gallery-thumbnails">${images.map((image,index)=>`<button type="button" class="gallery-thumbnail ${index===0?"active":""}" data-public-image="${index}" aria-label="View product image ${index+1}"><img src="${esc(image.url)}" alt=""></button>`).join("")}</div></div>`;app.dataset.galleryImages=JSON.stringify(images);}catch{}}
 function initProductDeliveryCheck(){const detail=$(".detail-copy");if(!detail||$("#delivery-check-form"))return;detail.insertAdjacentHTML("beforeend",'<form id="delivery-check-form" class="product-delivery-check"><label for="product-pincode">Check delivery by PIN code</label><div><input id="product-pincode" name="pincode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="6-digit PIN"><button class="btn btn-secondary">Check</button></div><p id="delivery-check-result" class="hint" aria-live="polite">Enter your PIN to check delivery availability.</p></form>');}
-async function initAdminSettingsEditor(){const form=$("#settings-form");if(!form)return;try{const d=await api("/api/v1/admin/settings"),settings=d.settings||{},sections=[{"Page and business copy":[["storeAbout","Store introduction"],["businessDetails","Legal business identity and address"],["supportPhone","Support phone"],["supportDetails","Support hours and contact instructions"]]},{"Home page copy":[["homeHeroEyebrow","Home eyebrow"],["homeHeroHeadline","Home headline"],["homeHeroBody","Home introduction"],["homeHeroNote","Supporting note"],["homeHeroPrimaryCta","Primary button label"]]},{"Policies and operating rules":[["deliveryRules","Delivery regions, fees and estimates (text)"],["codPolicy","Cash on delivery policy"],["cancellationReturnsRules","Cancellation and return rules"],["shippingReturnsPolicy","Shipping & returns page"],["privacyPolicy","Privacy page"],["termsPolicy","Terms page"],["productUseNotice","Product-use notice"]]}];const save=form.querySelector(".span-2");const markup=sections.map(([title,fields])=>`<div class="span-2 settings-section"><h3>${esc(title)}</h3><p class="hint">Leave blank until AgroSeed provides approved text. These values appear on the customer site.</p></div>${fields.map(([name,label])=>`<div class="field span-2"><label for="setting-${name}">${esc(label)}</label><textarea id="setting-${name}" name="${name}" maxlength="20000" placeholder="Not configured. Enter approved text here.">${esc(settings[name]||"")}</textarea></div>`).join("")}`).join("");save?.insertAdjacentHTML("beforebegin",markup);}catch{}}
+async function initAdminSettingsEditor(){const form=$("#settings-form");if(!form)return;try{const d=await api("/api/v1/admin/settings"),settings=d.settings||{},sections=[{"Page and business copy":[["storeAbout","Store introduction"],["businessDetails","Legal business identity and address"],["supportPhone","Support phone"],["supportDetails","Support hours and contact instructions"]]},{"Home page copy":[["homeHeroEyebrow","Home eyebrow"],["homeHeroHeadline","Home headline"],["homeHeroBody","Home introduction"],["homeHeroNote","Supporting note"],["homeHeroPrimaryCta","Primary button label"],["homeBannerTitle","Catalog banner title"],["homeBannerText","Catalog banner description"],["homeHelpTitle","Help banner title"],["homeHelpText","Help banner description"],["homeProductsTitle","Product shelf heading"]]},{"Policies and operating rules":[["deliveryRules","Delivery regions, fees and estimates (text)"],["codPolicy","Cash on delivery policy"],["cancellationReturnsRules","Cancellation and return rules"],["shippingReturnsPolicy","Shipping & returns page"],["privacyPolicy","Privacy page"],["termsPolicy","Terms page"],["productUseNotice","Product-use notice"]]}];const save=form.querySelector(".span-2:last-child");const markup=sections.map(([title,fields])=>`<div class="span-2 settings-section"><h3>${esc(title)}</h3><p class="hint">Leave blank until AgroSeed provides approved text. These values appear on the customer site.</p></div>${fields.map(([name,label])=>`<div class="field span-2"><label for="setting-${name}">${esc(label)}</label><textarea id="setting-${name}" name="${name}" maxlength="20000" placeholder="Not configured. Enter approved text here.">${esc(settings[name]||"")}</textarea></div>`).join("")}`).join("");save?.insertAdjacentHTML("beforebegin",markup + adminNavigationFields(settings));}catch{}}
 function applyEditableCustomerCopy(path){const lineBreak=value=>esc(value).replace(/\r?\n/g,"<br>");if(path==="/contact"){const title=$(".page-title")?.outerHTML,form=$("#support-form");if(form){const support=[storefrontSettings.supportDetails,storefrontSettings.supportPhone,storefrontSettings.supportEmail?`Email: ${storefrontSettings.supportEmail}`:"",storefrontSettings.businessDetails].filter(Boolean);form.insertAdjacentHTML("beforebegin",support.length?`<div class="notice support-details">${support.map(lineBreak).join("<br>")}</div>`:`<div class="notice support-details">Support contact details are not configured. Add approved details in Admin &gt; Settings.</div>`);}return title;}
  if(path==="/help"){const callout=$(".category-grid")?.nextElementSibling;if(callout)callout.textContent=storefrontSettings.supportDetails||"Support contact details are not configured. Add approved details in Admin > Settings.";return;}
  const map={"/shipping-returns":["Shipping & returns","shippingReturnsPolicy",[["Delivery rules","deliveryRules"],["Cash on delivery","codPolicy"],["Cancellation and returns","cancellationReturnsRules"]]],"/privacy":["Privacy","privacyPolicy",[]],"/terms":["Terms of service","termsPolicy",[["Business details","businessDetails"]]]},entry=map[path],copy=$(".policy-copy");if(!entry||!copy)return;const [title,key,extra]=entry,sections=[];if(storefrontSettings[key]?.trim())sections.push(`<p>${lineBreak(storefrontSettings[key])}</p>`);for(const [label,field] of extra)if(storefrontSettings[field]?.trim())sections.push(`<h2>${esc(label)}</h2><p>${lineBreak(storefrontSettings[field])}</p>`);copy.innerHTML=`${pageTitle(title)}${sections.length?`<div class="callout">Preview copy. Confirm this content before launch.</div>${sections.join("")}`:`<div class="notice">${esc(title)} text is not configured. Add AgroSeed-approved content in Admin &gt; Settings.</div>`}`;}
@@ -311,6 +364,7 @@ async function render(){
  try{
   if(path.startsWith("/admin"))html=await adminPage(path);
   else if(path==="/")html=await home();
+  else if(path==="/categories")html=await categoriesPage();
   else if(["/shop","/search"].includes(path)||path.startsWith("/category/")||path.startsWith("/brand/"))html=await listing(path);
   else if(path.startsWith("/product/"))html=await productPage(path);
   else if(path==="/cart")html=await cartPage();
@@ -333,14 +387,7 @@ async function render(){
 }
 async function addToCart(sku,quantity=1){const rows=cart(),row=rows.find(x=>x.sku===sku);if(row)row.quantity=Math.min(99,row.quantity+quantity);else rows.push({sku,quantity});if(!await saveCart(rows)){toast("Bag saved on this device, but could not sync to the server.",true);return;}toast("Added to your bag.");render();}
 async function updateCart(sku,delta){const rows=cart().map(x=>x.sku===sku?{...x,quantity:x.quantity+delta}:x).filter(x=>x.quantity>0);if(!await saveCart(rows)){toast("Bag saved on this device, but could not sync to the server.",true);return;}render();}
-function showPageTransition(){const overlay=$("#page-transition");if(!overlay)return;overlay.classList.add("is-active");overlay.setAttribute("aria-hidden","false");}
-function route(path){showPageTransition();location.assign(path);}
-document.addEventListener("click",e=>{
- const link=e.target.closest("a[href]");if(!link||e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||link.target||link.hasAttribute("download"))return;
- const target=new URL(link.href,location.href);if(target.origin!==location.origin||target.pathname+target.search+target.hash===location.pathname+location.search+location.hash||target.hash&&target.pathname===location.pathname&&target.search===location.search)return;
- showPageTransition();
-},true);
-window.addEventListener("pageshow",()=>{const overlay=$("#page-transition");overlay?.classList.remove("is-active");overlay?.setAttribute("aria-hidden","true");});
+function route(path){location.assign(path);}
 document.addEventListener("click",async e=>{
  const t=e.target.closest("button,[data-add],[data-remove],[data-cart-step],[data-detail-qty],[data-detail-add],[data-logout],[data-customer-logout],[data-publish],[data-feature],[data-archive],[data-adjust],[data-template],[data-import],[data-delete-coupon],[data-toggle-coupon],[data-delete-area],[data-order-status],[data-support-id],[data-delete-address],[data-default-address],[data-image-up],[data-image-down],[data-image-remove],[data-public-image],[data-dismiss],[data-menu],[data-language]");if(!t)return;
  try{
@@ -351,6 +398,16 @@ document.addEventListener("click",async e=>{
   if(t.hasAttribute("data-detail-add")){addToCart(pickedVariant,Number($("#detail-qty").value||1));return;}
   if(t.hasAttribute("data-menu")){ $(".site-header")?.classList.toggle("menu-open");return;}
   if(t.hasAttribute("data-language")){localStorage.setItem(languageKey,language()==="en"?"hi":"en");render();return;}
+  if(t.dataset.demoAction){
+   const remove=t.dataset.demoAction==="remove";
+   t.disabled=true;
+   try{
+    await api("/api/v1/admin/demo",{method:remove?"DELETE":"POST"});
+    toast(remove?"Demo data removed.":"Demo data added.");
+    await render();
+   }finally{t.disabled=false;}
+   return;
+  }
   if(t.hasAttribute("data-logout")){await api("/api/v1/admin/session",{method:"DELETE"});csrf="";route("/admin/login");return;}
   if(t.hasAttribute("data-publish")){const p=await api(`/api/v1/admin/products/${t.dataset.publish}`);p.status=t.dataset.next;await api(`/api/v1/admin/products/${t.dataset.publish}`,{method:"PATCH",body:JSON.stringify(p)});toast("Product status updated.");render();return;}
   if(t.hasAttribute("data-feature")){const p=await api(`/api/v1/admin/products/${t.dataset.feature}`);p.featured=t.dataset.next==="true";await api(`/api/v1/admin/products/${t.dataset.feature}`,{method:"PATCH",body:JSON.stringify(p)});toast("Featured placement updated.");render();return;}

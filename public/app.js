@@ -497,13 +497,41 @@ function adminShell(path,content,role="Owner"){
  return `<div class="admin-app"><header class="admin-top"><a class="logo" href="/admin"><span class="logo-mark">✳</span><span>AGRO <b>SEED</b> <small class="muted">/ ADMIN</small></span></a><form class="admin-global-search" action="/admin/search" role="search"><label class="sr-only" for="admin-global-search">Search the admin workspace</label><span aria-hidden="true">⌕</span><input id="admin-global-search" data-admin-search name="q" type="search" placeholder="Search products, SKU, support…"><kbd>Ctrl K</kbd><button aria-label="Search admin">Search</button></form><div class="staff-tag"><span class="staff-avatar">${esc(role[0])}</span><span>${esc(role)}</span><button class="btn btn-secondary btn-small" data-logout>Sign out</button></div></header><div class="admin-layout"><aside class="admin-sidebar"><nav class="admin-nav">${nav}</nav><a class="admin-nav" href="/" style="margin-top:25px">↗ View storefront</a></aside><main class="admin-content">${content}</main></div>${adminBottomNav(path,links)}</div>`;
 }
 const adminHead=(title,desc,action="")=>`<div class="admin-page-head"><div><h1>${title}</h1><p>${desc}</p></div>${action}</div>`;
+async function adminSearchItems(query){
+ const q=String(query||"").trim().toLocaleLowerCase();
+ if(!q)return [];
+ const [inventory,catalog,promotions,areas,support]=await Promise.all([
+  api("/api/v1/admin/inventory").catch(()=>null),
+  api("/api/v1/admin/catalog").catch(()=>null),
+  api("/api/v1/admin/coupons").catch(()=>null),
+  api("/api/v1/admin/service-areas").catch(()=>null),
+  api("/api/v1/admin/support").catch(()=>null)
+ ]);
+ const items=[];
+ const add=(type,title,detail,href,status="")=>{if(items.length<80)items.push({type,title,detail,href,status});};
+ const matches=(...values)=>values.filter(Boolean).join(" ").toLocaleLowerCase().includes(q);
+ for(const product of inventory?.products||[]){
+  const productMatch=matches(product.name,product.nameEn,product.brand,product.brandEn,product.category,product.categoryEn,product.sku);
+  if(productMatch)add("Product",product.nameEn||product.name,[product.brandEn||product.brand,product.categoryEn||product.category,product.sku,product.variants.length+" pack option(s)"].filter(Boolean).join(" · "),"/admin/products/"+product.id,product.status);
+  for(const variant of product.variants||[])if(matches(variant.sku,variant.pack)){
+   add("SKU / stock",(product.nameEn||product.name)+" · "+variant.pack,"SKU "+variant.sku+" · "+variant.stock+" available","/admin/inventory",variant.stock>0?"In stock":"Out of stock");
+  }
+ }
+ for(const category of catalog?.categories||[])if(matches(category.name,category.nameEn,category.slug))add("Category",category.nameEn||category.name,"Catalog category","/admin/catalog?category="+encodeURIComponent(category.slug),category.active===false?"Hidden":"Active");
+ for(const brand of catalog?.brands||[])if(matches(brand.name,brand.nameEn,brand.slug))add("Brand",brand.nameEn||brand.name,"Catalog brand","/admin/catalog",brand.active===false?"Hidden":"Active");
+ for(const transaction of inventory?.transactions||[])if(matches(transaction.sku,transaction.reason,transaction.actor))add("Stock activity",transaction.sku,(transaction.delta>0?"+":"")+transaction.delta+" · "+transaction.reason,"/admin/inventory");
+ for(const item of promotions?.items||[])if(matches(item.code,item.type))add("Promotion",item.code,(item.type==="percent"?item.value+"% off":"Discount")+(item.expiresAt?" · expires "+item.expiresAt:""),"/admin/promotions",item.active===false?"Paused":"Active");
+ for(const item of areas?.items||[])if(matches(item.pincode,item.city,item.estimate))add("Delivery area",item.pincode,[item.city,item.estimate].filter(Boolean).join(" · "),"/admin/shipping",item.active===false?"Inactive":"Active");
+ for(const item of support?.items||[])if(matches(item.id,item.name,item.email,item.topic,item.message,item.status))add("Support",item.topic||"Support request",[item.name,item.email,item.id].filter(Boolean).join(" · "),"/admin/support",item.status);
+ return items;
+}
 async function adminPage(path){
  let session;try{session=await api("/api/v1/admin/session");csrf=session.csrf||"";}catch(e){if(path!=="/admin/login"){location.replace("/admin/login");return "";}return adminLogin(e.message==="Sign in to the staff console."?"":e.message);}
  if(path==="/admin/login"){location.replace("/admin");return "";}
  const role=session.user?.role||"Owner";if((path==="/admin"||path==="/admin/")&&role==="Catalog"){location.replace("/admin/products");return "";}if((path==="/admin"||path==="/admin/")&&role==="Orders"){location.replace("/admin/orders");return "";}
  let content="";
  if(path==="/admin/search"){
-  const q=(new URLSearchParams(location.search).get("q")||"").trim();let results=[];if(q){const d=await api("/api/v1/admin/search?"+new URLSearchParams({q}));results=d.items||[];}
+  const q=(new URLSearchParams(location.search).get("q")||"").trim();let results=[];if(q){results=await adminSearchItems(q);}
   content=adminHead("Search",q?"Results for “"+esc(q)+"”":"Search across the store, stock and customer support.")+
    '<form class="admin-search-page" action="/admin/search"><label for="admin-search-query">Search everything you can manage</label><div><input id="admin-search-query" name="q" type="search" value="'+esc(q)+'" placeholder="Product name, SKU, PIN, promotion code…"><button class="btn btn-primary">Search</button></div><small>Products, pack variants, inventory, promotions, delivery areas and support requests.</small></form>'+
    (q?'<section class="admin-card admin-search-results"><div class="admin-search-summary">'+results.length+' result'+(results.length===1?"":"s")+'</div>'+(results.length?results.map(item=>'<a class="admin-search-result" href="'+esc(item.href)+'"><span class="admin-search-type">'+esc(item.type)+'</span><span class="admin-search-copy"><b>'+esc(item.title)+'</b><small>'+esc(item.detail||"")+'</small></span>'+(item.status?'<span class="status-pill '+(item.status==="published"||item.status==="resolved"||item.status==="Active"?"":"warning")+'">'+esc(item.status)+'</span>':"")+'<span class="admin-search-arrow" aria-hidden="true">↗</span></a>').join(""):'<div class="admin-search-empty"><b>No matches found</b><span>Try a product name, pack SKU, support email or delivery PIN.</span></div>')+'</section>':'<section class="admin-search-hints"><article><b>Catalog</b><span>Search names, brands, categories and SKU.</span></article><article><b>Inventory</b><span>Jump to a product or stock adjustment.</span></article><article><b>Store operations</b><span>Find promotions, shipping and support records.</span></article></section>');

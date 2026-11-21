@@ -546,8 +546,23 @@ export async function handleStoreRequest(request, response, pathname, env) {
         return true;
       }
       if (adminPath === "/overview" && method === "GET") {
-        const data = await state(env); const published = data.products.filter((p) => p.status === "published").length;
-        send(response, 200, { demo: demoCounts(data), products: data.products.length, published, lowStock: data.products.flatMap(p => p.variants).filter(v => v.stock <= 5).length }); return true;
+        const data = await state(env);
+        const variants = data.products.flatMap((product) => product.variants);
+        const openSupport = data.supportRequests.filter((item) => item.status !== "resolved").length;
+        const published = data.products.filter((product) => product.status === "published").length;
+        const activePromotions = data.coupons.filter((item) => item.active !== false && (!item.expiresAt || Date.now() <= Date.parse(`${item.expiresAt}T23:59:59Z`)) && (!item.maxUses || item.usesCount < item.maxUses)).length;
+        send(response, 200, {
+          demo: demoCounts(data),
+          products: data.products.length,
+          published,
+          lowStock: variants.filter((variant) => variant.stock > 0 && variant.stock <= 5).length,
+          outOfStock: variants.filter((variant) => variant.stock <= 0).length,
+          openSupport,
+          resolvedSupport: data.supportRequests.length - openSupport,
+          activePromotions,
+          totalPromotions: data.coupons.length,
+          deliveryAreas: data.serviceAreas.filter((area) => area.active !== false).length
+        }); return true;
       }
       if (adminPath === "/products" && method === "GET") {
         const data = await state(env); let products = data.products;

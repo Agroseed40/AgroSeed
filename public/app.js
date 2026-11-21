@@ -509,12 +509,30 @@ async function adminPage(path){
  if(path==="/admin"||path==="/admin/"){
   const d = await api("/api/v1/admin/overview");
   const demoActive = Object.values(d.demo || {}).some(Boolean);
-  const demoPanel = `<section class="admin-card"><h2>Demo data</h2>
-    <p>Preview the store with five sample products and records for the catalog, promotions, delivery, inventory, support and activity log.</p>
-    <button class="btn ${demoActive ? "btn-danger" : "btn-primary"}" data-demo-action="${demoActive ? "remove" : "add"}">${demoActive ? "Remove all demo data" : "Fill with demo data"}</button>
-  </section>`;
-  content = adminHead("Overview", "Manage your catalog and inventory.", '<a class="btn btn-primary" href="/admin/products/new">＋ Add product</a>') +
-    `<section class="admin-card"><p>Products: ${d.products}</p><p>Published: ${d.published}</p><p>Low stock variants: ${d.lowStock}</p></section>` + demoPanel;
+  const attention = d.outOfStock + d.lowStock;
+  const metric = (label,value,detail,href,icon,tone="") => `<a class="overview-metric ${tone}" href="${href}"><span class="overview-metric-icon" aria-hidden="true">${icon}</span><span class="overview-metric-label">${label}</span><strong>${value}</strong><small>${detail}</small></a>`;
+  const quick = (href,icon,title,detail) => `<a class="overview-quick-link" href="${href}"><span aria-hidden="true">${icon}</span><span><b>${title}</b><small>${detail}</small></span><i aria-hidden="true">↗</i></a>`;
+  const demoPanel = `<section class="admin-card overview-demo"><div><span class="overview-eyebrow">STORE PREVIEW</span><h2>Demo data</h2><p>Fill the store with sample catalog and service records, or remove them in one click.</p></div><button class="btn ${demoActive ? "btn-danger" : "btn-secondary"}" data-demo-action="${demoActive ? "remove" : "add"}">${demoActive ? "Remove demo data" : "Add demo data"}</button></section>`;
+  content = `<div class="overview-page">
+    <section class="overview-welcome"><div><span class="overview-eyebrow">AGROSEED CONTROL ROOM</span><h1>Good ${new Date().getHours()<12?"morning":new Date().getHours()<17?"afternoon":"evening"}</h1><p>Your store at a glance. Update products, check stock and keep the storefront current.</p></div><a class="btn btn-primary" href="/admin/products/new">＋ Add product</a></section>
+    <section class="overview-metrics" aria-label="Store summary">
+      ${metric("Published products",d.published,`${d.products-d.published} drafts or archived`,"/admin/products","▦")}
+      ${metric("Stock to review",attention,`${d.outOfStock} out of stock · ${d.lowStock} low`,"/admin/inventory","◈",attention?"attention":"")}
+      ${metric("Support requests",d.openSupport,`${d.resolvedSupport} resolved`,"/admin/support","✉",d.openSupport?"attention":"")}
+      ${metric("Active promotions",d.activePromotions,`${d.totalPromotions} total promotions`,"/admin/promotions","％")}
+    </section>
+    <section class="overview-workspace"><div class="overview-section-head"><div><span class="overview-eyebrow">STORE MANAGEMENT</span><h2>Pick up where you left off</h2></div><a href="/" class="text-link">View storefront ↗</a></div>
+      <div class="overview-quick-grid">
+       ${quick("/admin/catalog","◉","Categories & brands","Edit browse pages and imagery")}
+       ${quick("/admin/inventory","◈","Inventory","Review stock and adjustments")}
+       ${quick("/admin/shipping","⌖","Delivery areas",`${d.deliveryAreas} configured PIN codes`)}
+       ${quick("/admin/settings","⚙","Website settings","Branding, homepage and policies")}
+      </div>
+    </section>
+    ${attention ? `<a class="overview-alert" href="/admin/inventory"><span>!</span><div><b>Inventory needs attention</b><small>${d.outOfStock} out of stock and ${d.lowStock} low stock variants to review.</small></div><i>↗</i></a>` : ""}
+    ${demoPanel}
+    <p class="overview-footnote">Orders remain unavailable until checkout is enabled.</p>
+   </div>`;
  } else if(path==="/admin/products"||path==="/admin/products/"){
   const params=new URLSearchParams(location.search),q=params.get("q")||"",status=params.get("status")||"",page=Math.max(1,Number(params.get("page"))||1);const query=new URLSearchParams({page:String(page),limit:"20"});if(q)query.set("q",q);if(status)query.set("status",status);const d=await api(`/api/v1/admin/products?${query}`);content=adminHead("Products","Create, review, feature and publish the store catalog.",'<a class="btn btn-primary" href="/admin/products/new">＋ Add product</a>')+`<div class="admin-card"><form class="search-tools" action="/admin/products"><input class="control" name="q" placeholder="Search name, brand, SKU…" value="${esc(q)}"><select class="control" name="status"><option value="">All statuses</option><option value="published" ${status==="published"?"selected":""}>Published</option><option value="draft" ${status==="draft"?"selected":""}>Draft</option><option value="review" ${status==="review"?"selected":""}>Review</option><option value="archived" ${status==="archived"?"selected":""}>Archived</option></select><button class="btn btn-secondary">Filter</button><a class="btn btn-secondary" href="/admin/products/import">CSV import</a></form><div class="table-wrap"><table class="data-table"><thead><tr><th>Product</th><th>SKU / variants</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead><tbody>${d.items.map(p=>`<tr data-product-row><td><b class="table-primary">${esc(p.nameEn)}</b><span class="table-secondary">${esc(p.brandEn)} · ${esc(p.categoryEn)}${p.featured?" · Featured":""}</span></td><td>${esc(p.sku)}<span class="table-secondary">${p.variants.length} pack option(s)</span></td><td>${money(p.pricePaise)}</td><td>${p.stock}</td><td><span class="status-pill ${p.status==="published"?"":"warning"}">${p.status}</span></td><td><div class="table-actions"><a class="btn btn-secondary btn-small" href="/admin/products/${p.id}">Edit</a><button class="btn btn-secondary btn-small" data-publish="${p.id}" data-next="${p.status==="published"?"draft":"published"}">${p.status==="published"?"Unpublish":"Publish"}</button><button class="btn btn-secondary btn-small" data-feature="${p.id}" data-next="${!p.featured}">${p.featured?"Unfeature":"Feature"}</button></div></td></tr>`).join("")||"<tr><td colspan='6'>No products match these filters.</td></tr>"}</tbody></table></div>${pagination(d.page,d.pages,d.total)}</div>`;
  } else if(path==="/admin/products/new"||/^\/admin\/products\/\d+$/.test(path)){

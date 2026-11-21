@@ -115,11 +115,12 @@ async function requireAdmin(request, response, mutating = false, env) {
 const ADMIN_ROLE_PERMISSIONS = Object.freeze({
   Owner: Object.freeze(["*"]),
   "Owner/Admin": Object.freeze(["*"]),
-  Catalog: Object.freeze(["products", "media", "import", "catalog", "inventory"]),
-  Orders: Object.freeze(["orders", "support", "inventory"])
+  Catalog: Object.freeze(["products", "media", "import", "catalog", "inventory", "search"]),
+  Orders: Object.freeze(["orders", "support", "inventory", "search"])
 });
 
 function adminPermissionFor(path) {
+  if (path === "/search") return "search";
   if (path === "/overview" || path === "/audit" || path === "/reports" || path === "/settings" || path === "/coupons" || /^\/coupons\//.test(path) || path === "/service-areas" || /^\/service-areas\//.test(path)) return "owner";
   if (path === "/products" || /^\/products\//.test(path)) return "products";
   if (path === "/media") return "media";
@@ -544,6 +545,38 @@ export async function handleStoreRequest(request, response, pathname, env) {
         });
         send(response, 200, { counts });
         return true;
+      }
+      if (adminPath === "/search" && method === "GET") {
+        const query = String(url.searchParams.get("q") || "").trim().toLocaleLowerCase().slice(0, 120);
+        const data = await state(env);
+        const role = session.role || "Owner";
+        const items = [];
+        const add = (type, title, detail, href, status = "") => { if (items.length < 80) items.push({ type, title, detail, href, status }); };
+        const includes = values => values.filter(Boolean).join(" ").toLocaleLowerCase().includes(query);
+        if (query && canAccessAdminPath(role, "/products")) {
+          for (const product of data.products) {
+            if (includes([product.name, product.nameEn, product.brand, product.brandEn, product.category, product.categoryEn, product.sku, ...product.variants.map(v => v.sku), ...product.variants.map(v => v.pack)])) add("Product", product.nameEn || product.name, [product.brandEn || product.brand, product.categoryEn || product.category, product.sku, product.variants.length + " pack option(s)"].filter(Boolean).join(" · "), "/admin/products/" + product.id, product.status);
+            for (const variant of product.variants) if (includes([variant.sku, variant.pack])) add("SKU / stock", (product.nameEn || product.name) + " · " + variant.pack, "SKU " + variant.sku + " · " + variant.stock + " available", "/admin/inventory", variant.stock > 0 ? "In stock" : "Out of stock");
+          }
+        }
+        if (query && canAccessAdminPath(role, "/catalog")) {
+          const collections = deriveCollections(data.products, data.categories, data.brands, true);
+          for (const category of collections.categories) if (includes([category.name, category.nameEn, category.slug])) add("Category", category.nameEn || category.name, "Catalog category", "/admin/catalog?category=" + encodeURIComponent(category.slug), category.active === false ? "Hidden" : "Active");
+          for (const brand of collections.brands) if (includes([brand.name, brand.nameEn, brand.slug])) add("Brand", brand.nameEn || brand.name, "Catalog brand", "/admin/catalog", brand.active === false ? "Hidden" : "Active");
+        }
+        if (query && canAccessAdminPath(role, "/inventory")) {
+          for (const transaction of data.inventoryTransactions) if (includes([transaction.sku, transaction.reason, transaction.actor])) add("Stock activity", transaction.sku, (transaction.delta > 0 ? "+" : "") + transaction.delta + " · " + transaction.reason, "/admin/inventory");
+        }
+        if (query && canAccessAdminPath(role, "/support")) {
+          for (const item of data.supportRequests) if (includes([item.id, item.name, item.email, item.topic, item.message, item.status])) add("Support", item.topic || "Support request", [item.name, item.email, item.id].filter(Boolean).join(" · "), "/admin/support", item.status);
+        }
+        if (query && canAccessAdminPath(role, "/coupons")) {
+          for (const item of data.coupons) if (includes([item.code, item.type])) add("Promotion", item.code, (item.type === "percent" ? item.value + "% off" : "Discount") + (item.expiresAt ? " · expires " + item.expiresAt : ""), "/admin/promotions", item.active === false ? "Paused" : "Active");
+        }
+        if (query && canAccessAdminPath(role, "/service-areas")) {
+          for (const item of data.serviceAreas) if (includes([item.pincode, item.city, item.estimate])) add("Delivery area", item.pincode, [item.city, item.estimate].filter(Boolean).join(" · "), "/admin/shipping", item.active === false ? "Inactive" : "Active");
+        }
+        send(response, 200, { query, items: items.slice(0, 80) }); return true;
       }
       if (adminPath === "/overview" && method === "GET") {
         const data = await state(env);

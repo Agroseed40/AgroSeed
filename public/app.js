@@ -104,7 +104,7 @@ function bottomNavLabel(item, settings){
 function bottomNavIcon(key){
  return `<span class="store-nav-icon store-nav-icon-${key}" aria-hidden="true"><i></i></span>`;
 }
-function bottomNavLink(item, current, settings){
+function bottomNavLink(item, current, settings = {}){
  return `<a href="${item.href}"${current?' aria-current="page"':''}>${bottomNavIcon(item.key)}<small>${esc(bottomNavLabel(item,settings))}</small></a>`;
 }
 function adminNavigationFields(settings){
@@ -457,11 +457,39 @@ const adminLinks=[
  ["/admin/catalog","Categories & brands","◉","STORE SETUP"],["/admin/promotions","Promotions","％"],["/admin/shipping","Delivery areas","⌖"],["/admin/audit","Activity log","◷"],["/admin/settings","Settings","⚙"]
 ];
 function adminLogin(error="") {return `<main class="admin-login"><form id="admin-login-form" class="login-card"><a class="logo" href="/"><span class="logo-mark"><img src="/agroseed-mark-v2.png" alt="" aria-hidden="true"></span><span>AGRO <b>SEED</b></span></a><h1>Staff sign in</h1><p>This preview console is protected by a password stored in Cloudflare Worker secrets.</p>${error?`<div class="callout">${esc(error)}</div>`:""}<div class="field"><label for="admin-password">Owner password</label><input id="admin-password" type="password" name="password" required autocomplete="current-password"></div><button class="btn btn-primary">Sign in</button><p class="hint">The staff password is configured privately in Cloudflare.</p><a class="text-link" href="/">← Back to storefront</a></form></main>`;}
+const adminBottomTabs = [
+ {href:"/admin", key:"home", en:"Overview"},
+ {href:"/admin/catalog", key:"shop", en:"Categories"},
+ {href:"/admin/products", key:"bag", en:"Products"},
+ {href:"/admin/inventory", key:"inventory", en:"Inventory"},
+ {href:"/admin/orders", key:"orders", en:"Orders"},
+ {href:"/admin/support", key:"support", en:"Support"}
+];
+
+function adminPageIsActive(path, href) {
+ return path === href || (href !== "/admin" && path.startsWith(href + "/"));
+}
+
+function adminBottomNav(path, links) {
+ const allowed = new Set(links.map(([href]) => href));
+ const tabs = adminBottomTabs.filter(({href}) => allowed.has(href)).slice(0, 4);
+ const primary = new Set(tabs.map(({href}) => href));
+ const moreLinks = links.filter(([href]) => !primary.has(href));
+ const moreActive = moreLinks.some(([href]) => adminPageIsActive(path, href));
+ return `<nav class="customer-bottom-nav staff-bottom-nav" aria-label="Staff navigation" style="--bottom-nav-columns:${tabs.length+1}">
+  ${tabs.map(tab => bottomNavLink(tab, adminPageIsActive(path, tab.href))).join("")}
+  <button type="button" popovertarget="staff-more-menu"${moreActive ? ' data-current' : ""}>${bottomNavIcon("more")}<small>More</small></button>
+ </nav>
+ <nav id="staff-more-menu" class="staff-more-menu" aria-label="More staff pages" popover>
+  ${moreLinks.map(([href,label]) => `<a href="${href}"${adminPageIsActive(path, href) ? ' aria-current="page"' : ""}>${esc(label)}</a>`).join("")}
+  <a href="/">View storefront ↗</a>
+ </nav>`;
+}
+
 function adminShell(path,content,role="Owner"){
  const allowed=role==="Catalog"?new Set(["/admin/products","/admin/inventory","/admin/catalog"]):role==="Orders"?new Set(["/admin/inventory","/admin/orders","/admin/support"]):null,links=allowed?adminLinks.filter(([href])=>allowed.has(href)):adminLinks;
- const nav=links.map(([href,label,icon,group])=>`${group?`<div class="side-label">${group}</div>`:""}<a class="${path===href||path.startsWith(href+"/")?"active":""}" href="${href}"><span>${icon}</span> &nbsp;${label}</a>`).join("");
- const bottom=links.map(([href,label,icon])=>`<a href="${href}"><span>${icon}</span>${label.split(" ")[0]}</a>`).join("");
- return `<div class="admin-app"><header class="admin-top"><a class="logo" href="/admin"><span class="logo-mark">✳</span><span>AGRO <b>SEED</b> <small class="muted">/ ADMIN</small></span></a><div class="staff-tag"><span class="staff-avatar">${esc(role[0])}</span><span>${esc(role)} · Preview</span><button class="btn btn-secondary btn-small" data-logout>Sign out</button></div></header><div class="preview-strip"><b>LOCAL PREVIEW</b> Demo data · Orders do not accept payment or create real shipments.</div><div class="admin-layout"><aside class="admin-sidebar"><nav class="admin-nav">${nav}</nav><a class="admin-nav" href="/" style="margin-top:25px">↗ View storefront</a></aside><main class="admin-content">${content}</main></div><nav class="mobile-admin-nav" aria-label="Staff navigation">${bottom}</nav></div>`;
+ const nav=links.map(([href,label,icon,group])=>`${group?`<div class="side-label">${group}</div>`:""}<a class="${adminPageIsActive(path,href)?"active":""}" href="${href}"><span>${icon}</span> &nbsp;${label}</a>`).join("");
+ return `<div class="admin-app"><header class="admin-top"><a class="logo" href="/admin"><span class="logo-mark">✳</span><span>AGRO <b>SEED</b> <small class="muted">/ ADMIN</small></span></a><div class="staff-tag"><span class="staff-avatar">${esc(role[0])}</span><span>${esc(role)} · Preview</span><button class="btn btn-secondary btn-small" data-logout>Sign out</button></div></header><div class="preview-strip"><b>LOCAL PREVIEW</b> Demo data · Orders do not accept payment or create real shipments.</div><div class="admin-layout"><aside class="admin-sidebar"><nav class="admin-nav">${nav}</nav><a class="admin-nav" href="/" style="margin-top:25px">↗ View storefront</a></aside><main class="admin-content">${content}</main></div>${adminBottomNav(path,links)}</div>`;
 }
 const adminHead=(title,desc,action="")=>`<div class="admin-page-head"><div><h1>${title}</h1><p>${desc}</p></div>${action}</div>`;
 async function adminPage(path){

@@ -158,6 +158,7 @@ export default {
       return staticResponse(request, "/app.html");
     }
 
+    if (env.ASSETS) return env.ASSETS.fetch(request);
     return staticResponse(request, pathname);
   }
 };

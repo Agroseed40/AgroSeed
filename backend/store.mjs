@@ -266,43 +266,102 @@ function updateDemo(data, remove) {
     return demoCounts(data);
   }
   const samples = [
-    ["Tomato seeds", "टमाटर के बीज", "Seeds", "10 g"],
-    ["Compost", "खाद", "Soil Nutrition", "1 kg"],
-    ["Sticky traps", "चिपचिपे ट्रैप", "Crop Protection", "10 sheets"],
-    ["Hand trowel", "हाथ की खुरपी", "Farm Tools", "1 piece"],
-    ["Drip connectors", "ड्रिप कनेक्टर", "Irrigation", "5 pieces"]
+    {
+      nameEn: "Demo · Tomato Seeds (Pusa Ruby)", name: "डेमो · टमाटर के बीज (पूसा रूबी)", category: "Vegetable Seeds", categoryHi: "सब्ज़ियों के बीज",
+      image: "/images/demo/tomato-seeds.png", alt: "Open-license vintage tomato seed packet, used as illustrative demo product art",
+      descriptionEn: "Demo listing for a tomato seed variety. The seed packet photo is illustrative; replace it with the exact AgroSeed pack before selling.",
+      description: "टमाटर बीज का डेमो उत्पाद। पैकेट की तस्वीर केवल उदाहरण है; बिक्री से पहले असली पैक की तस्वीर लगाएं।",
+      directions: "Demo only: follow the sowing depth and seasonal guidance printed on the actual seed packet.",
+      labelInfo: "Demo catalog listing · Illustrative open-license image · Replace pack artwork before launch.",
+      safetyInfo: "Demo listing only. Verify variety, germination rate, lot, expiry and certification before selling.",
+      variants: [["10 g", 49, 69, 28], ["25 g", 99, 129, 16]]
+    },
+    {
+      nameEn: "Demo · Carrot Seeds (Nantes)", name: "डेमो · गाजर के बीज (नांतेस)", category: "Vegetable Seeds",
+      image: "/images/demo/carrot-seeds.png", alt: "Open-license vintage carrot seed packet, used as illustrative demo product art",
+      descriptionEn: "Demo listing for carrot seeds with small and value packs. Replace the illustrative seed packet with the exact retail pack before selling.",
+      description: "छोटे और बड़े पैक के साथ गाजर बीज का डेमो उत्पाद। बिक्री से पहले असली पैक की तस्वीर लगाएं।",
+      directions: "Demo only: follow the sowing depth and seasonal guidance printed on the actual seed packet.",
+      labelInfo: "Demo catalog listing · Illustrative open-license image · Replace pack artwork before launch.",
+      safetyInfo: "Demo listing only. Verify variety, germination rate, lot, expiry and certification before selling.",
+      variants: [["10 g", 39, 59, 34], ["25 g", 79, 99, 18]]
+    },
+    {
+      nameEn: "Demo · Onion Seeds (Nashik Red)", name: "डेमो · प्याज के बीज (नासिक रेड)", category: "Vegetable Seeds",
+      image: "/images/demo/onion-seeds.png", alt: "Open-license vintage onion seed packet, used as illustrative demo product art",
+      descriptionEn: "Demo listing for onion seed packs. Replace the illustrative seed packet with the exact retail pack before selling.",
+      description: "प्याज बीज पैक का डेमो उत्पाद। बिक्री से पहले असली पैक की तस्वीर लगाएं।",
+      directions: "Demo only: follow the sowing depth and seasonal guidance printed on the actual seed packet.",
+      labelInfo: "Demo catalog listing · Illustrative open-license image · Replace pack artwork before launch.",
+      safetyInfo: "Demo listing only. Verify variety, germination rate, lot, expiry and certification before selling.",
+      variants: [["5 g", 59, 79, 26], ["10 g", 99, 129, 14]]
+    },
+    {
+      nameEn: "Demo · Watermelon Seeds (Sugar Baby)", name: "डेमो · तरबूज के बीज (शुगर बेबी)", category: "Fruit Seeds", categoryHi: "फलों के बीज",
+      image: "/images/demo/watermelon-seeds.png", alt: "Open-license vintage watermelon seed packet, used as illustrative demo product art",
+      descriptionEn: "Demo listing for watermelon seeds with two pack sizes. Replace the illustrative seed packet with the exact retail pack before selling.",
+      description: "दो पैक आकारों के साथ तरबूज बीज का डेमो उत्पाद। बिक्री से पहले असली पैक की तस्वीर लगाएं।",
+      directions: "Demo only: follow the sowing depth and seasonal guidance printed on the actual seed packet.",
+      labelInfo: "Demo catalog listing · Illustrative open-license image · Replace pack artwork before launch.",
+      safetyInfo: "Demo listing only. Verify variety, germination rate, lot, expiry and certification before selling.",
+      variants: [["5 g", 49, 69, 24], ["10 g", 89, 109, 12]]
+    },
+    {
+      nameEn: "Demo · Thyme Seeds (Common)", name: "डेमो · थाइम के बीज (कॉमन)", category: "Herb Seeds", categoryHi: "जड़ी-बूटी के बीज",
+      image: "/images/demo/thyme-seeds.png", alt: "Open-license vintage thyme seed packet, used as illustrative demo product art",
+      descriptionEn: "Demo listing for culinary herb seeds with two pack choices. Replace the illustrative seed packet with the exact retail pack before selling.",
+      description: "दो पैक विकल्पों के साथ हर्ब बीज का डेमो उत्पाद। बिक्री से पहले असली पैक की तस्वीर लगाएं।",
+      directions: "Demo only: follow the sowing depth and seasonal guidance printed on the actual seed packet.",
+      labelInfo: "Demo catalog listing · Illustrative open-license image · Replace pack artwork before launch.",
+      safetyInfo: "Demo listing only. Verify variety, germination rate, lot, expiry and certification before selling.",
+      variants: [["2 g", 69, 89, 20], ["5 g", 129, 159, 10]]
+    }
   ];
-  for (const [index, [nameEn, name, category, pack]] of samples.entries()) {
+  for (const [index, sample] of samples.entries()) {
     const number = index + 1;
     const key = randomBytes(6).toString("hex");
-    const sku = "DEMO-" + key.toUpperCase();
-    const code = "DEMO" + key.toUpperCase();
-    const categoryEn = "Demo " + category;
-    const brandEn = "Demo Brand " + number;
-    const pricePaise = 7900 + index * 2000;
+    const code = "GROW" + (10 + number);
+    const brandEn = "AgroSeed Select";
     const product = cleanProduct({
-      nameEn: "Demo · " + nameEn,
-      name: "डेमो · " + name,
-      categoryEn,
+      nameEn: sample.nameEn,
+      name: sample.name,
+      categoryEn: sample.category,
+      category: sample.categoryHi,
       brandEn,
+      brand: brandEn,
       status: "published",
-      featured: true,
-      descriptionEn: "Sample product for previewing the AgroSeed catalog.",
-      variants: [{ sku, pack, pricePaise, mrpPaise: pricePaise + 2000, stock: 12 + index }]
+      featured: index < 3,
+      descriptionEn: sample.descriptionEn,
+      description: sample.description,
+      directions: sample.directions,
+      labelInfo: sample.labelInfo,
+      safetyInfo: sample.safetyInfo,
+      images: [sample.image],
+      imageAlt: [sample.alt],
+      variants: sample.variants.map(([pack, priceRupees, mrpRupees, stock], variantIndex) => ({
+        sku: "AGS-" + sample.category.slice(0, 3).toUpperCase() + "-" + String(number).padStart(2, "0") + (variantIndex ? "-B" : "-A"),
+        pack,
+        pricePaise: priceRupees * 100,
+        mrpPaise: mrpRupees * 100,
+        stock
+      }))
     }, null, data);
     data.products.push({ ...product, demo: true });
-    for (const [collection, label] of [["categories", categoryEn], ["brands", brandEn]]) {
+    for (const [collection, label, nativeName] of [["categories", sample.category, sample.categoryHi], ["brands", brandEn, brandEn]]) {
       data[collection] ||= [];
       if (!data[collection].some((row) => row.slug === slug(label))) {
-        data[collection].push({ id: slug(label), slug: slug(label), name: label, nameEn: label, active: true, order: index, demo: true });
+        data[collection].push({ id: slug(label), slug: slug(label), name: nativeName, nameEn: label, active: true, order: index, demo: true });
       }
     }
-    data.coupons.push({ id: key, code, type: "percent", value: 5 + index, minSubtotalPaise: 10_000, maxUses: 20, usesCount: 0, active: true, demo: true });
-    let pin = 900_000 + index;
-    while (data.serviceAreas.some((row) => row.pincode === String(pin))) pin += 5;
-    data.serviceAreas.push({ id: key, pincode: String(pin), city: "Demo delivery area " + number, feePaise: 2900, estimate: "2–4 days", active: true, demo: true });
-    data.supportRequests.unshift({ id: key, name: "Demo shopper " + number, email: "shopper" + number + "@example.invalid", topic: "Product question", message: "Sample request about " + nameEn.toLowerCase() + ".", status: ["new", "in_progress", "resolved"][index % 3], createdAt: now(), demo: true });
-    data.inventoryTransactions.unshift({ id: key, sku, delta: 12 + index, reason: "Demo opening stock", actor: "Demo data", createdAt: now(), demo: true });
+    const minSubtotalPaise = Math.min(...sample.variants.map((variant) => variant[1] * 100));
+    data.coupons.push({ id: key, code, type: "percent", value: 5 + index, minSubtotalPaise, maxUses: 20, usesCount: 0, active: true, demo: true });
+    let pin = 900000 + number;
+    while (data.serviceAreas.some((row) => row.pincode === String(pin))) pin += 7;
+    data.serviceAreas.push({ id: key, pincode: String(pin), city: "Sample service area " + number, feePaise: 2900, estimate: "2–4 days", active: true, demo: true });
+    data.supportRequests.unshift({ id: key, name: "Sample shopper " + number, email: "shopper" + number + "@example.invalid", topic: "Product question", message: "Demo request about " + sample.nameEn.replace(/^Demo · /, "").toLowerCase() + ".", status: ["new", "in_progress", "resolved"][index % 3], createdAt: now(), demo: true });
+    for (const variant of product.variants) {
+      data.inventoryTransactions.unshift({ id: randomBytes(8).toString("hex"), sku: variant.sku, delta: variant.stock, reason: "Demo opening stock", actor: "Demo data", createdAt: now(), demo: true });
+    }
     data.audit.unshift({ id: key, actor: "Demo data", action: "demo_product_created", entity: "product", entityId: String(product.id), detail: product.nameEn, createdAt: now(), demo: true });
   }
   return demoCounts(data);

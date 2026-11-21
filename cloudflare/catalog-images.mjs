@@ -34,7 +34,7 @@ export async function serveCatalogImage(request, db, id) {
 
 export function catalogImageUrl(value) {
   const url = String(value || "").trim();
-  if (!url || /^\/media\/images\/[a-f0-9]{64}$/.test(url)) return url;
+  if (!url || /^\/media\/images\/[a-f0-9]{64}$/.test(url) || /^\/images\/demo\/[a-z0-9-]+\.png$/.test(url)) return url;
   if (url.length <= 1000 && URL.canParse(url) && new URL(url).protocol === "https:") return url;
   throw Object.assign(new Error("Use an HTTPS image URL or upload an image."), { statusCode: 400 });
 }

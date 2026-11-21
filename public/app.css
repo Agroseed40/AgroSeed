@@ -370,3 +370,24 @@ a:focus-visible, button:focus-visible {
 @media(max-width:900px){.admin-top{gap:12px}.admin-global-search{width:min(390px,38vw);margin-right:8px}.variant-editor-head,.variant-row{grid-template-columns:1fr 1fr 1fr 1fr .9fr 28px;gap:6px}.product-image-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:720px){.admin-global-search{order:3;width:100%;max-width:none;margin:0;padding:0 7px 0 10px}.admin-global-search kbd{display:none}.admin-top{height:auto;min-height:58px;flex-wrap:wrap;padding:9px 13px}.admin-top .staff-tag{margin-left:auto}.admin-layout{min-height:calc(100vh - 104px)}.admin-content{padding-top:16px}.admin-search-hints{grid-template-columns:1fr}.product-editor{padding-bottom:100px}.product-editor-section{padding:16px}.product-section-heading{align-items:flex-start}.status-select{min-width:130px}.product-image-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.variant-editor-head{display:none}.variant-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:12px 4px}.variant-row label span{display:block}.variant-remove{grid-column:2;justify-self:end}.product-editor-actions{bottom:82px;align-items:flex-start}.product-editor-actions>div:first-child{display:none}.product-editor-actions>div:last-child{width:100%;justify-content:flex-end;flex-wrap:wrap}.media-upload-row{grid-template-columns:1fr}.admin-search-result{gap:9px;padding:12px}.admin-search-type{min-width:68px;font-size:8px}.admin-search-copy b{font-size:11px}.admin-search-page{padding:15px}.home-search{margin-top:18px}}
 @media(max-width:420px){.admin-search-result .status-pill{display:none}.product-editor-section{padding:13px}.status-select{min-width:116px}.product-section-heading h2{font-size:15px}.product-section-heading p{font-size:9px}.product-editor-actions .btn{padding:10px 11px;font-size:10px}.admin-global-search button{padding:7px 8px;font-size:9px}}
+
+/* Repair the overview link copy: only the icon gets a fixed icon tile. */
+.overview-quick-link{height:auto;min-height:98px;align-items:center}
+.overview-quick-link>span:not(:first-child){display:block;flex:1;min-width:0;width:auto;height:auto;background:none;border-radius:0;color:inherit;font-size:inherit;place-items:initial}
+.overview-quick-link>span:not(:first-child) b{line-height:1.25}
+.overview-quick-link small{line-height:1.45;white-space:normal;overflow-wrap:anywhere}
+.overview-quick-link i{flex:none}
+@media(max-width:720px){
+ .admin-content .table-wrap:has(.admin-mobile-table){overflow:visible}
+ .admin-mobile-table{min-width:0;width:100%;border-collapse:separate;border-spacing:0 9px}
+ .admin-mobile-table thead{display:none}
+ .admin-mobile-table tbody tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+ .admin-mobile-table tbody td{display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:0;padding:10px 11px;border:0;overflow-wrap:anywhere}
+ .admin-mobile-table tbody td::before{content:attr(data-label);color:#879287;font-size:9px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+ .admin-mobile-table tbody td:empty{display:none}
+ .admin-mobile-table tbody td:first-child,.admin-mobile-table tbody td:last-child,.admin-mobile-table tbody td[colspan]{grid-column:1/-1}
+ .admin-mobile-table .table-actions{white-space:normal;flex-wrap:wrap}
+ .admin-mobile-table .table-actions .btn{flex:1 1 auto}
+ .admin-card:has(.admin-mobile-table){padding:12px}
+}
+@media(max-width:420px){.overview-quick-link{min-height:102px;padding:12px;gap:10px}.overview-quick-link>span:first-child{width:36px;height:36px}}

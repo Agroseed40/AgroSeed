@@ -2,7 +2,7 @@ const customerTable = "agroseed_customers";
 import { createCustomerTestOrder, verifyCustomerTestPayment, closeCustomerTestOrder, customerOrders } from "../backend/store.mjs";
 
 let jwksCache;
-let jwksCacheUntil = 0;
+
 
 const json = (data, status = 200) => new Response(JSON.stringify(data), {
   status,
@@ -24,14 +24,13 @@ function decodeJsonSegment(value) {
 }
 
 async function accessKeys(domain) {
-  if (jwksCache && Date.now() < jwksCacheUntil) return jwksCache;
+  if (jwksCache?.domain === domain && Date.now() < jwksCache.expiresAt) return jwksCache.keys;
   const response = await fetch(`https://${domain}/cdn-cgi/access/certs`, { headers: { Accept: "application/json" } });
   if (!response.ok) throw new Error("Cloudflare Access signing keys could not be loaded.");
   const body = await response.json();
   if (!Array.isArray(body.keys)) throw new Error("Cloudflare Access returned an invalid signing-key set.");
-  jwksCache = body.keys;
-  jwksCacheUntil = Date.now() + 5 * 60 * 1000;
-  return jwksCache;
+  jwksCache = { domain, keys: body.keys, expiresAt: Date.now() + 5 * 60 * 1000 };
+  return body.keys;
 }
 
 async function verifyAccess(request, env) {

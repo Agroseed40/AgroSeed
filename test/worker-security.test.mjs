@@ -8,7 +8,7 @@ test("Worker adds baseline security headers to API responses", async () => {
 
   assert.equal(response.status, 200);
   assert.equal(response.headers.get("content-security-policy"), "frame-ancestors 'none'");
-  assert.equal(response.headers.get("permissions-policy"), "camera=(), geolocation=(), microphone=()");
+  assert.equal(response.headers.get("permissions-policy"), "camera=(), geolocation=(self), microphone=()");
   assert.equal(response.headers.get("referrer-policy"), "strict-origin-when-cross-origin");
   assert.equal(response.headers.get("x-frame-options"), "DENY");
   assert.equal(response.headers.get("strict-transport-security"), "max-age=31536000");

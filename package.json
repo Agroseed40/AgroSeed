@@ -2,7 +2,7 @@
   "name": "agroseed-storefront",
   "version": "0.1.0",
   "private": true,
-  "description": "AgroSeed preview storefront on Cloudflare Workers with D1",
+  "description": "AgroSeed storefront on Cloudflare Workers with D1",
   "main": "cloudflare/worker.mjs",
   "engines": {
     "node": "22.x"

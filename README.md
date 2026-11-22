@@ -1,49 +1,33 @@
 # AgroSeed
 
-AgroSeed is a farm-supplies storefront and API running on Cloudflare Workers with Cloudflare D1. This branch deploys a public preview on `workers.dev` and preserves the existing storefront design.
-
-## Live preview
-
-- Storefront: <https://agroseed-preview.durgesh5757g.workers.dev>
-- Staff console: <https://agroseed-preview.durgesh5757g.workers.dev/admin>
-- D1 database: `agroseed-db`
-
-This is a preview environment. It uses a sample catalog and demo prices. Checkout creates only a sandbox order; no payment provider or real checkout is enabled.
+AgroSeed runs on Cloudflare Workers and Cloudflare D1. The storefront and staff console share the same Worker. The catalog starts empty and staff can add approved products in `/admin`. Checkout displays the delivery form and order summary with submission disabled.
 
 ## Local development
 
-Requires Node.js 22 or newer.
+Use Node.js 22 and the checked-in Wrangler version.
 
 ```sh
 npm ci
+npx wrangler d1 migrations apply agroseed-db --local
 npm run dev
 ```
 
-Wrangler serves the Worker locally, normally at `http://localhost:8787`. Local development uses a local D1 database. To apply the checked-in migrations locally:
+Copy `.env.example` to `.dev.vars` and set a local staff password. The localhost Worker supports staff sign-in. Customer email authentication uses the hosted Access application.
 
-```sh
-npx wrangler d1 migrations apply agroseed-db --local
-```
-
-For local staff-console testing, create a `.dev.vars` file with a non-production `AGROSEED_ADMIN_PASSWORD`. Do not commit that file. `.env.example` lists the preview flags.
-
-## Deploy
-
-Authenticate the Wrangler CLI to Cloudflare, then run:
+## Cloudflare deployment
 
 ```sh
 npm run build
+npx wrangler d1 migrations apply agroseed-db --remote
 npm run deploy
 ```
 
-The Worker uses the `DB` D1 binding in `wrangler.toml`. The production staff password is a Worker secret, set with `npx wrangler secret put AGROSEED_ADMIN_PASSWORD`.
+Deploy to the existing `agroseed-preview` Worker. Keep the `AGROSEED_ADMIN_PASSWORD` Worker secret and the existing D1 binding. The site is served at https://agroseed-preview.durgesh5757g.workers.dev.
 
-## Authentication and storage
+## Customer accounts
 
-Customer account API routes use Cloudflare Access with email one-time PIN authentication. The Access application protects `/api/v1/customer/*`; the storefront remains public. Customer profiles, saved carts, addresses, staff sessions, login limits, and app state are stored in D1.
+Cloudflare Access protects `/api/v1/customer/*` with email one-time PIN. The first verified sign-in creates the D1 customer profile. Subsequent sign-ins use the same profile. Signing out uses the application domain's Access logout endpoint. Keep the Access application path, issuer and audience aligned with `wrangler.toml`.
 
-R2 is not configured. Product image uploads are not part of this preview; the existing storefront assets are bundled into the Worker.
+## Data
 
-## Before a real launch
-
-Replace the sample catalog and prices, verify customer email-code sign-in and account flows, set business and fulfilment policies, configure durable image storage if needed, and run a complete checkout verification with a payment provider. Keep real checkout disabled until those checks are complete.
+D1 stores customer profiles, addresses, carts, staff sessions, and merchant-managed store records. Guest carts use their own table with a 30-day expiry. The catalog, inventory, settings, promotions, and audit records share a versioned state row so related changes commit together. Migration 0004 removes the identified seed products and releases outstanding preview reservations while retaining legacy order records privately in D1. Product uploads are deferred. The storefront logo ships with the Worker.

@@ -21,9 +21,19 @@ const before=await page.evaluate(() => {
  const f=document.querySelector("#address-form");
  return {valid:f.checkValidity(),fields:[...f.elements].filter(el=>el.name).map(el=>({name:el.name,required:el.required,value:el.value,valid:el.validity?.valid,message:el.validationMessage})),submitButton:f.querySelector(".btn-primary")?.outerHTML.slice(0,500)};
 });
+const pre = await page.evaluate(() => ({
+  isForm: document.querySelector("#address-form") instanceof HTMLFormElement,
+  saving: document.querySelector("#address-form").dataset.saving || null,
+  readFormType:typeof readForm,
+  requestSubmitType:typeof document.querySelector("#address-form").requestSubmit,
+  csrfValue:typeof csrf !== "undefined" ? String(csrf).slice(0,12) : null,
+  customerSessionType: typeof customerSession,
+  account:typeof customerSession!=="undefined" ? !!customerSession : null
+}));
+console.log("QA_PRE="+JSON.stringify(pre));
 await page.locator("#address-form .btn-primary").click();
 await page.waitForTimeout(2000);
-const after=await page.evaluate(() => ({url:location.href,submitEvents:window.__submitEvents,invalidEvents:window.__invalidEvents||[],formPresent:!!document.querySelector("#address-form"),status:document.querySelector("[data-address-status]")?.textContent,toast:[...document.querySelectorAll(".toast")].map(x=>x.textContent),addressText:document.querySelector(".account-content")?.innerText.slice(-1000)}));
+const after=await page.evaluate(() => ({url:location.href,submitEvents:window.__submitEvents,button:document.querySelector("#address-form .btn-primary")?.outerHTML,formDataset:document.querySelector("#address-form")?.dataset.saving||null,invalidEvents:window.__invalidEvents||[],formPresent:!!document.querySelector("#address-form"),status:document.querySelector("[data-address-status]")?.textContent,toast:[...document.querySelectorAll(".toast")].map(x=>x.textContent),addressText:document.querySelector(".account-content")?.innerText.slice(-1000)}));
 console.log("QA_RESULT="+JSON.stringify({before,after,network,errors}));
 await browser.close();
 if(!network.some(x=>x.kind==="request"&&x.method==="POST"))process.exitCode=2;

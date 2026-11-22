@@ -11,7 +11,8 @@
     "build": "node scripts/embed-worker-assets.mjs && wrangler deploy --dry-run",
     "start": "node scripts/embed-worker-assets.mjs && wrangler dev",
     "dev": "node scripts/embed-worker-assets.mjs && wrangler dev",
-    "deploy": "node scripts/embed-worker-assets.mjs && wrangler deploy"
+    "deploy": "node scripts/embed-worker-assets.mjs && wrangler deploy",
+    "test": "node --test"
   },
   "devDependencies": {
     "wrangler": "^4.164.0"

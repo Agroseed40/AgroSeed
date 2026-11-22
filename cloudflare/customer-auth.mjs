@@ -1,4 +1,5 @@
 const customerTable = "agroseed_customers";
+import { createCustomerTestOrder, verifyCustomerTestPayment, closeCustomerTestOrder, customerOrders } from "../backend/store.mjs";
 
 let jwksCache;
 let jwksCacheUntil = 0;
@@ -46,7 +47,7 @@ async function verifyAccess(request, env) {
     const claims = decodeJsonSegment(parts[1]);
     if (header.alg !== "RS256" || !header.kid || claims.iss !== `https://${domain}`) return null;
     if (!Array.isArray(claims.aud) || !claims.aud.includes(audience)) return null;
-    if (typeof claims.sub !== "string" || !claims.sub || typeof claims.email !== "string" || !claims.email ||
+    if (typeof claims.sub !== "string" || !claims.sub || typeof claims.email !== "string" || !claims.email || claims.email_verified === false ||
         !Number.isFinite(claims.exp) || claims.exp * 1000 <= Date.now() ||
         (claims.nbf != null && (!Number.isFinite(claims.nbf) || claims.nbf * 1000 > Date.now()))) return null;
     const key = (await accessKeys(domain)).find((item) => item.kid === header.kid && item.kty === "RSA");
@@ -142,8 +143,10 @@ export async function handleCustomerAuth(request, env, pathname) {
     if (!identity) return json({ error: "Complete Cloudflare email-code sign-in and try again." }, 401);
     try {
       await customerRecord(env.DB, identity);
+      const requested = new URL(request.url).searchParams.get("returnTo") || "/account";
+      const returnTo = new Set(["/checkout", "/account/orders", "/account/addresses"]).has(requested) ? requested : "/account";
       return new Response(null, { status: 302, headers: {
-        Location: new URL("/account?access=1", request.url).href, "Cache-Control": "no-store"
+        Location: new URL(`${returnTo}?access=1`, request.url).href, "Cache-Control": "no-store"
       } });
     } catch (error) {
       console.error("Customer provisioning failed", { message: String(error?.message || "unknown").slice(0, 300) });
@@ -204,6 +207,40 @@ export async function handleCustomerAuth(request, env, pathname) {
       const { results = [] } = await env.DB.prepare(`SELECT id, name, phone, line1, line2, city, state, pincode, is_default, created_at
         FROM agroseed_customer_addresses WHERE customer_id = ? ORDER BY is_default DESC, created_at DESC`).bind(identity.id).all();
       return json({ items: results.map((row) => ({ ...row, isDefault: Boolean(row.is_default) })) });
+    }
+
+    if (method === "GET" && pathname === "/api/v1/customer/orders") {
+      return json({ items: await customerOrders(env, identity.id) });
+    }
+
+    if (method === "POST" && pathname === "/api/v1/customer/checkout/create-order") {
+      const input = await body(request);
+      const addressId = String(input.addressId || "");
+      if (!/^[0-9a-f-]{36}$/i.test(addressId)) return json({ error: "Choose a saved delivery address." }, 400);
+      const addressRow = await env.DB.prepare(`SELECT id, name, phone, line1, line2, city, state, pincode, is_default
+        FROM agroseed_customer_addresses WHERE id = ? AND customer_id = ?`).bind(addressId, identity.id).first();
+      if (!addressRow) return json({ error: "That saved address does not belong to this account." }, 404);
+      const cartRow = await env.DB.prepare("SELECT items_json FROM agroseed_customer_carts WHERE customer_id = ?").bind(identity.id).first();
+      let items = [];
+      try { items = normalizeCartItems(JSON.parse(cartRow?.items_json || "[]")); } catch { return json({ error: "Your saved bag is invalid. Review it and try again." }, 400); }
+      if (!items.length) return json({ error: "Your bag is empty." }, 400);
+      const address = { id: addressRow.id, name: addressRow.name, phone: addressRow.phone, line1: addressRow.line1, line2: addressRow.line2, city: addressRow.city, state: addressRow.state, pincode: addressRow.pincode, isDefault: Boolean(addressRow.is_default) };
+      const order = await createCustomerTestOrder(env, { id: identity.id, email: identity.email, name: profile.name || identity.name }, { items, couponCode: input.couponCode || "", address, idempotencyKey: input.idempotencyKey });
+      return json(order, 201);
+    }
+
+    if (method === "POST" && pathname === "/api/v1/customer/checkout/verify-payment") {
+      const details = await body(request);
+      const result = await verifyCustomerTestPayment(env, identity.id, details);
+      await env.DB.prepare("UPDATE agroseed_customer_carts SET items_json = '[]', guest_snapshot_json = '[]', updated_at = CURRENT_TIMESTAMP WHERE customer_id = ?")
+        .bind(identity.id).run();
+      return json(result);
+    }
+
+    const checkoutClose = pathname.match(/^\/api\/v1\/customer\/checkout\/orders\/(order_[A-Za-z0-9]+)\/(cancel|failed)$/);
+    if (method === "POST" && checkoutClose) {
+      const reason = checkoutClose[2] === "failed" ? "payment_failed" : "cancelled";
+      return json(await closeCustomerTestOrder(env, identity.id, checkoutClose[1], reason));
     }
 
     if (method === "PATCH" && pathname === "/api/v1/customer/profile") {

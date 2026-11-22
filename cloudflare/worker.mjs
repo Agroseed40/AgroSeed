@@ -1,6 +1,7 @@
 import { handleStoreRequest } from "../backend/store.mjs";
 import { handleCustomerAuth } from "./customer-auth.mjs";
 import { staticAssets } from "./static-assets.generated.mjs";
+import { serveCatalogImage } from "./catalog-images.mjs";
 
 const appRoutes = new Set([
   "/", "/categories", "/shop", "/cart", "/checkout", "/search", "/help", "/contact", "/shipping-returns",
@@ -105,6 +106,11 @@ export default {
     const url = new URL(request.url);
     const pathname = url.pathname.replace(/\/+$/, "") || "/";
 
+    const catalogImage = pathname.match(/^\/media\/images\/([a-f0-9]{64})$/);
+    if (catalogImage && (request.method === "GET" || request.method === "HEAD")) {
+      return await serveCatalogImage(request, env.DB, catalogImage[1]);
+    }
+
     if (pathname === "/health" || pathname === "/api/v1/health") {
       try {
         await env.DB.prepare("SELECT revision FROM agroseed_app_state WHERE state_id = 1").first("revision").then(revision => {
@@ -125,7 +131,10 @@ export default {
     }
 
     if (pathname === "/account/login" && request.method === "GET") {
-      return Response.redirect(new URL("/api/v1/customer/login", url), 302);
+      const login = new URL("/api/v1/customer/login", url);
+      const returnTo = url.searchParams.get("returnTo");
+      if (returnTo) login.searchParams.set("returnTo", returnTo);
+      return Response.redirect(login, 302);
     }
 
     if (pathname === "/account/logout" && request.method === "GET") {

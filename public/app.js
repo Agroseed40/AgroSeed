@@ -468,6 +468,41 @@ function checkoutAddressFromForm(form){
 function fillCheckoutAddress(form,address){
  for(const key of checkoutAddressFields){const input=form.querySelector(`[data-checkout-address="${key}"]`);if(input)input.value=address[key]||"";}
 }
+async function detectCurrentAddress(button){
+ const form=button.closest("form");
+ const status=form?.querySelector("#address-location-status");
+ if(!form||!status)return;
+ if(!navigator.geolocation){status.textContent="Location is unavailable in this browser. Enter the address manually.";return;}
+ button.disabled=true;
+ status.textContent="Waiting for location permission…";
+ try{
+  const coords=await new Promise((resolve,reject)=>navigator.geolocation.getCurrentPosition(
+   position=>resolve(position.coords),reject,
+   {enableHighAccuracy:false,timeout:12000,maximumAge:60000}
+  ));
+  status.textContent="Looking up your area…";
+  const url=new URL("https://nominatim.openstreetmap.org/reverse");
+  url.search=new URLSearchParams({lat:String(coords.latitude),lon:String(coords.longitude),format:"jsonv2",addressdetails:"1",zoom:"18"}).toString();
+  const response=await fetch(url.toString(),{headers:{"Accept":"application/json"}});
+  if(!response.ok)throw new Error("Address lookup unavailable");
+  const result=await response.json();
+  const address=result.address||{};
+  const values={
+   line1:[address.house_number,address.road||address.pedestrian||address.residential||address.hamlet].filter(Boolean).join(" ").trim(),
+   city:address.city||address.town||address.village||address.suburb||address.county||"",
+   state:address.state||"",
+   pincode:/^\\d{6}$/.test(String(address.postcode||""))?String(address.postcode):""
+  };
+  let count=0;
+  for(const [name,value] of Object.entries(values)){
+   const input=form.elements.namedItem(name);
+   if(input&&value&&!String(input.value||"").trim()){input.value=value;count++;}
+  }
+  status.textContent=count?"Area detected. Check your house number, street, city and PIN code before saving.":"Location found, but address details were unavailable. Enter them manually.";
+ }catch(error){
+  status.textContent=error.code===1?"Location permission denied. Allow location access in browser settings or enter the address manually.":error.code===3?"Location timed out. Retry or enter the address manually.":"Could not detect your address. Enter it manually.";
+ }finally{button.disabled=false;}
+}
 async function updateCheckoutQuote(form){
  const request=String((Number(form.dataset.quoteRequest)||0)+1);
  form.dataset.quoteRequest=request;
@@ -615,7 +650,7 @@ async function accountPage(path){
  }
  else if(path==="/account/addresses"){
   const {items:rows=[]}=await api("/api/v1/customer/addresses"),editId=new URLSearchParams(location.search).get("edit"),editing=rows.find(x=>x.id===editId)||{},field=(name,label,required=true)=>`<div class="field"><label>${label}${required?" *":""}</label><input name="${name}" ${required?"required":""} value="${esc(editing[name]||"")}"></div>`;
-  body=`<form id="address-form" class="form-card"><h2>${editing.id?"Edit address":"Add an address"}</h2><input type="hidden" name="id" value="${esc(editing.id||"")}"><div class="field-grid">${field("name","Full name")}${field("phone","Mobile number")}${field("line1","Address")}${field("line2","Landmark",false)}${field("city","Village / city")}${field("state","State")}${field("pincode","PIN code")}</div><label class="filter-option"><input type="checkbox" name="isDefault" ${editing.isDefault||!rows.length?"checked":""}> Use as default checkout address</label><div class="table-actions"><button class="btn btn-primary">${editing.id?"Save address":"Add address"}</button>${editing.id?'<a class="btn btn-secondary" href="/account/addresses">Cancel</a>':""}</div><p class="hint">Saved securely to your account.</p></form>${rows.length?`<div class="panel-card">${rows.map(a=>`<div class="cart-line"><div class="category-icon">⌂</div><div><h3>${esc(a.name)} ${a.isDefault?'<span class="status-pill">Default</span>':""}</h3><p>${esc([a.line1,a.line2,a.city,a.state,a.pincode].filter(Boolean).join(", "))}</p><p>${esc(a.phone||"")}</p></div><div class="table-actions"><a class="btn btn-secondary btn-small" href="/account/addresses?edit=${encodeURIComponent(a.id)}">Edit</a><button class="btn btn-danger btn-small" data-delete-address="${esc(a.id)}">Delete</button>${!a.isDefault?`<button class="btn btn-secondary btn-small" data-default-address="${esc(a.id)}">Make default</button>`:""}</div></div>`).join("")}</div>`:empty("No saved addresses","Add an address to reuse it when ordering.")}`;
+  body=`<form id="address-form" class="form-card"><h2>${editing.id?"Edit address":"Add an address"}</h2><input type="hidden" name="id" value="${esc(editing.id||"")}"><div class="field-grid">${field("name","Full name")}${field("phone","Mobile number")}${field("line1","Address")}${field("line2","Landmark",false)}${field("city","Village / city")}${field("state","State")}${field("pincode","PIN code")}</div><div class="table-actions"><button class="btn btn-secondary" type="button" data-detect-address>Use my current location</button><small class="hint" id="address-location-status" role="status" aria-live="polite">Location permission is optional. Check the address before saving.</small></div><label class="filter-option"><input type="checkbox" name="isDefault" ${editing.isDefault||!rows.length?"checked":""}> Use as default checkout address</label><div class="table-actions"><button class="btn btn-primary">${editing.id?"Save address":"Add address"}</button>${editing.id?'<a class="btn btn-secondary" href="/account/addresses">Cancel</a>':""}</div><p class="hint">Saved securely to your account.</p></form>${rows.length?`<div class="panel-card">${rows.map(a=>`<div class="cart-line"><div class="category-icon">⌂</div><div><h3>${esc(a.name)} ${a.isDefault?'<span class="status-pill">Default</span>':""}</h3><p>${esc([a.line1,a.line2,a.city,a.state,a.pincode].filter(Boolean).join(", "))}</p><p>${esc(a.phone||"")}</p></div><div class="table-actions"><a class="btn btn-secondary btn-small" href="/account/addresses?edit=${encodeURIComponent(a.id)}">Edit</a><button class="btn btn-danger btn-small" data-delete-address="${esc(a.id)}">Delete</button>${!a.isDefault?`<button class="btn btn-secondary btn-small" data-default-address="${esc(a.id)}">Make default</button>`:""}</div></div>`).join("")}</div>`:empty("No saved addresses","Add an address to reuse it when ordering.")}`;
  } else body=`<div class="account-overview-links"><a href="/account/addresses"><span>⌂</span><b>Saved addresses</b><small>Manage delivery details</small><i>↗</i></a><a href="/shop"><span>✿</span><b>Browse products</b><small>Explore the AgroSeed catalog</small><i>↗</i></a></div>${customerDetails(customerSession)}`;
  const signedInAs=customerSession.name||customerSession.email||customerSession.phone||"your AgroSeed account";
  const initial=String(signedInAs).trim().charAt(0).toUpperCase()||"A";
@@ -904,6 +939,7 @@ document.addEventListener("click",async e=>{
   if(t.hasAttribute("data-delete-area")){await api(`/api/v1/admin/service-areas/${t.dataset.deleteArea}`,{method:"DELETE"});toast("PIN code removed.");render();return;}
   if(t.hasAttribute("data-support-id")){await api(`/api/v1/admin/support/${t.dataset.supportId}`,{method:"PATCH",body:JSON.stringify({status:t.dataset.status||"in_progress"})});toast(t.dataset.status==="resolved"?"Request resolved.":"Request updated.");render();return;}
   if(t.hasAttribute("data-customer-logout")){localStorage.removeItem(customerAuthKey);customerSession=null;csrf="";saveCartLocal([]);location.assign("/account/logout");return;}
+  if(t.hasAttribute("data-detect-address")){await detectCurrentAddress(t);return;}
   if(t.hasAttribute("data-delete-address")){if(customerSession){await api(`/api/v1/customer/addresses/${encodeURIComponent(t.dataset.deleteAddress)}`,{method:"DELETE"});toast("Address deleted.");render();return;}let rows=addressBook().filter(x=>x.id!==t.dataset.deleteAddress);if(rows.length&&!rows.some(x=>x.isDefault))rows[0].isDefault=true;saveAddressBook(rows);toast("Address deleted from this device.");render();return;}
   if(t.hasAttribute("data-default-address")){if(customerSession){const {items}=await api("/api/v1/customer/addresses"),address=items.find(x=>x.id===t.dataset.defaultAddress);if(address)await api("/api/v1/customer/addresses",{method:"PUT",body:JSON.stringify({...address,isDefault:true})});toast("Default address updated.");render();return;}const rows=addressBook().map(x=>({...x,isDefault:x.id===t.dataset.defaultAddress}));saveAddressBook(rows);toast("Default address updated.");render();return;}
   if(t.hasAttribute("data-public-image")){const images=JSON.parse(app.dataset.galleryImages||"[]"),index=Number(t.dataset.publicImage),image=images[index];if(image){$("#detail-main-image").src=image.url;$("#detail-main-image").alt=image.alt;app.querySelectorAll("[data-public-image]").forEach((button,i)=>button.classList.toggle("active",i===index));}return;}
@@ -943,7 +979,7 @@ document.addEventListener("submit",async e=>{
   if(f.id==="customer-profile-form"){await api("/api/v1/customer/profile",{method:"PATCH",body:JSON.stringify(readForm(f))});toast("Profile saved to your account.");render();return;}
   if(f.id==="delivery-check-form"){const pin=String(readForm(f).pincode||"").trim(),result=$("#delivery-check-result");result.textContent="Checking delivery availability…";const data=await api(`/api/v1/serviceability/${encodeURIComponent(pin)}`);result.textContent=!data.configured?"No delivery areas are configured yet.":data.available?`Delivery available${data.area.city?` to ${data.area.city}`:""}. Fee: ${money(data.area.feePaise)}${data.area.estimate?` · estimate ${data.area.estimate}`:""}. Confirm current delivery details with AgroSeed.`:"This PIN is not included in the configured delivery areas.";return;}
   if(f.id==="profile-form"){localStorage.setItem(profileKey,JSON.stringify(readForm(f)));toast("Guest profile saved on this device.");return;}
-  if(f.id==="address-form"){const d=readForm(f);d.isDefault=d.isDefault==="on";if(customerSession){await api("/api/v1/customer/addresses",{method:d.id?"PUT":"POST",body:JSON.stringify(d)});toast("Address saved to your account.");route("/account/addresses");return;}const rows=addressBook(),id=d.id||`address-${Date.now()}`,isDefault=d.isDefault||!rows.length,record={...d,id,isDefault};const next=rows.filter(x=>x.id!==id).map(x=>({...x,isDefault:isDefault?false:!!x.isDefault}));next.push(record);if(!next.some(x=>x.isDefault))next[0].isDefault=true;saveAddressBook(next);toast("Address saved on this device.");route("/account/addresses");return;}
+  if(f.id==="address-form"){const d=readForm(f);d.isDefault=d.isDefault==="on";d.phone=String(d.phone||"").replace(/\D/g,"");d.pincode=String(d.pincode||"").trim();if(customerSession){await api("/api/v1/customer/addresses",{method:d.id?"PUT":"POST",body:JSON.stringify(d)});toast("Address saved to your account.");route("/account/addresses");return;}const rows=addressBook(),id=d.id||`address-${Date.now()}`,isDefault=d.isDefault||!rows.length,record={...d,id,isDefault};const next=rows.filter(x=>x.id!==id).map(x=>({...x,isDefault:isDefault?false:!!x.isDefault}));next.push(record);if(!next.some(x=>x.isDefault))next[0].isDefault=true;saveAddressBook(next);toast("Address saved on this device.");route("/account/addresses");return;}
   if(f.id==="checkout-form"){await startTestCheckout(f);return;}
   if(f.id==="support-form"){const d=await api("/api/v1/support/requests",{method:"POST",body:formDataJson(f)});f.innerHTML=`<div class="notice">Your message was sent to AgroSeed. Reference: <b>${esc(d.ticket)}</b>.</div>`;return;}
   if(f.id==="admin-login-form"){const d=await api("/api/v1/admin/session",{method:"POST",body:formDataJson(f)});csrf=d.csrf;route(d.user?.role==="Catalog"?"/admin/products":d.user?.role==="Orders"?"/admin/orders":"/admin");return;}

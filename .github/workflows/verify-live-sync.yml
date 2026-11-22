@@ -35,5 +35,6 @@ jobs:
             echo "Already up-to-date"
           else
             git commit -m "Build verified AgroSeed Worker bundle (no deployment)"
+            git pull --rebase origin codex/agroseed-live-safe-sync-2026-11-22
             git push
           fi

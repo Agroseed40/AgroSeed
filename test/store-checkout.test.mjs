@@ -103,6 +103,8 @@ test("repeated checkout submissions reuse one pending test order", async () => {
 
   const changedIntent = { ...input, address: { ...address, id: "address-2" } };
   await assert.rejects(createCustomerTestOrder(env, customer, changedIntent), error => error.statusCode === 409);
+  const editedAddress = { ...input, address: { ...address, line1: "2 New Test Road" } };
+  await assert.rejects(createCustomerTestOrder(env, customer, editedAddress), error => error.statusCode === 409);
   assert.equal(DB.snapshot().orders.length, 1);
 });
 

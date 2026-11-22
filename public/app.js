@@ -445,6 +445,39 @@ async function cartPage(){
  const estimate=lines.reduce((a,x)=>a+x.v.pricePaise*x.q,0);
  return wrap(`<div class="container page-wrap">${pageTitle("Your bag",`${cartCount()} item${cartCount()===1?"":"s"} · prices are rechecked at checkout.`)}<div class="cart-layout"><section class="panel-card">${items}<a class="text-link" href="/shop">← Continue browsing</a></section><aside class="summary-card"><h2>Order preview</h2><div class="summary-row"><span>Estimated subtotal</span><b>${money(estimate)}</b></div><div class="summary-row"><span>Delivery</span><span>Calculated at checkout</span></div><div class="summary-row total"><span>Estimated total</span><b>${money(estimate)}</b></div><a class="btn btn-primary" href="/checkout">Continue to checkout</a><p class="hint">Razorpay test payments are enabled. No delivery order will be placed.</p></aside></div></div>`);
 }
+const checkoutAddressFields=["name","phone","line1","line2","city","state","pincode"];
+function checkoutAddressEditor(address){
+ const fields=[
+  ["name","Recipient name","text",120,"name",true,""],
+  ["phone","Mobile number","tel",10,"tel",true,"[6-9][0-9]{9}"],
+  ["line1","Address line 1","text",200,"address-line1",true,""],
+  ["line2","Address line 2 (optional)","text",200,"address-line2",false,""],
+  ["city","Village / city","text",100,"address-level2",true,""],
+  ["state","State","text",100,"address-level1",true,""],
+  ["pincode","PIN code","text",6,"postal-code",true,"[0-9]{6}"]
+ ];
+ return `<div class="field-grid checkout-address-editor">${fields.map(([key,label,type,max,autocomplete,required,pattern])=>`<div class="field ${key==="line1"||key==="line2"?"span-2":""}"><label for="checkout-address-${key}">${label}${required?" *":""}</label><input id="checkout-address-${key}" data-checkout-address="${key}" type="${type}" maxlength="${max}" autocomplete="${autocomplete}" ${key==="phone"||key==="pincode"?`inputmode="numeric"`:""} ${pattern?`pattern="${pattern}"`:""} ${required?"required":""} value="${esc(address[key]||"")}"></div>`).join("")}</div>`;
+}
+function checkoutAddressFromForm(form){
+ const address=Object.fromEntries(checkoutAddressFields.map(key=>[key,form.querySelector(`[data-checkout-address="${key}"]`)?.value.trim()||""]));
+ address.id=form.elements.addressId.value;
+ return address;
+}
+function fillCheckoutAddress(form,address){
+ for(const key of checkoutAddressFields){const input=form.querySelector(`[data-checkout-address="${key}"]`);if(input)input.value=address[key]||"";}
+}
+async function updateCheckoutQuote(form){
+ const request=String((Number(form.dataset.quoteRequest)||0)+1);
+ form.dataset.quoteRequest=request;
+ const pay=$(".checkout-summary button[type=submit]");
+ if(pay){pay.disabled=true;pay.textContent="Checking delivery…";}
+ const quote=await api("/api/v1/checkout/quote",{method:"POST",body:JSON.stringify({items:cart(),couponCode:localStorage.getItem(couponKey)||"",address:checkoutAddressFromForm(form)})});
+ if(form.dataset.quoteRequest!==request)return;
+ const total=$(".checkout-summary .summary-row.total b"),shipping=$(".checkout-summary .summary-row:nth-of-type(3) span:last-child");
+ if(total)total.textContent=money(quote.totalPaise);
+ if(shipping)shipping.textContent=money(quote.shippingPaise);
+ if(pay){pay.textContent=`Continue to test payment · ${money(quote.totalPaise)}`;pay.disabled=quote.totalPaise<100;}
+}
 async function checkoutPage(){
  let current;
  try{current=await api("/api/v1/customer/session");}
@@ -459,8 +492,7 @@ async function checkoutPage(){
  if(!addresses.length)return wrap(`<div class="container page-wrap checkout-gate">${pageTitle("Checkout","Save a delivery address to continue.")}<section class="checkout-gate-card"><span class="checkout-step-mark">⌂</span><div><h2>Add a delivery address</h2><p>Checkout uses your saved address and keeps it attached to this verified account.</p><a class="btn btn-primary" href="/account/addresses">Add delivery address</a></div></section></div>`);
  const selected=addresses.find(address=>address.isDefault)||addresses[0];
  const quote=await api("/api/v1/checkout/quote",{method:"POST",body:JSON.stringify({items:rows,couponCode:localStorage.getItem(couponKey)||"",address:selected})});
- const addressText=address=>[address.name,address.line1,address.line2,address.city,address.state,address.pincode].filter(Boolean).join(", ");
- return wrap(`<div class="container page-wrap checkout-page">${pageTitle("Checkout","Verified account · secure Razorpay test payment.")}<div class="checkout-progress"><span class="done">01 <b>Delivery</b></span><i></i><span class="done">02 <b>Review</b></span><i></i><span>03 <b>Payment</b></span></div><form class="checkout-layout checkout-rework" id="checkout-form"><section class="checkout-main"><section class="checkout-section"><div class="checkout-section-heading"><span>01</span><div><h2>Delivery address</h2><p>Signed in as ${esc(customerSession.email)}</p></div><span class="checkout-verified-badge">✓ Verified</span></div><label class="sr-only" for="checkout-address">Choose saved address</label><select id="checkout-address" class="control" name="addressId">${addresses.map(address=>`<option value="${esc(address.id)}" ${address.id===selected.id?"selected":""}>${address.isDefault?"Default · ":""}${esc(address.name)} · ${esc([address.city,address.pincode].filter(Boolean).join(" "))}</option>`).join("")}</select><div class="checkout-address-preview" id="checkout-address-preview">${esc(addressText(selected))}</div><a class="text-link" href="/account/addresses">Manage saved addresses ↗</a></section><section class="checkout-section"><div class="checkout-section-heading"><span>02</span><div><h2>Items in your order</h2><p>${rows.reduce((n,row)=>n+row.quantity,0)} items · stock is reserved after order creation</p></div></div><div class="checkout-line-list">${quote.items.map(item=>`<div class="checkout-product-line"><div><b>${esc(item.nameEn)}</b><span>${esc(item.pack)} · ${esc(item.sku)} × ${item.quantity}</span></div><strong>${money(item.lineTotalPaise)}</strong></div>`).join("")}</div></section><div class="checkout-test-note"><b>Test mode</b><span>Razorpay simulates this payment. A clearly marked test order will appear in your account and the admin order queue after verification.</span></div><p id="checkout-message" role="status" aria-live="polite"></p><div id="checkout-result"></div></section><aside class="summary-card checkout-summary"><p class="eyebrow">ORDER SUMMARY</p><h2>Review and pay</h2><div class="summary-row"><span>Subtotal</span><span>${money(quote.subtotalPaise)}</span></div><div class="summary-row"><span>Discount</span><span>−${money(quote.discountPaise)}</span></div><div class="summary-row"><span>Delivery</span><span>${money(quote.shippingPaise)}</span></div><div class="summary-row total"><span>Test total</span><b>${money(quote.totalPaise)}</b></div><button class="btn btn-primary" type="submit" ${quote.totalPaise<100?"disabled":""}>Continue to test payment · ${money(quote.totalPaise)}</button><p class="hint">No real money is collected with test credentials. Test orders are labeled and can be removed through the test cancellation flow.</p><a class="text-link" href="/account/orders">View my orders</a></aside></form></div>`);
+ return wrap(`<div class="container page-wrap checkout-page">${pageTitle("Checkout","Verified account · secure Razorpay test payment.")}<div class="checkout-progress"><span class="done">01 <b>Delivery</b></span><i></i><span class="done">02 <b>Review</b></span><i></i><span>03 <b>Payment</b></span></div><form class="checkout-layout checkout-rework" id="checkout-form"><section class="checkout-main"><section class="checkout-section"><div class="checkout-section-heading"><span>01</span><div><h2>Delivery address</h2><p>Signed in as ${esc(customerSession.email)}</p></div><span class="checkout-verified-badge">✓ Verified</span></div><label class="sr-only" for="checkout-address">Choose saved address</label><select id="checkout-address" class="control" name="addressId">${addresses.map(address=>`<option value="${esc(address.id)}" ${address.id===selected.id?"selected":""}>${address.isDefault?"Default · ":""}${esc(address.name)} · ${esc([address.city,address.pincode].filter(Boolean).join(" "))}</option>`).join("")}</select><p class="hint checkout-address-hint">Your saved address is filled in. Changes below apply to this order only.</p>${checkoutAddressEditor(selected)}<a class="text-link" href="/account/addresses">Manage saved addresses ↗</a></section><section class="checkout-section"><div class="checkout-section-heading"><span>02</span><div><h2>Items in your order</h2><p>${rows.reduce((n,row)=>n+row.quantity,0)} items · stock is reserved after order creation</p></div></div><div class="checkout-line-list">${quote.items.map(item=>`<div class="checkout-product-line"><div><b>${esc(item.nameEn)}</b><span>${esc(item.pack)} · ${esc(item.sku)} × ${item.quantity}</span></div><strong>${money(item.lineTotalPaise)}</strong></div>`).join("")}</div></section><div class="checkout-test-note"><b>Test mode</b><span>Razorpay simulates this payment. A clearly marked test order will appear in your account and the admin order queue after verification.</span></div><p id="checkout-message" role="status" aria-live="polite"></p><div id="checkout-result"></div></section><aside class="summary-card checkout-summary"><p class="eyebrow">ORDER SUMMARY</p><h2>Review and pay</h2><div class="summary-row"><span>Subtotal</span><span>${money(quote.subtotalPaise)}</span></div><div class="summary-row"><span>Discount</span><span>−${money(quote.discountPaise)}</span></div><div class="summary-row"><span>Delivery</span><span>${money(quote.shippingPaise)}</span></div><div class="summary-row total"><span>Test total</span><b>${money(quote.totalPaise)}</b></div><button class="btn btn-primary" type="submit" ${quote.totalPaise<100?"disabled":""}>Continue to test payment · ${money(quote.totalPaise)}</button><p class="hint">No real money is collected with test credentials. Test orders are labeled and can be removed through the test cancellation flow.</p><a class="text-link" href="/account/orders">View my orders</a></aside></form></div>`);
 }
 async function startTestCheckout(form){
  if(form.dataset.paying)return;
@@ -490,14 +522,13 @@ async function startTestCheckout(form){
    return;
   }
   message.textContent="Creating your test order…";
-  const addressId=form.elements.addressId.value;
+  const address=checkoutAddressFromForm(form),addressId=form.elements.addressId.value;
   if(!window.Razorpay)throw new Error("Razorpay Checkout did not load. Check your connection and retry.");
-  const address=await api("/api/v1/customer/addresses").then(result=>result.items.find(item=>item.id===addressId));
-  if(!address)throw new Error("Choose one of your saved delivery addresses.");
+  if(!address.name||!address.phone||!address.line1||!address.city||!address.state||!/^[6-9]\d{9}$/.test(address.phone.replace(/\D/g,""))||!/^\d{6}$/.test(address.pincode))throw new Error("Enter a recipient, valid mobile number, complete address and 6-digit PIN code.");
   let idempotencyKey=form.dataset.checkoutKey;
   if(!idempotencyKey){try{idempotencyKey=sessionStorage.getItem(checkoutRequestKey)||crypto.randomUUID();sessionStorage.setItem(checkoutRequestKey,idempotencyKey);}catch{idempotencyKey=crypto.randomUUID();}form.dataset.checkoutKey=idempotencyKey;}
   let order;
-  try{order=await api("/api/v1/customer/checkout/create-order",{method:"POST",body:JSON.stringify({addressId,couponCode:localStorage.getItem(couponKey)||"",idempotencyKey})});}
+  try{order=await api("/api/v1/customer/checkout/create-order",{method:"POST",body:JSON.stringify({addressId,address,couponCode:localStorage.getItem(couponKey)||"",idempotencyKey})});}
   catch(error){if(error.status===409)clearRequestKey();throw error;}
   message.textContent="Complete the test payment in the Razorpay window.";
   let paymentReceived=false;
@@ -861,7 +892,8 @@ document.addEventListener("click",async e=>{
 });
 document.addEventListener("change",async e=>{
  const t=e.target;
- if(t.id==="checkout-address"){const addresses=await api("/api/v1/customer/addresses"),address=addresses.items.find(item=>item.id===t.value);if(!address)return;$("#checkout-address-preview").textContent=[address.name,address.line1,address.line2,address.city,address.state,address.pincode].filter(Boolean).join(", ");try{const quote=await api("/api/v1/checkout/quote",{method:"POST",body:JSON.stringify({items:cart(),couponCode:localStorage.getItem(couponKey)||"",address})});const total=$(".checkout-summary .summary-row.total b"),shipping=$(".checkout-summary .summary-row:nth-of-type(3) span:last-child");if(total)total.textContent=money(quote.totalPaise);if(shipping)shipping.textContent=money(quote.shippingPaise);const pay=$(".checkout-summary button[type=submit]");if(pay)pay.textContent=`Continue to test payment · ${money(quote.totalPaise)}`;}catch(error){toast(error.message,true);}return;}
+ if(t.id==="checkout-address"){try{const addresses=await api("/api/v1/customer/addresses"),address=addresses.items.find(item=>item.id===t.value);if(!address)return;fillCheckoutAddress(t.form,address);await updateCheckoutQuote(t.form);}catch(error){toast(error.message,true);}return;}
+ if(t.matches("[data-checkout-address]")){try{await updateCheckoutQuote(t.form);}catch(error){toast(error.message,true);}return;}
  if(t.matches("[data-variant]")){pickedVariant=t.value;try{const p=await api(`/api/v1/products/${encodeURIComponent(location.pathname.split("/").pop())}`);const v=p.variants.find(x=>x.sku===pickedVariant);$("#detail-price").innerHTML=`${money(v.pricePaise)} ${v.mrpPaise>v.pricePaise?`<del>${money(v.mrpPaise)}</del>`:""}`;$("#detail-sku").textContent=v.sku;const availability=productAvailability(v.stock);$("#detail-stock").textContent=availability.label;$("#detail-stock").className=`product-stock-status ${availability.tone}`;$("[data-detail-add]").disabled=v.stock<1;}catch{}}
  if(t.matches("[data-sort]")){const params=new URLSearchParams(location.search);params.set("sort",t.value);params.set("page","1");location.search=params.toString();}
  if(t.id==="product-filter"||t.id==="status-filter"){const q=$("#product-filter")?.value.toLowerCase()||"",status=$("#status-filter")?.value||"";document.querySelectorAll("[data-product-row]").forEach(r=>r.hidden=!(r.dataset.search.includes(q)&&(!status||r.dataset.status===status)));}

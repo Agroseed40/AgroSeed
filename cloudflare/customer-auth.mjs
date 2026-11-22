@@ -216,15 +216,26 @@ export async function handleCustomerAuth(request, env, pathname) {
     if (method === "POST" && pathname === "/api/v1/customer/checkout/create-order") {
       const input = await body(request);
       const addressId = String(input.addressId || "");
-      if (!/^[0-9a-f-]{36}$/i.test(addressId)) return json({ error: "Choose a saved delivery address." }, 400);
+      if (!/^[0-9a-f-]{36}$/i.test(addressId)) return json({ error: "Choose a valid saved delivery address." }, 400);
       const addressRow = await env.DB.prepare(`SELECT id, name, phone, line1, line2, city, state, pincode, is_default
         FROM agroseed_customer_addresses WHERE id = ? AND customer_id = ?`).bind(addressId, identity.id).first();
       if (!addressRow) return json({ error: "That saved address does not belong to this account." }, 404);
+      const submittedAddress = input.address && typeof input.address === "object" && !Array.isArray(input.address) ? input.address : addressRow;
       const cartRow = await env.DB.prepare("SELECT items_json FROM agroseed_customer_carts WHERE customer_id = ?").bind(identity.id).first();
       let items = [];
       try { items = normalizeCartItems(JSON.parse(cartRow?.items_json || "[]")); } catch { return json({ error: "Your saved bag is invalid. Review it and try again." }, 400); }
       if (!items.length) return json({ error: "Your bag is empty." }, 400);
-      const address = { id: addressRow.id, name: addressRow.name, phone: addressRow.phone, line1: addressRow.line1, line2: addressRow.line2, city: addressRow.city, state: addressRow.state, pincode: addressRow.pincode, isDefault: Boolean(addressRow.is_default) };
+      const address = {
+        id: addressRow?.id || crypto.randomUUID(),
+        name: String(submittedAddress.name || "").trim().slice(0, 120),
+        phone: String(submittedAddress.phone || "").replace(/\D/g, "").slice(0, 10),
+        line1: String(submittedAddress.line1 || "").trim().slice(0, 200),
+        line2: String(submittedAddress.line2 || "").trim().slice(0, 200),
+        city: String(submittedAddress.city || "").trim().slice(0, 100),
+        state: String(submittedAddress.state || "").trim().slice(0, 100),
+        pincode: String(submittedAddress.pincode || "").trim(),
+        isDefault: Boolean(addressRow?.is_default)
+      };
       const order = await createCustomerTestOrder(env, { id: identity.id, email: identity.email, name: profile.name || identity.name }, { items, couponCode: input.couponCode || "", address, idempotencyKey: input.idempotencyKey });
       return json(order, 201);
     }

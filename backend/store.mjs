@@ -416,8 +416,12 @@ function existingTestOrder(data, customerId, idempotencyKey, input, keyId) {
   if (!order) throw Object.assign(new Error("The previous checkout could not be recovered. Contact support before retrying."), { statusCode: 409 });
   const requestedItems = Array.isArray(input.items) ? input.items.map(item => ({ sku: String(item?.sku || "").trim().toUpperCase(), quantity: Number(item?.quantity) })).sort((a, b) => a.sku.localeCompare(b.sku)) : [];
   const savedItems = (order.items || []).map(item => ({ sku: String(item.sku || "").trim().toUpperCase(), quantity: Number(item.quantity) })).sort((a, b) => a.sku.localeCompare(b.sku));
+  const addressFields = ["name", "phone", "line1", "line2", "city", "state", "pincode"];
+  const requestedAddress = addressFields.map(field => String(input.address?.[field] || "").trim());
+  const savedAddress = addressFields.map(field => String(order.address?.[field] || "").trim());
   const sameIntent = JSON.stringify(requestedItems) === JSON.stringify(savedItems) &&
     String(order.address?.id || "") === String(input.address?.id || "") &&
+    JSON.stringify(requestedAddress) === JSON.stringify(savedAddress) &&
     String(order.couponCode || "") === String(input.couponCode || "").trim().toUpperCase();
   if (!sameIntent) throw Object.assign(new Error("This checkout retry key is already attached to a different bag or address. Refresh checkout and try again."), { statusCode: 409 });
   if (attempt.status !== "created" || order.status !== "pending_payment") {

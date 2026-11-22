@@ -101,6 +101,41 @@ function responseAdapter() {
   return response;
 }
 
+
+// Read-only Indian PIN lookup. Only the six-digit PIN is sent to the postal provider;
+// no saved customer details or GPS coordinates are sent from this route.
+const pinCache = new Map();
+export async function lookupIndianPin(pin, fetchPostal = fetch) {
+  if (!/^\d{6}$/.test(pin)) return json({ error: "Enter a six-digit PIN code." }, 400);
+  const cached = pinCache.get(pin);
+  if (cached && cached.until > Date.now()) return json(cached.value);
+  try {
+    const response = await fetchPostal(`https://api.postalpincode.in/pincode/${pin}`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(6500)
+    });
+    if (!response.ok || Number(response.headers.get("content-length") || 0) > 128000) {
+      return json({ error: "Postal lookup is unavailable. Enter your city and state manually." }, 503);
+    }
+    const body = await response.json();
+    const first = Array.isArray(body) ? body[0] : null;
+    const offices = first?.Status === "Success" && Array.isArray(first.PostOffice) ? first.PostOffice : [];
+    if (!offices.length) return json({ error: "No postal record was found for this PIN. Enter your address manually." }, 404);
+    const office = offices[0];
+    const result = {
+      pincode: pin,
+      city: String(office.District || office.Block || "").slice(0, 100),
+      state: String(office.State || "").slice(0, 100)
+    };
+    if (!result.city || !result.state) return json({ error: "This PIN has incomplete postal data. Enter your city and state manually." }, 503);
+    if (pinCache.size >= 200) pinCache.delete(pinCache.keys().next().value);
+    pinCache.set(pin, { value: result, until: Date.now() + 60 * 60 * 1000 });
+    return json(result);
+  } catch {
+    return json({ error: "Postal lookup failed. You can still enter your address manually." }, 503);
+  }
+}
+
 async function handleRequest(request, env) {
     const url = new URL(request.url);
     const pathname = url.pathname.replace(/\/+$/, "") || "/";
@@ -143,6 +178,9 @@ async function handleRequest(request, env) {
       return Response.redirect(logout, 302);
     }
 
+    const pinRoute = pathname.match(/^\/api\/v1\/address\/pincode\/(\d{6})$/);
+    if (pinRoute) return request.method === "GET" ? lookupIndianPin(pinRoute[1]) : json({ error: "Method not allowed." }, 405);
+
     if (pathname.startsWith("/api/v1/customer/")) {
       return await handleCustomerAuth(request, env, pathname) || json({ error: "Customer API route not found." }, 404);
     }
@@ -173,7 +211,7 @@ async function handleRequest(request, env) {
 function secureResponse(response, request) {
   const headers = new Headers(response.headers);
   headers.set("Content-Security-Policy", "frame-ancestors 'none'");
-  headers.set("Permissions-Policy", "camera=(), geolocation=(), microphone=()");
+  headers.set("Permissions-Policy", "camera=(), geolocation=(self), microphone=()");
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   headers.set("X-Frame-Options", "DENY");
   headers.set("X-Content-Type-Options", "nosniff");

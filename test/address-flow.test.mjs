@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
 import worker, { lookupIndianPin } from "../cloudflare/worker.mjs";
 
 test("PIN lookup returns sanitized district and state", async () => {
@@ -53,4 +54,11 @@ test("Account and checkout address controls remain wired and same-origin saves u
   assert.match(helper,/x-agroseed-csrf/);
   assert.match(helper,/data-save-checkout-address/);
   assert.match(html,/\/address-lookup\.js/);
+});
+
+test("Both browser scripts parse cleanly", () => {
+ for(const file of ["public/app.js","public/address-lookup.js"]){
+  const checked=spawnSync(process.execPath,["--check",file],{encoding:"utf8"});
+  assert.equal(checked.status,0,`${file} syntax check failed: ${checked.stderr}`);
+ }
 });

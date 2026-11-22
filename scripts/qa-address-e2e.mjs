@@ -37,3 +37,4 @@ const after=await page.evaluate(() => ({url:location.href,submitEvents:window.__
 console.log("QA_RESULT="+JSON.stringify({before,after,network,errors}));
 await browser.close();
 if(!network.some(x=>x.kind==="request"&&x.method==="POST"))process.exitCode=2;
+// QA rerun: one-line form ID shadowing fix must reach POST.

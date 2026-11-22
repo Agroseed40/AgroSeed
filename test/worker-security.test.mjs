@@ -21,3 +21,14 @@ test("Worker does not send HSTS over HTTP", async () => {
   assert.equal(response.status, 200);
   assert.equal(response.headers.get("strict-transport-security"), null);
 });
+
+test("Worker preserves storefront document responses while adding headers", async () => {
+  const html = "<!doctype html><title>AgroSeed</title>";
+  const env = { ASSETS: { fetch: async () => new Response(html, { headers: { "content-type": "text/html" } }) } };
+  const response = await worker.fetch(new Request("https://agroseed.example/"), env);
+
+  assert.equal(response.status, 200);
+  assert.match(await response.text(), /AgroSeed/);
+  assert.equal(response.headers.get("content-type"), "text/html");
+  assert.equal(response.headers.get("content-security-policy"), "frame-ancestors 'none'");
+});

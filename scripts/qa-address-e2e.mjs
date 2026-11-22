@@ -7,7 +7,7 @@ const network = [], errors = [];
 page.on("request", r => { if (r.url().includes("/api/v1/customer/addresses")) network.push({kind:"request",method:r.method(),url:r.url()}); });
 page.on("response", r => { if (r.url().includes("/api/v1/customer/addresses")) network.push({kind:"response",status:r.status(),url:r.url()}); });
 page.on("pageerror", e => errors.push(String(e)));
-page.on("console", m => { if (m.type() === "error") errors.push("console: "+m.text()); });
+page.on("console", m => { errors.push(m.type()+": "+m.text()); });
 await page.addInitScript(() => {
  window.__submitEvents = 0;
  document.addEventListener("submit", () => window.__submitEvents++, true);

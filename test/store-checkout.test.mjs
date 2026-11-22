@@ -4,6 +4,8 @@ import { test } from "node:test";
 import {
   closeCustomerTestOrder,
   createCustomerTestOrder,
+  deliveryFeePaise,
+  isValidCalendarDate,
   verifyCustomerTestPayment
 } from "../backend/store.mjs";
 
@@ -14,6 +16,16 @@ const address = {
   id: "address-1", name: "Buyer", phone: "9876543210", line1: "1 Test Road",
   city: "Bhopal", state: "Madhya Pradesh", pincode: "462001"
 };
+
+test("admin delivery fees and coupon dates reject malformed values", () => {
+  assert.equal(deliveryFeePaise("29.50"), 2950);
+  assert.equal(deliveryFeePaise(""), 0);
+  assert.throws(() => deliveryFeePaise("not a number"), error => error.statusCode === 400);
+  assert.throws(() => deliveryFeePaise(-1), error => error.statusCode === 400);
+  assert.equal(isValidCalendarDate("2028-02-29"), true);
+  assert.equal(isValidCalendarDate("2027-02-29"), false);
+  assert.equal(isValidCalendarDate("2028-13-01"), false);
+});
 
 function storeState(pricePaise = 1000) {
   return {

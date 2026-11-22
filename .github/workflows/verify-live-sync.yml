@@ -1,0 +1,39 @@
+name: Verify AgroSeed deploy bundle (no production upload)
+on:
+  push:
+    branches:
+      - codex/agroseed-live-safe-sync-2026-11-22
+  workflow_dispatch:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Generate bundled frontend assets
+        run: node scripts/embed-worker-assets.mjs
+      - name: Run all existing Node tests
+        run: node --test test/*.test.mjs
+      - name: Build Worker without deploying
+        run: npx wrangler deploy --dry-run --outdir=.deploy/build
+      - name: Confirm artifact exists
+        run: test -s .deploy/build/worker.js
+      - name: Save tested bundle on isolated branch
+        run: |
+          cp .deploy/build/worker.js .deploy/worker.js
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f .deploy/worker.js
+          if git diff --cached --quiet; then
+            echo "Already up-to-date"
+          else
+            git commit -m "Build verified AgroSeed Worker bundle (no deployment)"
+            git push
+          fi

@@ -7,12 +7,20 @@
   <meta name="description" content="Farm essentials, chosen for the way you grow. Browse the AgroSeed catalog.">
   <title>AgroSeed — Grow with confidence</title>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="/app.css">
+  <link rel="stylesheet" href="/app.css?v=storefront-6">
   <script src="/runtime-config.js"></script>
-  <script src="/app.js" defer></script>
+  <script src="/app.js?v=storefront-6" defer></script>
 </head>
 <body>
-  <div id="app"><div class="app-loading"><span class="brand-mark"><img src="/agroseed-mark-v2.png" alt=""></span><span>Loading AgroSeed</span></div></div>
+  <div id="app">
+    <div class="page-transition is-active" role="status">
+    <div class="page-transition-card">
+      <div class="transition-orbit" aria-hidden="true"><span class="transition-leaf transition-leaf-one">✦</span><span class="transition-leaf transition-leaf-two">✦</span><span class="transition-seed">🌱</span></div>
+      <strong>Loading AgroSeed</strong>
+      <span class="transition-progress" aria-hidden="true"><i></i></span>
+    </div>
+  </div>
+  </div>
   <div id="toast-region" class="toast-region" aria-live="polite"></div>
   <div id="dialog-root"></div>
 </body>

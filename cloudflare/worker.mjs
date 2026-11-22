@@ -3,7 +3,7 @@ import { handleCustomerAuth } from "./customer-auth.mjs";
 import { staticAssets } from "./static-assets.generated.mjs";
 
 const appRoutes = new Set([
-  "/", "/shop", "/cart", "/checkout", "/search", "/help", "/contact", "/shipping-returns",
+  "/", "/categories", "/shop", "/cart", "/checkout", "/search", "/help", "/contact", "/shipping-returns",
   "/privacy", "/terms"
 ]);
 
@@ -32,7 +32,7 @@ function staticResponse(request, pathname) {
   const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
   const headers = {
     "Content-Type": asset.contentType,
-    "Cache-Control": "public, max-age=3600",
+    "Cache-Control": asset.contentType.startsWith("image/") ? "public, max-age=3600" : "no-cache",
     "X-Content-Type-Options": "nosniff"
   };
   return new Response(request.method === "HEAD" ? null : bytes, { headers });
@@ -151,9 +151,14 @@ export default {
     }
 
     if (isAppRoute(pathname)) {
+      if (env.ASSETS) {
+        const appRequest = new Request(new URL("/app.html", request.url), request);
+        return env.ASSETS.fetch(appRequest);
+      }
       return staticResponse(request, "/app.html");
     }
 
+    if (env.ASSETS) return env.ASSETS.fetch(request);
     return staticResponse(request, pathname);
   }
 };

@@ -1,3 +1,4 @@
+import { catalogImageUrl, saveCatalogImage } from "../cloudflare/catalog-images.mjs";
 import { randomBytes, createHash, timingSafeEqual } from "node:crypto";
 const slug = (value) => String(value || "product").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "product";
 const now = () => new Date().toISOString();
@@ -137,19 +138,50 @@ export function canAccessAdminPath(role, path) {
 }
 
 function audit(data, action, entity, entityId, detail) {
-  data.audit.unshift({ id: randomBytes(9).toString("hex"), actor: "Store owner", action, entity, entityId: String(entityId), detail: String(detail || ""), createdAt: now() });
+  const collection = { product: "products", coupon: "coupons", "service-area": "serviceAreas", support: "supportRequests", category: "categories", brand: "brands" }[entity];
+  const demo = collection ? data[collection]?.some((item) => String(item.id) === String(entityId) && item.demo === true) : entity === "variant" && data.products.some((product) => product.demo === true && product.variants.some((variant) => variant.sku === entityId));
+  data.audit.unshift({ id: randomBytes(9).toString("hex"), actor: "Store owner", demo: demo || undefined, action, entity, entityId: String(entityId), detail: String(detail || ""), createdAt: now() });
   data.audit = data.audit.slice(0, 1500);
 }
-
 function deriveCollections(products, configuredCategories = [], configuredBrands = [], includeInactive = false) {
   const categoryMap = new Map(products.map((p) => [p.categoryEn, { id: slug(p.categoryEn), name: p.category, nameEn: p.categoryEn, slug: slug(p.categoryEn), active: true, order: 0 }]));
   const brandMap = new Map(products.map((p) => [p.brandEn, { id: slug(p.brandEn), name: p.brand, nameEn: p.brandEn, slug: slug(p.brandEn), active: true, order: 0 }]));
   configuredCategories.forEach((item) => categoryMap.set(item.nameEn, { id: item.id || slug(item.nameEn), slug: item.slug || slug(item.nameEn), active: true, order: 0, ...item }));
   configuredBrands.forEach((item) => brandMap.set(item.nameEn, { id: item.id || slug(item.nameEn), slug: item.slug || slug(item.nameEn), active: true, order: 0, ...item }));
   const orderRows = (rows) => [...rows.values()].filter((item) => includeInactive || item.active !== false).sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0) || a.nameEn.localeCompare(b.nameEn));
-  const categories = orderRows(categoryMap);
+  const categories = orderRows(categoryMap).map((entry) => ({ ...entry, sections: categorySections(entry) }));
   const brands = orderRows(brandMap);
   return { categories, brands };
+}
+
+function categorySections(category) {
+  if (Array.isArray(category.sections)) return category.sections;
+  return String(category.sectionCopy || "").split("\n").flatMap((line, index) => {
+    const [title = "", skus = ""] = line.split("|");
+    return title.trim() ? [{ id: `legacy-${index}`, title: title.trim(), skus: sectionSkus(skus), image: "" }] : [];
+  });
+}
+
+function sectionSkus(value) {
+  return [...new Set(String(value || "").split(/[,\s]+/).map((sku) => sku.trim().toUpperCase()).filter(Boolean))].slice(0, 100);
+}
+
+function updateTaxonomyPresentation(entry, input, kind) {
+  if (Object.hasOwn(input, "image")) entry.image = catalogImageUrl(input.image);
+  if (kind !== "category") return;
+  if (Object.hasOwn(input, "banner")) entry.banner = String(input.banner || "").trim().slice(0, 100);
+  if (Object.hasOwn(input, "bannerImage")) entry.bannerImage = catalogImageUrl(input.bannerImage);
+  if (Object.hasOwn(input, "sectionCopy")) {
+    entry.sectionCopy = String(input.sectionCopy || "").trim().slice(0, 2000);
+    delete entry.sections;
+  }
+}
+
+function saveTaxonomyEntry(data, key, entry, previousId = entry.id) {
+  const configured = data[key] || [];
+  const index = configured.findIndex((item) => (item.id || slug(item.nameEn)) === previousId);
+  if (index < 0) data[key] = [...configured, entry];
+  else data[key] = configured.map((item, position) => position === index ? entry : item);
 }
 
 function normalizeTaxonomy(rows, label) {
@@ -161,7 +193,9 @@ function normalizeTaxonomy(rows, label) {
     const key = nameEn.toLocaleLowerCase();
     if (seen.has(key)) throw Object.assign(new Error(`${label} names must be unique.`), { statusCode: 400 });
     seen.add(key);
-    return { id: slug(nameEn), slug: slug(nameEn), name: String(row.name || nameEn).trim().slice(0, 100), nameEn, active: row.active !== false && row.active !== "false", order: Math.min(1000, Math.max(0, Number(row.order) || 0)) };
+    const entry = { id: slug(nameEn), slug: slug(nameEn), name: String(row.name || nameEn).trim().slice(0, 100), nameEn, active: row.active !== false && row.active !== "false", order: Math.min(1000, Math.max(0, Number(row.order) || 0)) };
+    updateTaxonomyPresentation(entry, row, label === "Categories" ? "category" : "brand");
+    return entry;
   });
 }
 
@@ -199,7 +233,8 @@ function cleanProduct(input, previous, data) {
     labelInfo: String(input.labelInfo || "").trim().slice(0, 20000), labelInfoHi: String(input.labelInfoHi || "").trim().slice(0, 20000),
     directions: String(input.directions || "").trim().slice(0, 20000), directionsHi: String(input.directionsHi || "").trim().slice(0, 20000),
     safetyInfo: String(input.safetyInfo || "").trim().slice(0, 20000), safetyInfoHi: String(input.safetyInfoHi || "").trim().slice(0, 20000),
-    status, active: status === "published", images: Array.isArray(input.images) ? input.images.filter((image) => typeof image === "string" && image.length < 1000).slice(0, 8) : (previous?.images || []),
+    status, active: status === "published", images: Array.isArray(input.images) ? input.images.filter(Boolean).slice(0, 8).map((image) =>
+      previous?.images?.some((existing) => (typeof existing === "string" ? existing : existing?.url) === image) ? image : catalogImageUrl(image)) : (previous?.images || []),
     imageAlt: Array.isArray(input.imageAlt) ? input.imageAlt.slice(0, 8).map((alt) => String(alt || "").trim().slice(0, 180)) : (previous?.imageAlt || []),
     featured: input.featured === true || input.featured === "true" || input.featured === "on",
     variants, sku: variants[0].sku, pricePaise: variants[0].pricePaise, mrpPaise: variants[0].mrpPaise, stock: variants.reduce((sum, v) => sum + v.stock, 0),
@@ -207,6 +242,130 @@ function cleanProduct(input, previous, data) {
   };
 }
 
+const demoCollections = [
+  "products",
+  "categories",
+  "brands",
+  "coupons",
+  "serviceAreas",
+  "supportRequests",
+  "inventoryTransactions",
+  "audit"
+];
+function demoCounts(data) {
+  return Object.fromEntries(demoCollections.map((key) => [
+    key,
+    (data[key] || []).filter((row) => row.demo === true).length
+  ]));
+}
+function updateDemo(data, remove) {
+  if (remove) {
+    for (const key of demoCollections) {
+      if (data[key]) data[key] = data[key].filter((row) => row.demo !== true);
+    }
+    return demoCounts(data);
+  }
+  const samples = [
+    {
+      nameEn: "Demo · Tomato Seeds (Pusa Ruby)", name: "डेमो · टमाटर के बीज (पूसा रूबी)", category: "Vegetable Seeds", categoryHi: "सब्ज़ियों के बीज",
+      image: "/images/demo/tomato-seeds.png", alt: "Open-license vintage tomato seed packet, used as illustrative demo product art",
+      descriptionEn: "Demo listing for a tomato seed variety. The seed packet photo is illustrative; replace it with the exact AgroSeed pack before selling.",
+      description: "टमाटर बीज का डेमो उत्पाद। पैकेट की तस्वीर केवल उदाहरण है; बिक्री से पहले असली पैक की तस्वीर लगाएं।",
+      directions: "Demo only: follow the sowing depth and seasonal guidance printed on the actual seed packet.",
+      labelInfo: "Demo catalog listing · Illustrative open-license image · Replace pack artwork before launch.",
+      safetyInfo: "Demo listing only. Verify variety, germination rate, lot, expiry and certification before selling.",
+      variants: [["10 g", 49, 69, 28], ["25 g", 99, 129, 16]]
+    },
+    {
+      nameEn: "Demo · Carrot Seeds (Nantes)", name: "डेमो · गाजर के बीज (नांतेस)", category: "Vegetable Seeds",
+      image: "/images/demo/carrot-seeds.png", alt: "Open-license vintage carrot seed packet, used as illustrative demo product art",
+      descriptionEn: "Demo listing for carrot seeds with small and value packs. Replace the illustrative seed packet with the exact retail pack before selling.",
+      description: "छोटे और बड़े पैक के साथ गाजर बीज का डेमो उत्पाद। बिक्री से पहले असली पैक की तस्वीर लगाएं।",
+      directions: "Demo only: follow the sowing depth and seasonal guidance printed on the actual seed packet.",
+      labelInfo: "Demo catalog listing · Illustrative open-license image · Replace pack artwork before launch.",
+      safetyInfo: "Demo listing only. Verify variety, germination rate, lot, expiry and certification before selling.",
+      variants: [["10 g", 39, 59, 34], ["25 g", 79, 99, 18]]
+    },
+    {
+      nameEn: "Demo · Onion Seeds (Nashik Red)", name: "डेमो · प्याज के बीज (नासिक रेड)", category: "Vegetable Seeds",
+      image: "/images/demo/onion-seeds.png", alt: "Open-license vintage onion seed packet, used as illustrative demo product art",
+      descriptionEn: "Demo listing for onion seed packs. Replace the illustrative seed packet with the exact retail pack before selling.",
+      description: "प्याज बीज पैक का डेमो उत्पाद। बिक्री से पहले असली पैक की तस्वीर लगाएं।",
+      directions: "Demo only: follow the sowing depth and seasonal guidance printed on the actual seed packet.",
+      labelInfo: "Demo catalog listing · Illustrative open-license image · Replace pack artwork before launch.",
+      safetyInfo: "Demo listing only. Verify variety, germination rate, lot, expiry and certification before selling.",
+      variants: [["5 g", 59, 79, 26], ["10 g", 99, 129, 14]]
+    },
+    {
+      nameEn: "Demo · Watermelon Seeds (Sugar Baby)", name: "डेमो · तरबूज के बीज (शुगर बेबी)", category: "Fruit Seeds", categoryHi: "फलों के बीज",
+      image: "/images/demo/watermelon-seeds.png", alt: "Open-license vintage watermelon seed packet, used as illustrative demo product art",
+      descriptionEn: "Demo listing for watermelon seeds with two pack sizes. Replace the illustrative seed packet with the exact retail pack before selling.",
+      description: "दो पैक आकारों के साथ तरबूज बीज का डेमो उत्पाद। बिक्री से पहले असली पैक की तस्वीर लगाएं।",
+      directions: "Demo only: follow the sowing depth and seasonal guidance printed on the actual seed packet.",
+      labelInfo: "Demo catalog listing · Illustrative open-license image · Replace pack artwork before launch.",
+      safetyInfo: "Demo listing only. Verify variety, germination rate, lot, expiry and certification before selling.",
+      variants: [["5 g", 49, 69, 24], ["10 g", 89, 109, 12]]
+    },
+    {
+      nameEn: "Demo · Thyme Seeds (Common)", name: "डेमो · थाइम के बीज (कॉमन)", category: "Herb Seeds", categoryHi: "जड़ी-बूटी के बीज",
+      image: "/images/demo/thyme-seeds.png", alt: "Open-license vintage thyme seed packet, used as illustrative demo product art",
+      descriptionEn: "Demo listing for culinary herb seeds with two pack choices. Replace the illustrative seed packet with the exact retail pack before selling.",
+      description: "दो पैक विकल्पों के साथ हर्ब बीज का डेमो उत्पाद। बिक्री से पहले असली पैक की तस्वीर लगाएं।",
+      directions: "Demo only: follow the sowing depth and seasonal guidance printed on the actual seed packet.",
+      labelInfo: "Demo catalog listing · Illustrative open-license image · Replace pack artwork before launch.",
+      safetyInfo: "Demo listing only. Verify variety, germination rate, lot, expiry and certification before selling.",
+      variants: [["2 g", 69, 89, 20], ["5 g", 129, 159, 10]]
+    }
+  ];
+  for (const [index, sample] of samples.entries()) {
+    const number = index + 1;
+    const key = randomBytes(6).toString("hex");
+    const code = "GROW" + (10 + number);
+    const brandEn = "AgroSeed Select";
+    const product = cleanProduct({
+      nameEn: sample.nameEn,
+      name: sample.name,
+      categoryEn: sample.category,
+      category: sample.categoryHi,
+      brandEn,
+      brand: brandEn,
+      status: "published",
+      featured: index < 3,
+      descriptionEn: sample.descriptionEn,
+      description: sample.description,
+      directions: sample.directions,
+      labelInfo: sample.labelInfo,
+      safetyInfo: sample.safetyInfo,
+      images: [sample.image],
+      imageAlt: [sample.alt],
+      variants: sample.variants.map(([pack, priceRupees, mrpRupees, stock], variantIndex) => ({
+        sku: "AGS-" + sample.category.slice(0, 3).toUpperCase() + "-" + String(number).padStart(2, "0") + (variantIndex ? "-B" : "-A"),
+        pack,
+        pricePaise: priceRupees * 100,
+        mrpPaise: mrpRupees * 100,
+        stock
+      }))
+    }, null, data);
+    data.products.push({ ...product, demo: true });
+    for (const [collection, label, nativeName] of [["categories", sample.category, sample.categoryHi], ["brands", brandEn, brandEn]]) {
+      data[collection] ||= [];
+      if (!data[collection].some((row) => row.slug === slug(label))) {
+        data[collection].push({ id: slug(label), slug: slug(label), name: nativeName, nameEn: label, active: true, order: index, demo: true });
+      }
+    }
+    const minSubtotalPaise = Math.min(...sample.variants.map((variant) => variant[1] * 100));
+    data.coupons.push({ id: key, code, type: "percent", value: 5 + index, minSubtotalPaise, maxUses: 20, usesCount: 0, active: true, demo: true });
+    let pin = 900000 + number;
+    while (data.serviceAreas.some((row) => row.pincode === String(pin))) pin += 7;
+    data.serviceAreas.push({ id: key, pincode: String(pin), city: "Sample service area " + number, feePaise: 2900, estimate: "2–4 days", active: true, demo: true });
+    data.supportRequests.unshift({ id: key, name: "Sample shopper " + number, email: "shopper" + number + "@example.invalid", topic: "Product question", message: "Demo request about " + sample.nameEn.replace(/^Demo · /, "").toLowerCase() + ".", status: ["new", "in_progress", "resolved"][index % 3], createdAt: now(), demo: true });
+    for (const variant of product.variants) {
+      data.inventoryTransactions.unshift({ id: randomBytes(8).toString("hex"), sku: variant.sku, delta: variant.stock, reason: "Demo opening stock", actor: "Demo data", createdAt: now(), demo: true });
+    }
+    data.audit.unshift({ id: key, actor: "Demo data", action: "demo_product_created", entity: "product", entityId: String(product.id), detail: product.nameEn, createdAt: now(), demo: true });
+  }
+  return demoCounts(data);
+}
 function findVariant(data, sku) {
   for (const product of data.products) {
     const variant = product.variants.find((item) => item.sku.toLowerCase() === String(sku || "").toLowerCase());
@@ -256,7 +415,7 @@ export async function handleStoreRequest(request, response, pathname, env) {
   try {
     const url = new URL(request.url || "/", "http://localhost");
     const method = request.method;
-    if (pathname === "/api/v1/storefront/settings" && method === "GET") { const data = await state(env), allowed = ["storeName", "publicDomain", "storeAbout", "supportEmail", "supportPhone", "supportDetails", "businessDetails", "homeHeroEyebrow", "homeHeroHeadline", "homeHeroBody", "homeHeroNote", "homeHeroPrimaryCta", "deliveryRules", "codPolicy", "cancellationReturnsRules", "shippingReturnsPolicy", "privacyPolicy", "termsPolicy", "productUseNotice"]; send(response, 200, Object.fromEntries(allowed.map((key) => [key, String(data.settings?.[key] || "")]))); return true; }
+    if (pathname === "/api/v1/storefront/settings" && method === "GET") { const data = await state(env), allowed = ["brandLogo", "homeBannerImage", "homeHelpImage", "storeName", "publicDomain", "storeAbout", "supportEmail", "supportPhone", "supportDetails", "businessDetails", "language", "homeHeroEyebrow", "homeHeroHeadline", "homeHeroBody", "homeHeroNote", "homeHeroPrimaryCta", "homeBannerTitle", "homeBannerText", "homeHelpTitle", "homeHelpText", "homeProductsTitle", "catalogBannerTitle", "catalogBannerImage", "navHome", "navCategories", "navSearch", "navCart", "navAccount", "deliveryRules", "codPolicy", "cancellationReturnsRules", "shippingReturnsPolicy", "privacyPolicy", "termsPolicy", "productUseNotice"]; send(response, 200, Object.fromEntries(allowed.map((key) => [key, String(data.settings?.[key] || "")]))); return true; }
     if (pathname === "/api/v1/storefront/offers" && method === "GET") { const data = await state(env), time = Date.now(), items = (data.coupons || []).filter((item) => item.active !== false && (!item.expiresAt || time <= Date.parse(`${item.expiresAt}T23:59:59Z`)) && (!item.maxUses || (Number(item.usesCount) || 0) < item.maxUses)).map(({ code, type, value, minSubtotalPaise, expiresAt }) => ({ code, type, value, minSubtotalPaise: Number(minSubtotalPaise) || 0, expiresAt: expiresAt || null })); send(response, 200, { items }); return true; }
     if (pathname === "/api/v1/cart" && (method === "GET" || method === "PUT")) {
       const id = String(request.headers["x-agroseed-cart-id"] || "").trim();
@@ -296,26 +455,14 @@ export async function handleStoreRequest(request, response, pathname, env) {
       send(response, 200, { items, updatedAt }); return true;
     }
     if (pathname === "/api/v1/admin/session" && method === "POST") {
-      const ip = request.socket.remoteAddress || "unknown";
-      const attemptKey = hash(ip);
-      const savedAttempt = await env.DB.prepare("SELECT count, window_started FROM agroseed_admin_login_attempts WHERE ip_hash = ?").bind(attemptKey).first();
-      const attempt = savedAttempt ? { count: Number(savedAttempt.count) || 0, since: Number(savedAttempt.window_started) || Date.now() } : { count: 0, since: Date.now() };
-      if (Date.now() - attempt.since > 15 * 60_000) { attempt.count = 0; attempt.since = Date.now(); }
-      if (attempt.count >= 8) { send(response, 429, { error: "Too many sign-in attempts. Try again in 15 minutes." }); return true; }
       const input = await body(request, 2048);
       const configured = String(env.AGROSEED_ADMIN_PASSWORD || "");
       if (!configured) { send(response, 503, { error: "The staff password is not configured." }); return true; }
       const supplied = Buffer.from(String(input.password || "")); const expected = Buffer.from(configured);
       const match = supplied.length === expected.length && timingSafeEqual(supplied, expected);
       if (!match) {
-        attempt.count++;
-        await env.DB.prepare(`INSERT INTO agroseed_admin_login_attempts (ip_hash, count, window_started) VALUES (?, ?, ?)
-          ON CONFLICT(ip_hash) DO UPDATE SET count = excluded.count, window_started = excluded.window_started, updated_at = CURRENT_TIMESTAMP`)
-          .bind(attemptKey, attempt.count, attempt.since).run();
-
         send(response, 401, { error: "That password did not match." }); return true;
       }
-      await env.DB.prepare("DELETE FROM agroseed_admin_login_attempts WHERE ip_hash = ?").bind(attemptKey).run();
 
       const raw = randomBytes(32).toString("base64url");
       const csrf = randomBytes(24).toString("base64url");
@@ -385,9 +532,96 @@ export async function handleStoreRequest(request, response, pathname, env) {
       const session = await requireAdmin(request, response, mutating, env); if (!session) return true;
       const adminPath = pathname.slice("/api/v1/admin".length);
       if (!canAccessAdminPath(session.role || "Owner", adminPath)) { send(response, 403, { error: "Your staff role cannot access this area." }); return true; }
+      if (adminPath === "/media" && method === "POST") {
+        const input = await body(request, 1100 * 1024);
+        send(response, 201, await saveCatalogImage(env.DB, input));
+        return true;
+      }
+      if (adminPath === "/catalog" && method === "GET") {
+        const data = await state(env);
+        const category = url.searchParams.get("category");
+        const items = data.products.filter(p => p.status === "published" && (!category || slug(p.categoryEn) === category));
+        send(response, 200, {
+          ...deriveCollections(data.products, data.categories, data.brands, true),
+          items: items.map(({ id, nameEn, variants, featured }) => ({ id, nameEn, skus: variants.map(v => v.sku), featured })),
+          banner: data.settings.catalogBannerTitle || "",
+          bannerImage: data.settings.catalogBannerImage || ""
+        });
+        return true;
+      }
+      if (adminPath === "/catalog/banner" && method === "PATCH") {
+        const input = await body(request);
+        await change(env, (data) => {
+          data.settings.catalogBannerTitle = String(input.banner || "").trim().slice(0, 100);
+          data.settings.catalogBannerImage = catalogImageUrl(input.bannerImage);
+          audit(data, "catalog_banner_updated", "settings", "catalog", "Categories banner updated");
+        });
+        send(response, 200, { ok: true });
+        return true;
+      }
+      const featuredRoute = adminPath.match(/^\/catalog\/featured\/(\d+)$/);
+      if (featuredRoute && method === "PATCH") {
+        const input = await body(request);
+        await change(env, (data) => {
+          const product = data.products.find((item) => item.id === Number(featuredRoute[1]) && item.status === "published");
+          if (!product) throw Object.assign(new Error("Published product not found."), { statusCode: 404 });
+          product.featured = input.featured === true;
+          audit(data, "product_featured_updated", "product", product.id, product.nameEn);
+        });
+        send(response, 200, { ok: true });
+        return true;
+      }
+      const sectionRoute = adminPath.match(/^\/catalog\/category\/([^/]+)\/sections(?:\/([^/]+))?$/);
+      if (sectionRoute && (sectionRoute[2] ? method === "PATCH" : method === "POST")) {
+        const input = await body(request);
+        const title = String(input.title || "").trim().slice(0, 80);
+        if (!title) { send(response, 400, { error: "Enter a section name." }); return true; }
+        const image = catalogImageUrl(input.image);
+        const skus = sectionSkus(input.skus);
+        const entry = await change(env, (data) => {
+          const { categories } = deriveCollections(data.products, data.categories, data.brands, true);
+          const category = categories.find((item) => item.id === sectionRoute[1]);
+          if (!category) throw Object.assign(new Error("Category not found."), { statusCode: 404 });
+          const index = category.sections.findIndex((item) => item.id === sectionRoute[2]);
+          if (method === "PATCH" && index < 0) throw Object.assign(new Error("Section not found."), { statusCode: 404 });
+          if (index < 0 && category.sections.length >= 30) throw Object.assign(new Error("A category can have up to 30 sections."), { statusCode: 400 });
+          const section = { id: index < 0 ? randomBytes(8).toString("hex") : category.sections[index].id, title, skus, image };
+          category.sections = category.sections.slice();
+          if (index < 0) category.sections.push(section);
+          else category.sections[index] = section;
+          saveTaxonomyEntry(data, "categories", category);
+          audit(data, "catalog_section_saved", "category", category.id, title);
+          return section;
+        });
+        send(response, method === "POST" ? 201 : 200, entry);
+        return true;
+      }
+      if (adminPath === "/demo" && ["POST", "DELETE"].includes(method)) {
+        const counts = await change(env, (data) => {
+          if (method === "POST" && Object.values(demoCounts(data)).some(Boolean)) return demoCounts(data);
+          return updateDemo(data, method === "DELETE");
+        });
+        send(response, 200, { counts });
+        return true;
+      }
       if (adminPath === "/overview" && method === "GET") {
-        const data = await state(env); const published = data.products.filter((p) => p.status === "published").length;
-        send(response, 200, { products: data.products.length, published, lowStock: data.products.flatMap(p => p.variants).filter(v => v.stock <= 5).length }); return true;
+        const data = await state(env);
+        const variants = data.products.flatMap((product) => product.variants);
+        const openSupport = data.supportRequests.filter((item) => item.status !== "resolved").length;
+        const published = data.products.filter((product) => product.status === "published").length;
+        const activePromotions = data.coupons.filter((item) => item.active !== false && (!item.expiresAt || Date.now() <= Date.parse(`${item.expiresAt}T23:59:59Z`)) && (!item.maxUses || item.usesCount < item.maxUses)).length;
+        send(response, 200, {
+          demo: demoCounts(data),
+          products: data.products.length,
+          published,
+          lowStock: variants.filter((variant) => variant.stock > 0 && variant.stock <= 5).length,
+          outOfStock: variants.filter((variant) => variant.stock <= 0).length,
+          openSupport,
+          resolvedSupport: data.supportRequests.length - openSupport,
+          activePromotions,
+          totalPromotions: data.coupons.length,
+          deliveryAreas: data.serviceAreas.filter((area) => area.active !== false).length
+        }); return true;
       }
       if (adminPath === "/products" && method === "GET") {
         const data = await state(env); let products = data.products;
@@ -408,7 +642,7 @@ export async function handleStoreRequest(request, response, pathname, env) {
       }
       if (adminPath === "/inventory" && method === "GET") { const data = await state(env); send(response, 200, { products: data.products, transactions: data.inventoryTransactions.slice(0, 300) }); return true; }
       if (adminPath === "/inventory" && method === "POST") {
-        const input = await body(request); const result = await change(env, (data) => { const found = findVariant(data, input.sku); const delta = Number(input.delta); const reason = String(input.reason || "").trim(); if (!found) throw Object.assign(new Error("SKU not found."), { statusCode: 404 }); if (!Number.isInteger(delta) || delta === 0 || Math.abs(delta) > 10000) throw Object.assign(new Error("Stock change must be a non-zero whole number."), { statusCode: 400 }); if (found.variant.stock + delta < 0) throw Object.assign(new Error("Stock cannot go below zero."), { statusCode: 400 }); if (reason.length < 5) throw Object.assign(new Error("Add a reason (at least 5 characters)."), { statusCode: 400 }); found.variant.stock += delta; found.product.stock = found.product.variants.reduce((sum, item) => sum + item.stock, 0); const row = { id: randomBytes(8).toString("hex"), sku: found.variant.sku, delta, reason, actor: "Store owner", createdAt: now() }; data.inventoryTransactions.unshift(row); audit(data, "inventory_adjusted", "variant", found.variant.sku, `${delta > 0 ? "+" : ""}${delta}: ${reason}`); return row; }); send(response, 201, result); return true;
+        const input = await body(request); const result = await change(env, (data) => { const found = findVariant(data, input.sku); const delta = Number(input.delta); const reason = String(input.reason || "").trim(); if (!found) throw Object.assign(new Error("SKU not found."), { statusCode: 404 }); if (!Number.isInteger(delta) || delta === 0 || Math.abs(delta) > 10000) throw Object.assign(new Error("Stock change must be a non-zero whole number."), { statusCode: 400 }); if (found.variant.stock + delta < 0) throw Object.assign(new Error("Stock cannot go below zero."), { statusCode: 400 }); if (reason.length < 5) throw Object.assign(new Error("Add a reason (at least 5 characters)."), { statusCode: 400 }); found.variant.stock += delta; found.product.stock = found.product.variants.reduce((sum, item) => sum + item.stock, 0); const row = { id: randomBytes(8).toString("hex"), sku: found.variant.sku, demo: found.product.demo === true || undefined, delta, reason, actor: "Store owner", createdAt: now() }; data.inventoryTransactions.unshift(row); audit(data, "inventory_adjusted", "variant", found.variant.sku, `${delta > 0 ? "+" : ""}${delta}: ${reason}`); return row; }); send(response, 201, result); return true;
       }
       if (adminPath === "/import" && method === "POST") {
         const input = await body(request); if (!Array.isArray(input.rows) || !["create", "upsert"].includes(input.mode)) { send(response, 400, { error: "Choose create or update, and include CSV rows." }); return true; }
@@ -416,40 +650,77 @@ export async function handleStoreRequest(request, response, pathname, env) {
       }
       if (adminPath === "/settings" && (method === "GET" || method === "PATCH")) {
         if (method === "GET") { const data = await state(env); const collections = deriveCollections(data.products, data.categories, data.brands, true); send(response, 200, { settings: data.settings, categories: collections.categories, brands: collections.brands, serviceAreas: data.serviceAreas, coupons: data.coupons }); return true; }
-        const input = await body(request); const rawDomain = Object.hasOwn(input, "publicDomain") ? String(input.publicDomain || "").trim() : String((await state(env)).settings?.publicDomain || ""); let publicDomain = ""; if (rawDomain) { let parsed; try { parsed = new URL(rawDomain); } catch { send(response, 400, { error: "Public website domain must be a full URL such as https://agroseed.in." }); return true; } if (!["http:", "https:"].includes(parsed.protocol) || parsed.username || parsed.password || parsed.pathname !== "/" || parsed.search || parsed.hash) { send(response, 400, { error: "Enter only the public site base URL, such as https://agroseed.in, without a path." }); return true; } publicDomain = parsed.origin; } const result = await change(env, (data) => { data.settings ||= {}; data.settings = { ...data.settings, storeName: String(input.storeName || data.settings.storeName || "AgroSeed").slice(0, 80), publicDomain, supportEmail: Object.hasOwn(input, "supportEmail") ? String(input.supportEmail || "").trim().slice(0, 160) : String(data.settings.supportEmail || ""), supportPhone: Object.hasOwn(input, "supportPhone") ? String(input.supportPhone || "").trim().slice(0, 40) : String(data.settings.supportPhone || ""), language: ["en", "hi"].includes(input.language) ? input.language : (data.settings.language || "en") }; for (const field of ["storeAbout", "supportDetails", "businessDetails", "homeHeroEyebrow", "homeHeroHeadline", "homeHeroBody", "homeHeroNote", "homeHeroPrimaryCta", "deliveryRules", "codPolicy", "cancellationReturnsRules", "shippingReturnsPolicy", "privacyPolicy", "termsPolicy", "productUseNotice"]) if (Object.hasOwn(input, field)) data.settings[field] = String(input[field] || "").trim().slice(0, 20000); if (Array.isArray(input.categories)) data.categories = normalizeTaxonomy(input.categories, "Categories"); if (Array.isArray(input.brands)) data.brands = normalizeTaxonomy(input.brands, "Brands"); audit(data, "store_settings_updated", "settings", "store", "Store details and editable copy updated"); return data.settings; }); send(response, 200, result); return true;
+        const input = await body(request); const rawDomain = Object.hasOwn(input, "publicDomain") ? String(input.publicDomain || "").trim() : String((await state(env)).settings?.publicDomain || ""); let publicDomain = ""; if (rawDomain) { let parsed; try { parsed = new URL(rawDomain); } catch { send(response, 400, { error: "Public website domain must be a full URL such as https://agroseed.in." }); return true; } if (!["http:", "https:"].includes(parsed.protocol) || parsed.username || parsed.password || parsed.pathname !== "/" || parsed.search || parsed.hash) { send(response, 400, { error: "Enter only the public site base URL, such as https://agroseed.in, without a path." }); return true; } publicDomain = parsed.origin; } const result = await change(env, (data) => { data.settings ||= {}; data.settings = { ...data.settings, storeName: String(input.storeName || data.settings.storeName || "AgroSeed").slice(0, 80), publicDomain, supportEmail: Object.hasOwn(input, "supportEmail") ? String(input.supportEmail || "").trim().slice(0, 160) : String(data.settings.supportEmail || ""), supportPhone: Object.hasOwn(input, "supportPhone") ? String(input.supportPhone || "").trim().slice(0, 40) : String(data.settings.supportPhone || ""), language: ["en", "hi"].includes(input.language) ? input.language : (data.settings.language || "en") }; for (const field of ["storeAbout", "supportDetails", "businessDetails", "homeHeroEyebrow", "homeHeroHeadline", "homeHeroBody", "homeHeroNote", "homeHeroPrimaryCta", "homeBannerTitle", "homeBannerText", "homeHelpTitle", "homeHelpText", "homeProductsTitle", "deliveryRules", "codPolicy", "cancellationReturnsRules", "shippingReturnsPolicy", "privacyPolicy", "termsPolicy", "productUseNotice"]) if (Object.hasOwn(input, field)) data.settings[field] = String(input[field] || "").trim().slice(0, 20000); for (const field of ["brandLogo","homeBannerImage","homeHelpImage"]) if (Object.hasOwn(input,field)) data.settings[field]=catalogImageUrl(input[field]); for (const field of ["navHome", "navCategories", "navSearch", "navCart", "navAccount"]) if (Object.hasOwn(input, field)) data.settings[field] = String(input[field] ?? "").trim().slice(0, 20);
+          if (Array.isArray(input.categories)) data.categories = normalizeTaxonomy(input.categories, "Categories").map((row) => ({ ...data.categories?.find((old) => old.slug === row.slug), ...row }));
+          if (Array.isArray(input.brands)) data.brands = normalizeTaxonomy(input.brands, "Brands").map((row) => ({ ...data.brands?.find((old) => old.slug === row.slug), ...row })); audit(data, "store_settings_updated", "settings", "store", "Store details and editable copy updated"); return data.settings; }); send(response, 200, result); return true;
       }
-      const taxonomyRoute = adminPath.match(/^\/catalog\/(category|brand)\/([^/]+)$/);
-      if (taxonomyRoute && method === "PATCH") {
+      const taxonomyRoute = adminPath.match(/^\/catalog\/(category|brand)(?:\/([^/]+))?$/);
+      if (taxonomyRoute && (taxonomyRoute[2] ? method === "PATCH" : method === "POST")) {
         const input = await body(request);
+        const [ , kind, id] = taxonomyRoute;
+        const key = kind === "category" ? "categories" : "brands";
+        const creating = method === "POST";
         const result = await change(env, (data) => {
-          const key = taxonomyRoute[1] === "category" ? "categories" : "brands";
-          const derived = deriveCollections(data.products, data.categories, data.brands, true)[key];
-          const rows = (data[key]?.length ? data[key] : derived).map((item) => ({ ...item }));
-          const entry = rows.find((item) => String(item.id || slug(item.nameEn)) === taxonomyRoute[2]);
-          if (!entry) throw Object.assign(new Error("Browse label not found."), { statusCode: 404 });
-          const nameEn = String(input.nameEn || "").trim();
-          if (!nameEn || nameEn.length > 80) throw Object.assign(new Error("Add an English label up to 80 characters."), { statusCode: 400 });
-          if (rows.some((item) => item !== entry && item.nameEn.toLowerCase() === nameEn.toLowerCase())) throw Object.assign(new Error("That label already exists."), { statusCode: 409 });
-          const oldEn = entry.nameEn, oldHi = entry.name;
-          entry.nameEn = nameEn; entry.name = String(input.name || nameEn).trim().slice(0, 100); entry.slug = slug(nameEn); entry.id = entry.slug;
-          entry.order = Math.min(1000, Math.max(0, Number(input.order) || 0)); entry.active = input.active !== false && input.active !== "false";
-          for (const product of data.products) {
-            if (taxonomyRoute[1] === "category" && product.categoryEn === oldEn) { product.categoryEn = nameEn; product.category = String(input.name || oldHi || nameEn); }
-            if (taxonomyRoute[1] === "brand" && product.brandEn === oldEn) { product.brandEn = nameEn; product.brand = String(input.name || oldHi || nameEn); }
+          const collections = deriveCollections(data.products, data.categories, data.brands, true);
+          const rows = collections[key];
+          const existingId = creating ? (kind === "brand" ? input.existingId : "") : id;
+          const current = existingId ? rows.find((row) => String(row.id) === existingId) : null;
+          if ((!creating || existingId) && !current) throw Object.assign(new Error("Browse label not found."), { statusCode: 404 });
+          const entry = current ? { ...current } : { active: true, order: rows.length };
+          if (!creating || !current) {
+            const nameEn = String(input.nameEn ?? entry.nameEn ?? "").trim();
+            const nextSlug = slug(nameEn);
+            if (!nameEn || nameEn.length > 80) throw Object.assign(new Error("Add an English label up to 80 characters."), { statusCode: 400 });
+            if (rows.some((row) => row !== current && (row.slug === nextSlug || row.nameEn.toLowerCase() === nameEn.toLowerCase()))) {
+              throw Object.assign(new Error("That label already exists."), { statusCode: 409 });
+            }
+            entry.nameEn = nameEn;
+            entry.name = String(input.name ?? entry.name ?? nameEn).trim().slice(0, 100) || nameEn;
+            entry.slug = nextSlug;
+            entry.id = nextSlug;
+            if (Object.hasOwn(input, "order")) entry.order = Math.min(1000, Math.max(0, Number(input.order) || 0));
+            if (Object.hasOwn(input, "active")) entry.active = input.active !== false && input.active !== "false";
+            updateTaxonomyPresentation(entry, input, kind);
           }
-          data[key] = rows; audit(data, "catalog_label_updated", key.slice(0, -1), entry.id, `${oldEn} → ${nameEn}; ${entry.active ? "active" : "disabled"}`); return entry;
+          if (current && (current.nameEn !== entry.nameEn || current.name !== entry.name)) {
+            for (const product of data.products) {
+              if (kind === "category" && product.categoryEn === current.nameEn) {
+                product.categoryEn = entry.nameEn; product.category = entry.name;
+              }
+              if (kind === "brand" && product.brandEn === current.nameEn) {
+                product.brandEn = entry.nameEn; product.brand = entry.name;
+              }
+            }
+          }
+          if (!creating || !current) saveTaxonomyEntry(data, key, entry, current?.id);
+          if (kind === "brand") {
+            const categoryId = String(input.categoryId || "");
+            const linked = collections.categories.find((row) => row.id === categoryId);
+            if (categoryId && !linked) throw Object.assign(new Error("Category not found."), { statusCode: 404 });
+            if (current && current.id !== entry.id) {
+              data.categories = (data.categories || []).map((row) => ({
+                ...row, brandIds: row.brandIds?.map((value) => value === current.id ? entry.id : value)
+              }));
+            }
+            if (linked) saveTaxonomyEntry(data, "categories", {
+              ...linked, brandIds: [...new Set([...(linked.brandIds || []), entry.id])]
+            });
+          }
+          audit(data, "catalog_label_saved", kind, entry.id, entry.nameEn);
+          return entry;
         });
-        send(response, 200, result); return true;
+        send(response, creating ? 201 : 200, result);
+        return true;
       }
       if (adminPath === "/coupons" && method === "GET") { const data = await state(env); send(response, 200, { items: data.coupons }); return true; }
       if (adminPath === "/coupons" && method === "POST") { const input = await body(request); const result = await change(env, (data) => { const code = String(input.code || "").trim().toUpperCase(); const value = Number(input.value); const maxUses = input.maxUses === "" || input.maxUses === undefined ? null : Number(input.maxUses); const minimum = input.minSubtotal === "" || input.minSubtotal === undefined ? 0 : Number(input.minSubtotal); if (!/^[A-Z0-9_-]{3,20}$/.test(code) || !["percent", "flat"].includes(input.type) || !Number.isFinite(value) || value <= 0 || (input.type === "percent" && value > 100)) throw Object.assign(new Error("Check promotion code and discount value."), { statusCode: 400 }); if (maxUses !== null && (!Number.isInteger(maxUses) || maxUses < 1 || maxUses > 1000000)) throw Object.assign(new Error("Maximum uses must be a positive whole number."), { statusCode: 400 }); if (!Number.isFinite(minimum) || minimum < 0) throw Object.assign(new Error("Minimum order amount cannot be negative."), { statusCode: 400 }); if (input.expiresAt && !/^\d{4}-\d{2}-\d{2}$/.test(input.expiresAt)) throw Object.assign(new Error("Enter a valid expiration date."), { statusCode: 400 }); if (data.coupons.some((c) => c.code === code)) throw Object.assign(new Error("That code already exists."), { statusCode: 409 }); const item = { id: randomBytes(6).toString("hex"), code, type: input.type, value: input.type === "flat" ? Math.round(value * 100) : Math.round(value), minSubtotalPaise: Math.round(minimum * 100), maxUses, usesCount: 0, active: true, expiresAt: input.expiresAt || null, createdAt: now() }; data.coupons.push(item); audit(data, "coupon_created", "coupon", item.id, code); return item; }); send(response, 201, result); return true; }
       const couponRoute = adminPath.match(/^\/coupons\/([^/]+)$/);
       if (couponRoute && method === "PATCH") { const input = await body(request); const result = await change(env, (data) => { const item = data.coupons.find((row) => row.id === couponRoute[1]); if (!item) throw Object.assign(new Error("Promotion not found."), { statusCode: 404 }); item.active = input.active === true || input.active === "true"; audit(data, "coupon_status_changed", "coupon", item.id, item.active ? "activated" : "paused"); return item; }); send(response, 200, result); return true; }
-      if (couponRoute && method === "DELETE") { await change(env, (data) => { data.coupons = data.coupons.filter((item) => item.id !== couponRoute[1]); audit(data, "coupon_deleted", "coupon", couponRoute[1], "Promotion removed"); }); send(response, 200, { ok: true }); return true; }
+      if (couponRoute && method === "DELETE") { await change(env, (data) => { audit(data, "coupon_deleted", "coupon", couponRoute[1], "Promotion removed"); data.coupons = data.coupons.filter((item) => item.id !== couponRoute[1]); }); send(response, 200, { ok: true }); return true; }
       if (adminPath === "/service-areas" && method === "GET") { const data = await state(env); send(response, 200, { items: data.serviceAreas }); return true; }
       if (adminPath === "/service-areas" && method === "POST") { const input = await body(request); const result = await change(env, (data) => { const pincode = String(input.pincode || "").trim(); if (!/^\d{6}$/.test(pincode)) throw Object.assign(new Error("PIN code must have 6 digits."), { statusCode: 400 }); if (data.serviceAreas.some((area) => area.pincode === pincode)) throw Object.assign(new Error("That PIN code is already configured."), { statusCode: 409 }); const area = { id: randomBytes(6).toString("hex"), pincode, city: String(input.city || "").slice(0, 80), feePaise: Math.max(0, Math.round(Number(input.feeRupees || 0) * 100)), estimate: String(input.estimate || "").slice(0, 80), active: true }; data.serviceAreas.push(area); audit(data, "service_area_added", "service-area", area.id, pincode); return area; }); send(response, 201, result); return true; }
       const areaRoute = adminPath.match(/^\/service-areas\/([^/]+)$/);
-      if (areaRoute && method === "DELETE") { await change(env, (data) => { data.serviceAreas = data.serviceAreas.filter((item) => item.id !== areaRoute[1]); audit(data, "service_area_removed", "service-area", areaRoute[1], "PIN code removed"); }); send(response, 200, { ok: true }); return true; }
+      if (areaRoute && method === "DELETE") { await change(env, (data) => { audit(data, "service_area_removed", "service-area", areaRoute[1], "PIN code removed"); data.serviceAreas = data.serviceAreas.filter((item) => item.id !== areaRoute[1]); }); send(response, 200, { ok: true }); return true; }
       if (adminPath === "/support" && method === "GET") { const data = await state(env); send(response, 200, { items: data.supportRequests }); return true; }
       const supportRoute = adminPath.match(/^\/support\/([^/]+)$/);
       if (supportRoute && method === "PATCH") { const input = await body(request); const result = await change(env, (data) => { const item = data.supportRequests.find((row) => row.id === supportRoute[1]); if (!item) throw Object.assign(new Error("Request not found."), { statusCode: 404 }); item.status = input.status === "resolved" ? "resolved" : "in_progress"; audit(data, "support_request_updated", "support", item.id, item.status); return item; }); send(response, 200, result); return true; }

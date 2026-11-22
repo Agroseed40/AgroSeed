@@ -1,0 +1,13 @@
+Demo catalog imagery sources
+
+The following downloaded PNGs are used only as illustrative demo product images. They are not official AgroSeed packaging. Replace them with the exact product pack photos before publishing real products.
+
+Seed packet photos by Karen Arnold, PublicDomainPictures.net; each listed source page identifies the image as CC0 Public Domain:
+- tomato-seeds.png — https://www.publicdomainpictures.net/en/view-image.php?image=406876&picture=seed-packet-vintage-tomato
+- carrot-seeds.png — https://www.publicdomainpictures.net/en/view-image.php?image=406865&picture=seed-packet-vintage-carrots
+- watermelon-seeds.png — https://www.publicdomainpictures.net/en/view-image.php?image=406877&picture=seed-packet-vintage-fruit
+- thyme-seeds.png — https://www.publicdomainpictures.net/en/view-image.php?image=406875&picture=seed-packet-vintage-thyme
+- onion-seeds.png — https://www.publicdomainpictures.net/en/view-image.php?image=406873&picture=seed-packet-vintage-onions
+
+
+The source pages describe these images as CC0/public domain for reuse. The source site notes that depicted product designs can have separate third-party rights; these photos are therefore labelled as illustrative demo art in product alt text and descriptions.

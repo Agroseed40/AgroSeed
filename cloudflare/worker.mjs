@@ -173,7 +173,7 @@ async function handleRequest(request, env) {
 function secureResponse(response, request) {
   const headers = new Headers(response.headers);
   headers.set("Content-Security-Policy", "frame-ancestors 'none'");
-  headers.set("Permissions-Policy", "camera=(), geolocation=(), microphone=()");
+  headers.set("Permissions-Policy", "camera=(), geolocation=(self), microphone=()");
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   headers.set("X-Frame-Options", "DENY");
   headers.set("X-Content-Type-Options", "nosniff");

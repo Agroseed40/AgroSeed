@@ -1,0 +1,21 @@
+name: AgroSeed Add Address Browser QA
+on:
+  push:
+    branches: [codex/address-add-browser-diagnosis-2026-11-22]
+  workflow_dispatch:
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install browser automation
+        run: npm install --no-save playwright
+      - name: Install Chromium
+        run: npx playwright install chromium
+      - name: Reproduce Add Address with simulated customer
+        run: node scripts/qa-address-e2e.mjs

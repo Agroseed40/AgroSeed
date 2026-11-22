@@ -24,7 +24,10 @@ test("Worker does not send HSTS over HTTP", async () => {
 
 test("Worker preserves storefront document responses while adding headers", async () => {
   const html = "<!doctype html><title>AgroSeed</title>";
-  const env = { ASSETS: { fetch: async () => new Response(html, { headers: { "content-type": "text/html" } }) } };
+  const env = { ASSETS: { fetch: async request => {
+    assert.equal(new URL(request.url).pathname, "/app");
+    return new Response(html, { headers: { "content-type": "text/html" } });
+  } } };
   const response = await worker.fetch(new Request("https://agroseed.example/"), env);
 
   assert.equal(response.status, 200);

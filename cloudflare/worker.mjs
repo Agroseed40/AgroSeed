@@ -160,7 +160,7 @@ async function handleRequest(request, env) {
 
     if (isAppRoute(pathname)) {
       if (env.ASSETS) {
-        const appRequest = new Request(new URL("/app.html", request.url), request);
+        const appRequest = new Request(new URL("/app", request.url), request);
         return env.ASSETS.fetch(appRequest);
       }
       return staticResponse(request, "/app.html");

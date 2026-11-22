@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - codex/agroseed-live-safe-sync-2026-11-22
+      - codex/agroseed-address-fix-2026-11-22
   workflow_dispatch:
 jobs:
   validate:

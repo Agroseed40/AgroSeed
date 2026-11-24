@@ -3,15 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "description": "AgroSeed storefront on Cloudflare Workers with D1",
-  "main": "cloudflare/worker.mjs",
+  "main": "cloudflare/deployed-worker.mjs",
   "engines": {
     "node": "22.x"
   },
   "scripts": {
-    "build": "node scripts/embed-worker-assets.mjs && wrangler deploy --dry-run",
-    "start": "node scripts/embed-worker-assets.mjs && wrangler dev",
-    "dev": "node scripts/embed-worker-assets.mjs && wrangler dev",
-    "deploy": "node scripts/embed-worker-assets.mjs && wrangler deploy"
+    "build": "wrangler deploy --dry-run",
+    "start": "wrangler dev",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
   },
   "devDependencies": {
     "wrangler": "^4.164.0"
